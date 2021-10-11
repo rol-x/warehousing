@@ -10,17 +10,11 @@ services:
       - webdriver
     command: python -u ./main.py
     volumes:
-      -  -data:/data
-      - gathering-logs:/logs
+      - ./data:/data
+      - ./logs:/logs
 
   webdriver:
     image: selenium/standalone-firefox
     container_name: firefox-webdriver
     ports:
       - "4444:4444"
-
-volumes:
-  gathering-data:
-    name: gathering-data
-  gathering-logs:
-    name: gathering-logs
