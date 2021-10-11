@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+
   gathering:
     image: the-gathering
     container_name: data-gathering
@@ -9,7 +10,7 @@ services:
       - webdriver
     command: python -u ./main.py
     volumes:
-      - gathering-data:/data
+      -  -data:/data
       - gathering-logs:/logs
 
   webdriver:
