@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  gathering:
+    image: the-gathering
+    container_name: data-gathering
+    shm_size: 2gb
+    depends_on:
+      - webdriver
+    command: python -u ./main.py
+    volumes:
+      - gathering-data:/data
+      - gathering-logs:/logs
+
+  webdriver:
+    image: selenium/standalone-firefox
+    container_name: firefox-webdriver
+    ports:
+      - "4444:4444"
+
+volumes:
+  gathering-data:
+    name: gathering-data
+  gathering-logs:
+    name: gathering-logs
