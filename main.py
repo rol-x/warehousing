@@ -16,6 +16,10 @@ from etl.handlers.web_handler import (add_sellers_from_set,
 # TODO: Look into handling of wild Firefox processes.
 # TODO: Change singular to plural in entities use, not in model.
 
+# Docker containers startup commands
+# docker run --rm --network the-gathering -v gathering-data:/data -v gathering-logs:/logs the-gathering
+# docker run -d --network the-gathering --network-alias=webdriver -p 4444:4444 selenium/standalone-firefox
+
 # Main function
 if __name__ == "__main__":
 

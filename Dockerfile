@@ -8,5 +8,5 @@ RUN pip install selenium
 
 EXPOSE 4444
 
-CMD [ "python", "./main.py" ]
+CMD [ "python", "-u", "./main.py" ]
 
