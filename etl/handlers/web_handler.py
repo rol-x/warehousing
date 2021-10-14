@@ -1,3 +1,4 @@
+import os
 from random import normalvariate, random
 from time import sleep, time
 
@@ -8,6 +9,7 @@ from etl.handlers.data_handler import load_df
 from etl.handlers.log_handler import log, log_url
 from selenium import common, webdriver
 from selenium.webdriver.firefox.options import Options
+from urllib3.exceptions import MaxRetryError
 
 
 # Return the Firefox webdriver in headless mode.
@@ -15,10 +17,16 @@ def create_webdriver():
     '''Return the Firefox webdriver in headless mode.'''
     options = Options()
     options.headless = True
-    driver = webdriver.Remote("http://" + globals.webdriver_hostname
-                              + ":4444/wd/hub", options=options)
-    log('Webdriver ready\n')
-    return driver
+    try:
+        driver = webdriver.Remote("http://" + globals.webdriver_hostname
+                                + ":4444/wd/hub", options=options)
+        log('Webdriver ready\n')
+        return driver
+    except MaxRetryError as exception:
+        log(exception)
+        log('The connection to remote webdriver failed. Check if the container is running.\n')
+        log('If it is, check the hostname in etl/globals.py and other configuration settings.\n')
+        os.system.exit('Webdriver connection failed - aborting.')
 
 
 # Return the Firefox webdriver in headless mode.
