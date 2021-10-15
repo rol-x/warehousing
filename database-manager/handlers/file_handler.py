@@ -1,10 +1,9 @@
 import os
-import subprocess
 
 import pandas as pd
+from checksumdir import dirhash
 
 from handlers.log_handler import log
-from checksumdir import dirhash
 
 
 # Try to securely load a dataframe from a .csv file.
@@ -19,9 +18,12 @@ def secure_load_df(entity_name):
     return df
 
 
-# Generate a hash based on the contents of data directory
+# Return generated hash based on the contents of data directory
 def generate_data_hash():
-    sha1_hash = dirhash('./data', 'sha1')
-    with open('./database-manager/data-checksum.sha1', 'w+') as hash_file:
-        hash_file.write(sha1_hash)
-    return sha1_hash
+    return str(dirhash('./data', 'sha1'))
+
+
+# Save given data hash to an external file
+def save_hash(hash):
+    with open('data-checksum.sha1', 'w+') as hash_file:
+        hash_file.write(hash)

@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - data-gathering
-    command: bash -c 'if [[ "$$(sha1sum ./data/* | sha1sum)" == "$$(cat ./data-checksum.sha1)" ]]; then sleep 60; else echo File change detected; echo "$$(sha1sum ./data/* | sha1sum)"; python -u ./main.py; fi'
+    command: python -u ./main.py
     volumes:
       - ./data:/data
       - ./logs:/logs
