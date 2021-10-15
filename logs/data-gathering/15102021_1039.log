@@ -1,0 +1,63 @@
+10:39:22:  = Creation of this file = 
+
+10:39:22: Date 15/10/2021 already added (date ID: 18)
+10:39:25: Webdriver ready
+
+10:39:27: Local data validated (removed 0 records)
+
+10:39:27: Task - Getting all card names from current expansion
+10:39:28: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=1
+10:39:28: Done - All card names from Battlebond saved
+
+10:39:28:  == Skyshroud Claim ==    (1/264  0.38%)
+10:39:33: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Skyshroud-Claim
+10:39:33:                 Expanding page...
+
+10:39:37:  = Card stats = 
+10:39:37: Card ID:  1
+10:39:37: Already saved today
+
+10:39:37:  = Sellers = 
+10:39:37: Task - Updating sellers
+10:39:37: Done - 0 new sellers saved  (out of: 139, total: 6682)
+
+10:39:37:  = Offers = 
+10:39:37: Task - Updating sale offers
+10:39:42: Done - 153 sale offers saved  (before: 153, total: 374558)
+
+
+10:39:42:  == Impulse ==    (2/264  0.76%)
+10:39:46: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Impulse
+10:39:46:                 Expanding page...
+
+10:39:55:  = Card stats = 
+10:39:55: Card ID:  2
+10:39:55: Already saved today
+
+10:39:55:  = Sellers = 
+10:39:55: Task - Updating sellers
+10:39:55: Done - 0 new sellers saved  (out of: 350, total: 6682)
+
+10:39:55:  = Offers = 
+10:39:55: Task - Updating sale offers
+10:40:02: Done - 386 sale offers saved  (before: 386, total: 374558)
+
+
+10:40:02:  == Zndrsplt, Eye of Wisdom ==    (3/264  1.14%)
+10:40:06: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Zndrsplt-Eye-of-Wisdom
+10:40:06:                 Expanding page...
+
+10:40:14:  = Card stats = 
+10:40:14: Card ID:  3
+10:40:14: Already saved today
+
+10:40:14:  = Sellers = 
+10:40:14: Task - Updating sellers
+10:40:15: Done - 0 new sellers saved  (out of: 327, total: 6682)
+
+10:40:15:  = Offers = 
+10:40:15: Task - Updating sale offers
+10:40:22: Done - 381 sale offers saved  (before: 381, total: 374558)
+
+
+10:40:22:  == Chain Lightning ==    (4/264  1.52%)

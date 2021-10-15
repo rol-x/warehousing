@@ -1,0 +1,75 @@
+10:54:06:  = Creation of this file = 
+
+10:54:06: Date 15/10/2021 already added (date ID: 18)
+10:54:08: Webdriver ready
+
+10:54:11: Local data validated (removed 0 records)
+
+10:54:11: Task - Getting all card names from current expansion
+10:54:12: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=1
+10:54:13: Done - All card names from Battlebond saved
+
+10:54:13:  == Skyshroud Claim ==    (1/264  0.38%)
+10:54:16: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Skyshroud-Claim
+10:54:16:                 Expanding page...
+
+10:54:22:  = Card stats = 
+10:54:22: Card ID:  1
+10:54:22: Already saved today
+
+10:54:22:  = Sellers = 
+10:54:22: Task - Updating sellers
+10:54:22: Done - 0 new sellers saved  (out of: 139, total: 6682)
+
+10:54:22:  = Offers = 
+10:54:22: Task - Updating sale offers
+10:54:27: Done - 153 sale offers saved  (before: 153, total: 375547)
+
+
+10:54:27:  == Impulse ==    (2/264  0.76%)
+10:54:54:  = Separate code execution = 
+
+10:54:54: Date 15/10/2021 already added (date ID: 18)
+10:54:57: Webdriver ready
+
+10:55:00: Local data validated (removed 0 records)
+
+10:55:00: Task - Getting all card names from current expansion
+10:55:01: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=1
+10:55:01: Done - All card names from Battlebond saved
+
+10:55:01:  == Skyshroud Claim ==    (1/264  0.38%)
+10:55:06: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Skyshroud-Claim
+10:55:06:                 Expanding page...
+
+10:55:10:  = Card stats = 
+10:55:10: Card ID:  1
+10:55:10: Already saved today
+
+10:55:10:  = Sellers = 
+10:55:10: Task - Updating sellers
+10:55:10: Done - 0 new sellers saved  (out of: 139, total: 6682)
+
+10:55:10:  = Offers = 
+10:55:10: Task - Updating sale offers
+10:55:15: Done - 153 sale offers saved  (before: 153, total: 375547)
+
+
+10:55:15:  == Impulse ==    (2/264  0.76%)
+10:55:18: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Impulse
+10:55:18:                 Expanding page...
+
+10:55:28:  = Card stats = 
+10:55:28: Card ID:  2
+10:55:28: Already saved today
+
+10:55:28:  = Sellers = 
+10:55:28: Task - Updating sellers
+10:55:28: Done - 0 new sellers saved  (out of: 350, total: 6682)
+
+10:55:28:  = Offers = 
+10:55:28: Task - Updating sale offers
+10:55:36: Done - 386 sale offers saved  (before: 386, total: 375547)
+
+
+10:55:36:  == Zndrsplt, Eye of Wisdom ==    (3/264  1.14%)

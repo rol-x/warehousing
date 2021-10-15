@@ -1,10 +1,10 @@
-import etl.globals as globals
+import globals
 import numpy as np
 import pandas as pd
-from etl.entity.card import get_card_ID
-from etl.entity.seller import get_seller_ID
-from etl.handlers.data_handler import load_df
-from etl.handlers.log_handler import log
+from entity.card import get_card_ID
+from entity.seller import get_seller_ID
+from handlers.data_handler import load_df
+from handlers.log_handler import log
 
 
 # Extract information about the offers from provided card soup.

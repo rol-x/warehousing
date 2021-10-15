@@ -2,19 +2,38 @@ version: "3.8"
 
 services:
 
-  gathering:
-    image: the-gathering
-    container_name: data-gathering
+  data_gathering:
+    container_name: data_gathering
     shm_size: 2gb
+    build:
+      context: ./data-gathering
+      dockerfile: Dockerfile
     depends_on:
-      - webdriver
+      - firefox-webdriver
     command: python -u ./main.py
     volumes:
       - ./data:/data
       - ./logs:/logs
+    ports:
+      - "4443:4443"
+      - "4442:4442"
+      - "4441:4441"
 
-  webdriver:
+  database_manager:
+    container_name: database_manager
+    build:
+      context: ./database-manager
+      dockerfile: Dockerfile
+    depends_on:
+      - data-gathering
+    command: bash -c 'if [[ "$$(sha1sum ./data/* | sha1sum)" == "$$(cat ./data-checksum.sha1)" ]]; then sleep 60; else echo File change detected; echo "$$(sha1sum ./data/* | sha1sum)"; python -u ./main.py; fi'
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    restart: always
+
+  firefox_webdriver:
+    container_name: firefox_webdriver
     image: selenium/standalone-firefox
-    container_name: firefox-webdriver
     ports:
       - "4444:4444"

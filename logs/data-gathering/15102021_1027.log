@@ -1,0 +1,100 @@
+10:27:03:  = Creation of this file = 
+
+10:27:03: Date 15/10/2021 already added (date ID: 18)
+10:27:07: Webdriver ready
+
+10:27:12: Local data validated (removed 0 records)
+
+10:27:12: Task - Getting all card names from current expansion
+10:27:13: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=1
+10:27:13: Done - All card names from Battlebond saved
+
+10:27:13:  == Skyshroud Claim ==    (1/264  0.38%)
+10:27:18: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Skyshroud-Claim
+10:27:18:                 Expanding page...
+
+10:27:23:  = Card stats = 
+10:27:23: Card ID:  1
+10:27:23: Already saved today
+
+10:27:23:  = Sellers = 
+10:27:23: Task - Updating sellers
+10:27:23: Done - 0 new sellers saved  (out of: 139, total: 6682)
+
+10:27:23:  = Offers = 
+10:27:23: Task - Updating sale offers
+10:27:30: Done - 153 sale offers saved  (before: 151, total: 882828)
+
+
+10:27:30:  == Impulse ==    (2/264  0.76%)
+10:27:34: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Impulse
+10:27:34:                 Expanding page...
+
+10:27:43:  = Card stats = 
+10:27:43: Card ID:  2
+10:27:43: Already saved today
+
+10:27:43:  = Sellers = 
+10:27:43: Task - Updating sellers
+10:27:44: Done - 0 new sellers saved  (out of: 350, total: 6682)
+
+10:27:44:  = Offers = 
+10:27:44: Task - Updating sale offers
+10:27:56: Done - 386 sale offers saved  (before: 384, total: 882830)
+
+
+10:27:56:  == Zndrsplt, Eye of Wisdom ==    (3/264  1.14%)
+10:28:00: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Zndrsplt-Eye-of-Wisdom
+10:28:00:                 Expanding page...
+
+10:28:09:  = Card stats = 
+10:28:09: Card ID:  3
+10:28:09: Already saved today
+
+10:28:09:  = Sellers = 
+10:28:09: Task - Updating sellers
+10:28:10: Done - 0 new sellers saved  (out of: 327, total: 6682)
+
+10:28:10:  = Offers = 
+10:28:10: Task - Updating sale offers
+10:28:21: Done - 381 sale offers saved  (before: 379, total: 882832)
+
+
+10:28:21:  == Chain Lightning ==    (4/264  1.52%)
+10:28:25: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Chain-Lightning
+10:28:25:                 Expanding page...
+
+10:28:30:  = Card stats = 
+10:28:30: Card ID:  4
+10:28:30: Already saved today
+
+10:28:30:  = Sellers = 
+10:28:30: Task - Updating sellers
+10:28:30: Done - 0 new sellers saved  (out of: 149, total: 6682)
+
+10:28:30:  = Offers = 
+10:28:30: Task - Updating sale offers
+10:28:38: Done - 157 sale offers saved  (before: 157, total: 882832)
+
+
+10:28:38:  == Stolen Strategy ==    (5/264  1.89%)
+10:28:42: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Stolen-Strategy
+10:28:42:                 Expanding page...
+
+10:28:45:  = Card stats = 
+10:28:45: Card ID:  5
+10:28:45: Already saved today
+
+10:28:45:  = Sellers = 
+10:28:45: Task - Updating sellers
+10:28:46: Done - 0 new sellers saved  (out of: 112, total: 6682)
+
+10:28:46:  = Offers = 
+10:28:46: Task - Updating sale offers
+10:28:53: Done - 128 sale offers saved  (before: 127, total: 882833)
+
+
+10:28:53:  == Azra Oddsmaker ==    (6/264  2.27%)
+10:28:57: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Azra-Oddsmaker
+10:28:57:                 Expanding page...
+

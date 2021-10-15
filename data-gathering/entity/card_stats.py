@@ -1,6 +1,6 @@
-import etl.globals as globals
-from etl.handlers.data_handler import load_df
-from etl.handlers.log_handler import log
+import globals as globals
+from handlers.data_handler import load_df
+from handlers.log_handler import log
 
 
 # Extract information about card statistics from provided soup.

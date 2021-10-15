@@ -1,9 +1,9 @@
 """Manage the local files with data stored in .csv format."""
 import os
 
-import etl.globals as globals
+import globals
 import pandas as pd
-from etl.handlers.log_handler import log
+from handlers.log_handler import log
 
 
 # Load and validate local files, returning the number of removed rows.

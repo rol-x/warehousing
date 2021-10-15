@@ -2,11 +2,11 @@ import os
 from random import normalvariate, random
 from time import sleep, time
 
-import etl.globals as globals
+import globals
 from bs4 import BeautifulSoup
-from etl.entity.seller import add_seller
-from etl.handlers.data_handler import load_df
-from etl.handlers.log_handler import log, log_url
+from entity.seller import add_seller
+from handlers.data_handler import load_df
+from handlers.log_handler import log, log_url
 from selenium import common, webdriver
 from selenium.webdriver.firefox.options import Options
 from urllib3.exceptions import MaxRetryError
@@ -24,9 +24,9 @@ def create_webdriver():
         return driver
     except MaxRetryError as exception:
         log(exception)
-        log('The connection to remote webdriver failed. Check if the container is running.\n')
-        log('If it is, check the hostname in etl/globals.py and other configuration settings.\n')
-        os.system.exit('Webdriver connection failed - aborting.')
+        log('The connection to remote webdriver failed. Check if the container is running.')
+        log('If it is, check the hostname in globals.py and other connection settings.\n')
+        raise SystemExit
 
 
 # Return the Firefox webdriver in headless mode.

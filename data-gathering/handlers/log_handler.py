@@ -1,7 +1,7 @@
 """Scrape the card market website to get all the neccessary data."""
 from datetime import datetime
 
-import etl.globals as globals
+import globals
 
 
 # Log the current url to the console and log file.
@@ -14,7 +14,7 @@ def log_url(url):
 def log(msg):
     '''Log a message to a local file and the console.'''
     msg = str(msg)
-    with open('logs/' + globals.log_filename, 'a', encoding="utf-8") \
+    with open('logs/data-gathering/' + globals.log_filename, 'a+', encoding="utf-8") \
             as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         logfile.write(timestamp + ": " + msg + "\n")

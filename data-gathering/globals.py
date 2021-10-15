@@ -6,7 +6,7 @@ button_timeout = 120.0
 expansion_name = 'Battlebond'
 max_tries = 3
 start_from = 1
-webdriver_hostname = 'webdriver'
+webdriver_hostname = 'firefox_webdriver'
 
 # Variables connected to this single run of the code
 log_filename = 'init.log'

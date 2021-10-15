@@ -1,0 +1,7 @@
+11:02:07:  = Creation of this file = 
+
+11:02:07: Date 15/10/2021 already added (date ID: 18)
+11:02:18: HTTPConnectionPool(host='webdriver', port=4444): Max retries exceeded with url: /wd/hub/session (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001F8EA8E6EE0>: Failed to establish a new connection: [Errno 11001] getaddrinfo failed'))
+11:02:18: The connection to remote webdriver failed. Check if the container is running.
+11:02:18: If it is, check the hostname in etl/globals.py and other configuration settings.
+

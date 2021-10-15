@@ -1,9 +1,9 @@
 import os
 from datetime import datetime
 
-import etl.globals as globals
-from etl.handlers.data_handler import load_df
-from etl.handlers.log_handler import log
+import globals
+from handlers.data_handler import load_df
+from handlers.log_handler import log
 
 
 # Prepare the local log files.
@@ -11,10 +11,12 @@ def prepare_log_files():
     '''Prepare the local log files.'''
     if not os.path.exists('logs'):
         os.mkdir('logs')
+        if not os.path.exists('logs'):
+            os.mkdir('logs/data-gathering')
         print("Logs directory created")
 
-    logfile = open('logs/' + globals.log_filename, "a+", encoding="utf-8")
-    if os.path.getsize('logs/' + globals.log_filename):
+    logfile = open('logs/data-gathering/' + globals.log_filename, "a+", encoding="utf-8")
+    if os.path.getsize('logs/data-gathering/' + globals.log_filename):
         log(" = Separate code execution = \n")
     else:
         log(" = Creation of this file = \n")

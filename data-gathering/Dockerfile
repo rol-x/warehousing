@@ -1,7 +1,6 @@
 FROM python:3
 
-COPY ./etl ./etl
-COPY main.py .
+COPY . .
 
 RUN pip install pandas
 RUN pip install beautifulSoup4
