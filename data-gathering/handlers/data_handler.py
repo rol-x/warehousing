@@ -165,11 +165,28 @@ def get_size(entity_name):
     return len(entity_df.index)
 
 
+# Set up the file with information about ongoing update.
+def set_update_flag():
+    '''Set up the file with information about ongoing update.'''
+    update_flag = open('data/update_flag', 'w')
+    update_flag.write('1')
+    update_flag.close()
+
+
+# Update the flag about the end of the update
+def reset_update_flag():
+    update_flag = open('data/update_flag', 'w')
+    update_flag.write('0')
+    update_flag.close()
+
+
 # Prepare .csv files for storing the scraped data locally
 def prepare_files():
     '''Prepare .csv files for storing the scraped data locally.'''
     if not os.path.exists('data'):
         os.mkdir('data')
+
+    set_update_flag()
 
     seller_csv = open('data/seller.csv', 'a+', encoding="utf-8")
     if not os.path.getsize('data/seller.csv'):

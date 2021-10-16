@@ -90,7 +90,7 @@ def add_offers(card_page):
         offers_dict['amount'].append(amount)
         offers_dict['date_ID'].append(globals.this_date_ID)
 
-        for key in offers_dict.keys:
+        for key in offers_dict.keys():
             if len(offers_dict[key]) == 0:
                 log("Faulty offer set! No entrys for key: " + key)
                 return
@@ -110,12 +110,12 @@ def update_offers(offers_dict):
     all.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
-    new_all = pd.concat([all, scraped]).reset_index(drop=True).drop_duplicates()
+    fresh = pd.concat([all, scraped]).reset_index(drop=True).drop_duplicates()
     filename = 'sale_offer{suffix}.csv' \
         .format(suffix=f"_{globals.file_part}"
                 if globals.file_part > 1 else "")
-    new_all.to_csv(f'data/{filename}', ';', index=False)
+    fresh.to_csv(f'data/{filename}', ';', index=False)
 
     # Log task finished
-    log(f"Done - {len(new_all) - len(all)} sale offers saved  (before: "
-        + f"{len(this_card_today)}, total: {len(new_all)})\n\n")
+    log(f"Done - {len(fresh) - len(all)} sale offers saved  (before: "
+        + f"{len(this_card_today)}, total: {len(fresh)})\n\n")

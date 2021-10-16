@@ -19,13 +19,15 @@ def create_webdriver():
     options.headless = True
     try:
         driver = webdriver.Remote("http://" + globals.webdriver_hostname
-                                + ":4444/wd/hub", options=options)
+                                  + ":4444/wd/hub", options=options)
         log('Webdriver ready\n')
         return driver
     except MaxRetryError as exception:
         log(exception)
-        log('The connection to remote webdriver failed. Check if the container is running.')
-        log('If it is, check the hostname in globals.py and other connection settings.\n')
+        log('The connection to remote webdriver failed. '
+            + 'Check if the container is running.')
+        log('If it is, check the hostname in globals.py '
+            + 'and other connection settings.\n')
         raise SystemExit
 
 
