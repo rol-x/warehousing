@@ -3371,3 +3371,40 @@
 00:38:00: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Noxious-Dragon
 00:38:00:                 Expanding page...
 
+00:38:12: == Add card stats ==
+00:38:12: Card ID:       194
+00:38:12: Price from:    0.02
+00:38:12: 30-day avg:    0.08
+00:38:12: 7-day avg:     0.06
+00:38:12: 1-day avg:     0.06
+00:38:12: Amount:        2879
+00:38:12: Date ID:       18
+
+00:38:12:  = Sellers = 
+00:38:12: Task - Updating sellers
+00:38:12: Done - 0 new sellers saved  (out of: 385, total: 6700)
+
+00:38:12:  = Offers = 
+00:38:12: Task - Updating sale offers
+00:38:22: Done - 445 sale offers saved  (before: 0, total: 447125)
+
+
+00:38:22:  == Screeching Buzzard ==    (195/264  73.86%)
+00:38:26: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Screeching-Buzzard
+00:38:26:                 Expanding page...
+
+00:38:41: == Add card stats ==
+00:38:41: Card ID:       195
+00:38:41: Price from:    0.01
+00:38:41: 30-day avg:    0.03
+00:38:41: 7-day avg:     0.07
+00:38:41: 1-day avg:     0.02
+00:38:41: Amount:        4889
+00:38:41: Date ID:       18
+
+00:38:41:  = Sellers = 
+00:38:41: Task - Updating sellers
+00:38:41: Done - 0 new sellers saved  (out of: 439, total: 6700)
+
+00:38:41:  = Offers = 
+00:38:41: Task - Updating sale offers
