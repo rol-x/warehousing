@@ -33,6 +33,7 @@ def register_change():
 
 # Main function
 if __name__ == '__main__':
+    time.sleep(60)
     while True:
         register_change()
         log("Database update here")
