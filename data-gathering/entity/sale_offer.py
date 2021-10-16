@@ -75,8 +75,8 @@ def add_offers(card_page):
             condition = offer_attrs[0]
             card_lang = offer_attrs[1]
         else:
-            condition = np.nan
-            card_lang = np.nan
+            condition = ''
+            card_lang = ''
             log("Incomplete card attributes!")
 
         # Load the entry into the dictionary
@@ -90,6 +90,11 @@ def add_offers(card_page):
         offers_dict['amount'].append(amount)
         offers_dict['date_ID'].append(globals.this_date_ID)
 
+        for key in offers_dict.keys:
+            if len(offers_dict[key]) == 0:
+                log("Faulty offer set! No entrys for key: " + key)
+                return
+
     update_offers(offers_dict)
 
 
@@ -99,13 +104,13 @@ def update_offers(offers_dict):
 
     # Load and drop today's sales data for this card
     all = load_df('sale_offer')
-    read = pd.DataFrame(offers_dict)
-    this_card_today = all[(all['card_ID'] == read['card_ID'].values[0])
+    scraped = pd.DataFrame(offers_dict)
+    this_card_today = all[(all['card_ID'] == scraped['card_ID'].values[0])
                           & (all['date_ID'] == globals.this_date_ID)]
     all.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
-    new_all = pd.concat([all, read]).reset_index(drop=True).drop_duplicates()
+    new_all = pd.concat([all, scraped]).reset_index(drop=True).drop_duplicates()
     filename = 'sale_offer{suffix}.csv' \
         .format(suffix=f"_{globals.file_part}"
                 if globals.file_part > 1 else "")
