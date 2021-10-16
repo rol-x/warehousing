@@ -15,11 +15,13 @@ def register_change():
         this_hash = generate_data_hash()
 
     # Every thirty seconds check whether the update flag is active
-    while(open("data/update_flag", "r").readline() == '1'):
+    log("Change in data files detected")
+    while(open("./data/update_flag", "r").readline() == '1'):
         time.sleep(30)
 
     # On finished update or data migration the files are static
-    log("File change detected")
+    this_hash = generate_data_hash()
+    log("Changes ready to commence")
     log("Old hash: " + last_hash)
     log("New hash: " + this_hash)
     log("Saving new hash to the file")
