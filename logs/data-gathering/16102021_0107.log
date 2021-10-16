@@ -3456,3 +3456,32 @@
 
 02:12:57:  = Offers = 
 02:12:57: Task - Updating sale offers
+02:13:12: Done - 459 sale offers saved  (before: 0, total: 503321)
+
+
+02:13:12:  == Angelic Gift ==    (158/264  59.85%)
+02:13:16: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Angelic-Gift
+02:13:16:                 Expanding page...
+
+02:13:34: == Add card stats ==
+02:13:34: Card ID:       158
+02:13:34: Price from:    0.01
+02:13:34: 30-day avg:    0.05
+02:13:34: 7-day avg:     0.08
+02:13:34: 1-day avg:     0.10
+02:13:34: Amount:        4860
+02:13:34: Date ID:       19
+
+02:13:34:  = Sellers = 
+02:13:34: Task - Updating sellers
+02:13:35: Done - 0 new sellers saved  (out of: 429, total: 6701)
+
+02:13:35:  = Offers = 
+02:13:35: Task - Updating sale offers
+02:13:50: Done - 523 sale offers saved  (before: 0, total: 503844)
+
+
+02:13:50:  == Solemn Offering ==    (159/264  60.23%)
+02:13:54: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Solemn-Offering
+02:13:54:                 Expanding page...
+
