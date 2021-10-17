@@ -15,7 +15,8 @@ def schedule_run():
     time.sleep(20)
     date = load_df('date')
     now = datetime.now()
-    last_date = date[date['date_ID'] == date['date_ID'].max()]
+    last_date = date[date['date_ID'] == date['date_ID'].max()] \
+        .index[0]
     while last_date['day'] == now.day and \
         last_date['month'] == now.month and \
             last_date['year'] == now.year:
