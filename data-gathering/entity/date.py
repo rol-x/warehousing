@@ -15,7 +15,8 @@ def prepare_log_files():
             os.mkdir('logs/data-gathering')
         print("Logs directory created")
 
-    logfile = open('logs/data-gathering/' + globals.log_filename, "a+", encoding="utf-8")
+    logfile = open('logs/data-gathering/' + globals.log_filename,
+                   "a+", encoding="utf-8")
     if os.path.getsize('logs/data-gathering/' + globals.log_filename):
         log(" = Separate code execution = \n")
     else:

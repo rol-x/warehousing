@@ -12,9 +12,15 @@ from handlers.log_handler import log
 # Check the time and files status to run the code once a day.
 def schedule_run():
     '''Check the time and files status to run the code once a day.'''
-    now = datetime.now()
     time.sleep(20)
-    log(now)
+    date = load_df('date')
+    now = datetime.now()
+    last_date = date[date['date_ID'] == date['date_ID'].max()]
+    while last_date['day'] == now.day and \
+        last_date['month'] == now.month and \
+            last_date['year'] == now.year:
+        time.sleep(60 * 30)
+        now = datetime.now()
 
     # get newest date_id, check how much data is saved under it, run the code
     # if date_id.date < now.date : run the first run of the code
