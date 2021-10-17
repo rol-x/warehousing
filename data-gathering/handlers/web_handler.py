@@ -1,15 +1,15 @@
-import os
 from random import normalvariate, random
 from time import sleep, time
 
 import globals
 from bs4 import BeautifulSoup
 from entity.seller import add_seller
-from handlers.data_handler import load_df
-from handlers.log_handler import log, log_url
 from selenium import common, webdriver
 from selenium.webdriver.firefox.options import Options
 from urllib3.exceptions import MaxRetryError
+
+from handlers.data_handler import load_df, reset_update_flag
+from handlers.log_handler import log, log_url
 
 
 # Return the Firefox webdriver in headless mode.
@@ -28,6 +28,7 @@ def create_webdriver():
             + 'Check if the container is running.')
         log('If it is, check the hostname in globals.py '
             + 'and other connection settings.\n')
+        reset_update_flag()
         raise SystemExit
 
 
@@ -175,10 +176,10 @@ def click_load_more_button(driver):
             return False
         except common.exceptions.ErrorInResponseException:
             return False
-        except common.exceptions.WebDriverException:
-            return False
         except common.exceptions.InvalidSessionIdException:
             realistic_pause(globals.wait_coef)
+            return False
+        except common.exceptions.WebDriverException:
             return False
 
 
