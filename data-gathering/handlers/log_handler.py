@@ -14,9 +14,8 @@ def log_url(url):
 def log(msg):
     '''Log a message to a local file and the console.'''
     msg = str(msg)
-    with open('logs/data-gathering/'
-              + globals.log_filename, 'a+', encoding="utf-8") \
-            as logfile:
+    with open('logs/data-gathering/' + globals.log_filename,
+              'a+', encoding="utf-8") as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         logfile.write(timestamp + ": " + msg + "\n")
     print(msg)
