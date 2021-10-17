@@ -1,4 +1,3 @@
-import os
 import time
 
 import pandas as pd
@@ -14,7 +13,7 @@ def register_change():
     change_registered = False
 
     # Timeout after update over four (4) hours
-    while ~change_registered:
+    while not change_registered:
         # Every thirty (30) minutes check whether the two hashes differ
         while this_hash == last_hash:
             log("Checksums checked - no changes detected")
@@ -23,16 +22,18 @@ def register_change():
         log("Change in data files detected")
 
         # Every thirty (30) seconds check whether the update flag is active
+        timeout = False
         start = time.time()
         while open("./data/update_flag", "r").readline() == '1':
             log("Update flag active")
             if time.time() - start > 60 * 60 * 4:
                 log("Waiting for the update to end timed out")
                 reset_update_flag()
+                timeout = True
                 break
             time.sleep(30)
         log("Update flag not active")
-        if time.time() - start < 60 * 60 * 4:
+        if not timeout:
             change_registered = True
 
     # On finished update or data migration the files are static
@@ -78,5 +79,7 @@ def secure_load_df(entity_name):
                          error_bad_lines=False)
     except pd.errors.ParserError as parser_err:
         log(parser_err)
-        os.system.exit("Importing data from csv failed - aborting.\n")
+        log("Importing data from csv failed - aborting.\n")
+        reset_update_flag()
+        raise SystemExit
     return df

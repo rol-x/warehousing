@@ -3,6 +3,7 @@ import os
 
 import globals
 import pandas as pd
+
 from handlers.log_handler import log
 
 
@@ -154,7 +155,9 @@ def secure_load_df(entity_name):
                          error_bad_lines=False)
     except pd.errors.ParserError as parser_err:
         log(parser_err)
-        os.system.exit("Importing data from csv failed - aborting.\n")
+        log("Importing data from csv failed - aborting.\n")
+        reset_update_flag()
+        raise SystemExit
     return df
 
 
