@@ -1,6 +1,7 @@
 """Manage the local files with data stored in .csv format."""
 import os
 import time
+from datetime import datetime
 
 import globals
 import pandas as pd
@@ -11,7 +12,7 @@ from handlers.log_handler import log
 # Check the time and files status to run the code once a day.
 def schedule_run():
     '''Check the time and files status to run the code once a day.'''
-    now = time.now()
+    now = datetime.now()
     time.sleep(20)
     log(now)
 
