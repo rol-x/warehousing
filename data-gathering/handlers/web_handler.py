@@ -176,10 +176,10 @@ def click_load_more_button(driver):
             return False
         except common.exceptions.ErrorInResponseException:
             return False
-        except common.exceptions.WebDriverException:
-            return False
         except common.exceptions.InvalidSessionIdException:
             realistic_pause(globals.wait_coef)
+            return False
+        except common.exceptions.WebDriverException:
             return False
 
 
