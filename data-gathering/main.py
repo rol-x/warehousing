@@ -20,7 +20,7 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
 if __name__ == '__main__':
 
     # Setup
-    realistic_pause(20)
+    data_handler.schedule_run()
     data_handler.prepare_files()
     globals.this_date_ID = add_date()
     data_handler.prepare_expansion_list_file(globals.expansion_name)

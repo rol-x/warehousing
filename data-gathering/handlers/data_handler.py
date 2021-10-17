@@ -1,10 +1,24 @@
 """Manage the local files with data stored in .csv format."""
 import os
+import time
 
 import globals
 import pandas as pd
 
 from handlers.log_handler import log
+
+
+# Check the time and files status to run the code once a day.
+def schedule_run():
+    '''Check the time and files status to run the code once a day.'''
+    now = time.now()
+    time.sleep(20)
+    log(now)
+
+    # get newest date_id, check how much data is saved under it, run the code
+    # if date_id.date < now.date : run the first run of the code
+    # if date_id.date == now.date : check data validity and completeness
+    # if the data is not valid in the database : run the code
 
 
 # Load and validate local files, returning the number of removed rows.
