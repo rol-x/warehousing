@@ -3,7 +3,7 @@ import globals
 import handlers.data_handler as data_handler
 from entity.card import add_card, get_card_ID, is_card_saved
 from entity.card_stats import add_card_stats, are_card_stats_saved_today
-from entity.date import add_date
+from entity.date import add_date, prepare_daily_log_file
 from entity.sale_offer import add_offers
 from entity.seller import get_seller_names
 from handlers.log_handler import log, log_progress, log_url
@@ -20,6 +20,7 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
 if __name__ == '__main__':
     while True:
         # Setup
+        prepare_daily_log_file()
         data_handler.schedule_run()
         data_handler.prepare_files()
         globals.this_date_ID = add_date()

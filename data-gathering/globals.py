@@ -10,6 +10,7 @@ webdriver_hostname = 'firefox_webdriver'
 
 # Variables connected to this single run of the code
 log_filename = 'init.log'
+daily_logname = 'init_daily.log'
 this_date_ID = 0
 file_part = 1
 

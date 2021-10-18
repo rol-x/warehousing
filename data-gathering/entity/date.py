@@ -3,18 +3,13 @@ from datetime import datetime
 
 import globals
 from handlers.data_handler import load_df
-from handlers.log_handler import log
+from handlers.log_handler import log, log_daily
 
 
-# Prepare the local log files.
-def prepare_log_files():
-    '''Prepare the local log files.'''
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-        if not os.path.exists('logs'):
-            os.mkdir('logs/data-gathering')
-        print("Logs directory created")
-
+# TODO: Investigate how to move this out.
+# Prepare the local log files for single run.
+def prepare_single_log_file():
+    '''Prepare the local log files for single run.'''
     logfile = open('logs/data-gathering/' + globals.log_filename,
                    "a+", encoding="utf-8")
     if os.path.getsize('logs/data-gathering/' + globals.log_filename):
@@ -22,6 +17,26 @@ def prepare_log_files():
     else:
         log(" = Creation of this file = \n")
     logfile.close()
+
+
+# Prepare the daily log file.
+def prepare_daily_log_file():
+    '''Prepare the daily log file.'''
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+        if not os.path.exists('logs'):
+            os.mkdir('logs/data-gathering')
+        print("Logs directory created")
+
+    daily_logname = datetime.now().strftime("%d%m%Y") + ".log"
+    daily_logfile = open('logs/data-gathering/'
+                         + daily_logname, "a+", encoding="utf-8")
+
+    if os.path.getsize('logs/data-gathering/' + daily_logname):
+        log_daily(" = Separate code execution = \n")
+    else:
+        log_daily(" = Creation of this file = \n")
+    daily_logfile.close()
 
 
 # Add the current date, return the date ID and its log file name.
@@ -43,7 +58,7 @@ def add_date():
     # Create a log filename from the datetime
     # global globals.log_filename
     globals.log_filename = now.strftime("%d%m%Y_%H%M") + ".log"
-    prepare_log_files()
+    prepare_single_log_file()
 
     # Check for the same datetime record
     same_date = date_df[(date_df['day'] == int(day))

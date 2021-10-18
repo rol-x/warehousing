@@ -21,6 +21,17 @@ def log(msg):
     print(msg)
 
 
+# Log a message to the daily run file and the console.
+def log_daily(msg):
+    '''Log a message to the daily run file and the console.'''
+    msg = str(msg)
+    with open('logs/data-gathering/' + globals.daily_logname,
+              'a+', encoding="utf-8") as logfile:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        logfile.write(timestamp + ": " + msg + "\n")
+    print(msg)
+
+
 # Log progress of gathered info (done card by card).
 def log_progress(card_name, progress, cards_total):
     '''Log progress of gathered info (done card by card).'''
