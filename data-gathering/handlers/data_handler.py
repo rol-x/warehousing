@@ -55,6 +55,9 @@ def schedule_run():
 # Return whether the data saved for specified date is complete.
 def try_to_validate_data(date_ID):
     '''Return whether the data saved for specified date is complete.'''
+    if globals.force_update:
+        return True
+
     # Load the data
     extension_name = 'Battlebond'
     card_list = open('./data/' + extension_name + '.txt').readlines()
@@ -71,8 +74,8 @@ def try_to_validate_data(date_ID):
 
     # Find any new sellers from sale_offer csv
     before = sale_offer[sale_offer['date_ID'] < date_ID]
-    sellers_today = sale_offer['seller_ID'].unique().values
-    sellers_before = before['seller_ID'].unique().values
+    sellers_today = sale_offer['seller_ID'].unique()
+    sellers_before = before['seller_ID'].unique()
 
     # Check if there isn't more sellers yesterday than today
     if len(sellers_before) > len(sellers_today):

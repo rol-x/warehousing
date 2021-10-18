@@ -41,9 +41,6 @@ if __name__ == '__main__':
     try:
         while True:
             main()
-    except KeyboardInterrupt:
-        log("Interrupted by user")
-        raise SystemExit
     except Exception as exception:
         log(exception)
         raise SystemExit

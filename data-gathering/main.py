@@ -117,11 +117,7 @@ if __name__ == '__main__':
     try:
         while True:
             main()
-    except KeyboardInterrupt:
-        data_handler.reset_update_flag()
-        log("Interrupted by user")
-        raise SystemExit
     except Exception as exception:
         data_handler.reset_update_flag()
-        log(exception)
+        log_daily(exception)
         raise SystemExit
