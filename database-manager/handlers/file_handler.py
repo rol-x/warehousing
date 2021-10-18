@@ -24,7 +24,7 @@ def register_change():
         # Every thirty (30) seconds check whether the update flag is active
         timeout = False
         start = time.time()
-        while open("./data/update_flag", "r").readline() == '1':
+        while open("./update_flag", "r").readline() == '1':
             log("Update flag active")
             if time.time() - start > 60 * 60 * 4:
                 log("Waiting for the update to end timed out")
@@ -59,14 +59,14 @@ def save_hash(hash):
 # Set up the file with information about ongoing update.
 def set_update_flag():
     '''Set up the file with information about ongoing update.'''
-    update_flag = open('./data/update_flag', 'w')
+    update_flag = open('./update_flag', 'w')
     update_flag.write('1')
     update_flag.close()
 
 
 # Update the flag about the end of the update
 def reset_update_flag():
-    update_flag = open('./data/update_flag', 'w')
+    update_flag = open('./update_flag', 'w')
     update_flag.write('0')
     update_flag.close()
 

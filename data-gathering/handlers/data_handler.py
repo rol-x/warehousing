@@ -96,6 +96,13 @@ def try_to_validate_data(date_ID):
     return True
 
 
+# Create the checksums file for storing validated datasets.
+def create_checksums_file():
+    '''Create the checksums file for storing validated datasets.'''
+    checksums = open('validated-checksums.sha1', 'a+')
+    checksums.close()
+
+
 # Return whether the data in the files has already been validated.
 def is_data_validated():
     '''Return whether the data in the files has already been validated.'''
@@ -109,7 +116,7 @@ def get_checksums():
     try:
         checksums = open('validated-checksums.sha1', 'r').readlines()
     except FileNotFoundError:
-        open('validated-checksums.sha1', 'w+').close()
+        log_daily("No checksums file found.")
         checksums = []
     return checksums
 
@@ -289,14 +296,14 @@ def get_size(entity_name):
 # Set up the file with information about ongoing update.
 def set_update_flag():
     '''Set up the file with information about ongoing update.'''
-    update_flag = open('data/update_flag', 'w')
+    update_flag = open('update_flag', 'w')
     update_flag.write('1')
     update_flag.close()
 
 
 # Update the flag about the end of the update
 def reset_update_flag():
-    update_flag = open('data/update_flag', 'w')
+    update_flag = open('update_flag', 'w')
     update_flag.write('0')
     update_flag.close()
 
@@ -404,8 +411,11 @@ def prepare_files():
                              + 'language;is_foiled;amount;date_ID\n')
     sale_offer_csv.close()
 
-    # Set global variable date ID and save new date if neccessary
+    # Set global date ID and new date if needed
     generate_date_ID()
+
+    # Create a file for storing checksums of validated datasets
+    create_checksums_file()
 
 
 # Scan local files to chose the file part for sale offers.
