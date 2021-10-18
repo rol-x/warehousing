@@ -102,7 +102,12 @@ def is_data_validated():
 
 # Get checksums of data files that has been validated
 def get_checksums():
-    return open('validated-checksums.sha1', 'r').readlines()
+    try:
+        checksums = open('validated-checksums.sha1', 'r').readlines()
+    except FileNotFoundError:
+        open('validated-checksums.sha1', 'w+').close()
+        checksums = []
+    return checksums
 
 
 # Return generated hash based on the contents of data directory
