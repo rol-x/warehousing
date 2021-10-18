@@ -18,6 +18,7 @@ services:
       - "4443:4443"
       - "4442:4442"
       - "4441:4441"
+    restart: always
 
   database_manager:
     container_name: database_manager
