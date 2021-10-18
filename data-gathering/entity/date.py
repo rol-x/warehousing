@@ -12,10 +12,12 @@ def prepare_single_log_file():
     '''Prepare the local log files for single run.'''
     logfile = open('logs/data-gathering/' + globals.log_filename,
                    "a+", encoding="utf-8")
+
+    timestamp = datetime.now().strftime("%H:%M:%S")
     if os.path.getsize('logs/data-gathering/' + globals.log_filename):
-        logfile.write(" = Separate code execution = \n")
+        logfile.write(timestamp + " = Separate code execution = \n")
     else:
-        logfile.write(" = Creation of this file = \n")
+        logfile.write(timestamp + " = Creation of this file = \n")
     logfile.close()
 
 
@@ -32,7 +34,8 @@ def prepare_daily_log_file():
     daily_logfile = open('logs/data-gathering/'
                          + globals.daily_logname, "a+", encoding="utf-8")
 
-    daily_logfile.write("Data gathering run started.")
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    daily_logfile.write(timestamp + ": Data gathering run started.\n")
     daily_logfile.close()
 
 
