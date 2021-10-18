@@ -8,6 +8,7 @@ import pandas as pd
 from checksumdir import dirhash
 
 from handlers.log_handler import log, log_daily
+from entity.date import save_date
 
 
 # Check the time and files status to run the code once a day.
@@ -34,7 +35,7 @@ def schedule_run():
                 break
 
             # Data validation successful
-            log_daily("Data validated.")
+            log_daily("Data validation complete.")
             log_daily("Saving checksum: " + generate_checksum())
             save_checksum(generate_checksum())
 
@@ -300,13 +301,79 @@ def reset_update_flag():
     update_flag.close()
 
 
-# Prepare .csv files for storing the scraped data locally
+# Prepare the daily log file.
+def prepare_daily_log_file():
+    '''Prepare the daily log file.'''
+    globals.daily_logname = datetime.now().strftime("%d%m%Y") + ".log"
+    daily_logfile = open('logs/data-gathering/' + globals.daily_logname,
+                         "a+", encoding="utf-8")
+
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    daily_logfile.write(timestamp + ": Data gathering run started.\n")
+    daily_logfile.close()
+
+
+# Prepare the local log files for single run.
+def prepare_single_log_file():
+    '''Prepare the local log files for single run.'''
+    globals.log_filename = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
+    logfile = open('logs/data-gathering/' + globals.log_filename,
+                   "a+", encoding="utf-8")
+
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    if os.path.getsize('logs/data-gathering/' + globals.log_filename):
+        logfile.write(timestamp + " = Separate code execution = \n")
+    else:
+        logfile.write(timestamp + " = Creation of this file = \n")
+    logfile.close()
+
+
+# Get the current date ID.
+def generate_date_ID():
+    '''Get the current date ID.'''
+
+    # Load the date dataframe
+    date_df = load_df('date')
+
+    # Prepare the attributes
+    now = datetime.now()
+    date = now.strftime("%d/%m/%Y").split("/")
+    day = int(date[0])
+    month = int(date[1])
+    year = int(date[2])
+    weekday = now.weekday() + 1
+    date_ID = len(date_df.index) + 1
+
+    # Check for the same datetime record
+    same_date = date_df[(date_df['day'] == int(day))
+                        & (date_df['month'] == int(month))
+                        & (date_df['year'] == int(year))]['date_ID']
+
+    if(len(same_date) > 0):
+        log(f'Date {day}/{month}/{year} '
+            + f'already added (date ID: {same_date.values[0]})')
+        globals.this_date_ID = same_date.values[0]
+    else:
+        # Save the date locally
+        globals.this_date_ID = date_ID
+        save_date(date_ID, day, month, year, weekday)
+
+
+# Prepare the local data and log files.
 def prepare_files():
-    '''Prepare .csv files for storing the scraped data locally.'''
+    '''Prepare the local data and log files.'''
+    # Logs
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    if not os.path.exists('logs/data-gathering'):
+        os.mkdir('logs/data-gathering')
+
+    prepare_daily_log_file()
+    prepare_single_log_file()
+
+    # Data
     if not os.path.exists('data'):
         os.mkdir('data')
-
-    set_update_flag()
 
     seller_csv = open('data/seller.csv', 'a+', encoding="utf-8")
     if not os.path.getsize('data/seller.csv'):
@@ -336,6 +403,9 @@ def prepare_files():
         sale_offer_csv.write('seller_ID;price;card_ID;card_condition;'
                              + 'language;is_foiled;amount;date_ID\n')
     sale_offer_csv.close()
+
+    # Set global variable date ID and save new date if neccessary
+    generate_date_ID()
 
 
 # Scan local files to chose the file part for sale offers.

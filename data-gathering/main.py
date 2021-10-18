@@ -19,10 +19,9 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
 # Main function
 def main():
     # Setup
-    prepare_daily_log_file()
-    data_handler.schedule_run()
+    data_handler.set_update_flag()
     data_handler.prepare_files()
-    globals.this_date_ID = add_date()
+    data_handler.schedule_run()
     data_handler.prepare_expansion_list_file(globals.expansion_name)
     driver = create_webdriver()
 
@@ -108,8 +107,8 @@ def main():
     # Validate the local data (post-acquisition)
     removed = data_handler.validate_local_data()
     log(f"Local data validated (removed {removed} records)\n")
-    data_handler.reset_update_flag()
     log(" = Program execution finished = ")
+    data_handler.reset_update_flag()
 
 
 # Main function
