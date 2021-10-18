@@ -64,9 +64,9 @@ def try_to_validate_data(date_ID):
 
     # Check whether the number of card stats is correct
     if len(card_stats[card_stats['date_ID'] == date_ID]) != len(card_list):
-        log_daily(f"The number of card for date ID: {date_ID} is incorrect")
+        log_daily(f"The number of cards for date ID {date_ID} is incorrect")
         log_daily(f"Expected: {len(card_list)}    got: "
-                  + len(card_stats[card_stats['date_ID'] == date_ID]))
+                  + str(len(card_stats[card_stats['date_ID'] == date_ID])))
         return False
 
     # Find any new sellers from sale_offer csv
