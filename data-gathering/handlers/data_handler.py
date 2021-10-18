@@ -5,28 +5,115 @@ from datetime import datetime
 
 import globals
 import pandas as pd
+from checksumdir import dirhash
 
-from handlers.log_handler import log
+from handlers.log_handler import log, log_daily
 
 
 # Check the time and files status to run the code once a day.
 def schedule_run():
     '''Check the time and files status to run the code once a day.'''
+    # Load the data
     time.sleep(20)
     date = load_df('date')
     now = datetime.now()
-    last_date = date[date['date_ID'] == date['date_ID'].max()] \
-        .index[0]
-    while last_date['day'] == now.day and \
-        last_date['month'] == now.month and \
-            last_date['year'] == now.year:
-        time.sleep(60 * 30)
+    id = date.index[-1]
+
+    # Wait until the newest date is different than today
+    while date.loc[id, 'day'] == now.day and \
+        date.loc[id, 'month'] == now.month and \
+            date.loc[id, 'year'] == now.year:
+
+        # However, check the files contents for incorrect or incomplete data
+        log_daily("Data from today already gathered. Validating.")
+
+        # If the data is not complete, break out of the wait loop
+        if not is_data_validated():
+            if not try_to_validate_data(date.loc[id, 'date_ID']):
+                log_daily("Data invalid. Proceeding to run.")
+                break
+
+            # Data validation successful
+            log_daily("Data validated.")
+            log_daily("Saving checksum: " + generate_checksum())
+            save_checksum(generate_checksum())
+
+        # Data already validated
+        else:
+            log_daily("Data already validated.")
+
+        # If the data doesn't need to be gathered, wait 1 hour
+        log_daily("Waiting for 1 hour.")
+        time.sleep(60 * 60)
+
+        # Reload the data after waiting
+        date = load_df('date')
+        id = date.index[-1]
         now = datetime.now()
 
-    # get newest date_id, check how much data is saved under it, run the code
-    # if date_id.date < now.date : run the first run of the code
-    # if date_id.date == now.date : check data validity and completeness
-    # if the data is not valid in the database : run the code
+
+# Return whether the data saved for specified date is complete.
+def try_to_validate_data(date_ID):
+    '''Return whether the data saved for specified date is complete.'''
+    # Load the data
+    extension_name = 'Battlebond'
+    card_list = open('./data/' + extension_name + '.txt').readlines()
+    card_stats = load_df('card_stats')
+    seller = load_df('seller')
+    sale_offer = load_df('sale_offer')
+
+    # Check whether the number of card stats is correct
+    if len(card_stats[card_stats['date_ID'] == date_ID]) != len(card_list):
+        log_daily(f"The number of card for date ID: {date_ID} is incorrect")
+        log_daily(f"Expected: {len(card_list)}    got: "
+                  + len(card_stats[card_stats['date_ID'] == date_ID]))
+        return False
+
+    # Find any new sellers from sale_offer csv
+    before = sale_offer[sale_offer['date_ID'] < date_ID]
+    sellers_today = sale_offer['seller_ID'].unique().values
+    sellers_before = before['seller_ID'].unique().values
+
+    # Check if there isn't more sellers yesterday than today
+    if len(sellers_before) > len(sellers_today):
+        log_daily(f"The number of sellers for date ID: {date_ID} is incorrect")
+        log_daily(f"Expected: >= {len(sellers_before)}    "
+                  + f"got: {len(sellers_today)}")
+        return False
+
+    # Check if all sellers from offers are in the sellers file
+    for seller_ID in sellers_today:
+        if seller_ID not in seller['seller_ID'].values:
+            log_daily("Seller from sale offer not saved in sellers")
+            return False
+
+    # TODO: Check sale_offer for outlier changes (crudely)
+
+    return True
+
+
+# Return whether the data in the files has already been validated.
+def is_data_validated():
+    '''Return whether the data in the files has already been validated.'''
+    if generate_checksum() in get_checksums():
+        return True
+    return False
+
+
+# Get checksums of data files that has been validated
+def get_checksums():
+    return open('validated-checksums.sha1', 'r').readlines()
+
+
+# Return generated hash based on the contents of data directory
+def generate_checksum():
+    return str(dirhash('./data', 'sha1'))
+
+
+# Save given data chceksum to an external file
+def save_checksum(checksum):
+    with open('validated-checksums.sha1', 'w+') as checksums_file:
+        checksums_file.write(checksum)
 
 
 # Load and validate local files, returning the number of removed rows.
