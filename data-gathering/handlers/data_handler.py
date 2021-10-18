@@ -127,7 +127,7 @@ def generate_checksum():
 
 # Save given data chceksum to an external file
 def save_checksum(checksum):
-    with open('./flags/validated-checksums.sha1', 'w+') as checksums_file:
+    with open('./flags/validated-checksums.sha1', 'a+') as checksums_file:
         checksums_file.write(checksum)
 
 
