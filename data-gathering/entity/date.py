@@ -32,8 +32,7 @@ def prepare_daily_log_file():
     daily_logfile = open('logs/data-gathering/'
                          + globals.daily_logname, "a+", encoding="utf-8")
 
-    if os.path.getsize('logs/data-gathering/' + globals.daily_logname):
-        daily_logfile.write("Data gathering run started.")
+    daily_logfile.write("Data gathering run started.")
     daily_logfile.close()
 
 
