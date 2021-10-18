@@ -13,14 +13,14 @@ from handlers.log_handler import log, log_url
 
 
 # Return the Firefox webdriver in headless mode.
-def create_webdriver():
+def connect_webdriver():
     '''Return the Firefox webdriver in headless mode.'''
     options = Options()
     options.headless = True
     try:
         driver = webdriver.Remote("http://" + globals.webdriver_hostname
                                   + ":4444/wd/hub", options=options)
-        log('Webdriver ready\n')
+        log('Webdriver connection ready\n')
         return driver
     except MaxRetryError as exception:
         log(exception)
@@ -33,12 +33,11 @@ def create_webdriver():
 
 
 # Return the Firefox webdriver in headless mode.
-def restart_webdriver(driver):
+def reconnect(driver):
     '''Return the Firefox webdriver in headless mode.'''
-    log('Restarting the webdriver')
-    driver.close()
+    log('Restarting the webdriver connection')
     realistic_pause(2*globals.wait_coef)
-    driver = create_webdriver()
+    driver = connect_webdriver()
     return driver
 
 

@@ -7,9 +7,9 @@ from entity.sale_offer import add_offers
 from entity.seller import get_seller_names
 from handlers.log_handler import log, log_daily, log_progress, log_url
 from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
-                                  create_soup, create_webdriver,
+                                  create_soup, connect_webdriver,
                                   get_card_names, is_valid_card_page,
-                                  realistic_pause, urlify)
+                                  realistic_pause, reconnect, urlify)
 
 # TODO: Specify parameters in drop() method explicitly
 # TODO: Change singular to plural in entities use, not in model
@@ -23,7 +23,7 @@ def main():
     data_handler.prepare_single_log_file()
     data_handler.set_update_flag()
     data_handler.prepare_expansion_list_file(globals.expansion_name)
-    driver = create_webdriver()
+    driver = connect_webdriver()
 
     # Validate the local data (pre-acquisition)
     removed = data_handler.validate_local_data()
@@ -58,16 +58,14 @@ def main():
                     break
                 else:
                     log('Card page invalid')
-                    # TODO: Redo this in the presence of standalone driver
-                    # driver = restart_webdriver(driver)
-                    log('Waiting and reconnecting...  (20 sec cooldown)')
-                    realistic_pause(20.0)
+                    driver = reconnect(driver)
+                    log('Waiting and reconnecting...  (15 sec cooldown)')
+                    realistic_pause(15.0)
             else:
                 log('Expanding the offers list timed out')
-                # TODO: Redo this in the presence of standalone webdriver
-                # driver = restart_webdriver(driver)
-                log('Waiting and reconnecting...  (20 sec cooldown)')
-                realistic_pause(20.0)
+                driver = reconnect(driver)
+                log('Waiting and reconnecting...  (15 sec cooldown)')
+                realistic_pause(15.0)
                 globals.wait_coef *= 1.1
             tries += 1
 
@@ -99,10 +97,6 @@ def main():
 
     # Log program task completion
     log("All cards, sellers and sale offers acquired")
-
-    # Close the webdriver
-    driver.close()
-    log("Webdriver closed")
 
     # Validate the local data (post-acquisition)
     removed = data_handler.validate_local_data()
