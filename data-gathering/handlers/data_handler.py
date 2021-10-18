@@ -375,7 +375,6 @@ def prepare_files():
         os.mkdir('logs/data-gathering')
 
     prepare_daily_log_file()
-    prepare_single_log_file()
 
     # Data
     if not os.path.exists('data'):
