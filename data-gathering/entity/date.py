@@ -13,9 +13,9 @@ def prepare_single_log_file():
     logfile = open('logs/data-gathering/' + globals.log_filename,
                    "a+", encoding="utf-8")
     if os.path.getsize('logs/data-gathering/' + globals.log_filename):
-        log(" = Separate code execution = \n")
+        logfile.write(" = Separate code execution = \n")
     else:
-        log(" = Creation of this file = \n")
+        logfile.write(" = Creation of this file = \n")
     logfile.close()
 
 
@@ -33,9 +33,7 @@ def prepare_daily_log_file():
                          + globals.daily_logname, "a+", encoding="utf-8")
 
     if os.path.getsize('logs/data-gathering/' + globals.daily_logname):
-        log_daily(" = Separate code execution = \n")
-    else:
-        log_daily(" = Creation of this file = \n")
+        daily_logfile.write("Data gathering run started.")
     daily_logfile.close()
 
 
