@@ -3,14 +3,13 @@ import globals
 import handlers.data_handler as data_handler
 from entity.card import add_card, get_card_ID, is_card_saved
 from entity.card_stats import add_card_stats, are_card_stats_saved_today
-from entity.date import add_date, prepare_daily_log_file
 from entity.sale_offer import add_offers
 from entity.seller import get_seller_names
 from handlers.log_handler import log, log_daily, log_progress, log_url
 from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
                                   create_soup, create_webdriver,
                                   get_card_names, is_valid_card_page,
-                                  realistic_pause, restart_webdriver, urlify)
+                                  realistic_pause, urlify)
 
 # TODO: Specify parameters in drop() method explicitly
 # TODO: Change singular to plural in entities use, not in model
