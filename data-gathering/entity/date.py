@@ -28,11 +28,11 @@ def prepare_daily_log_file():
             os.mkdir('logs/data-gathering')
         print("Logs directory created")
 
-    daily_logname = datetime.now().strftime("%d%m%Y") + ".log"
+    globals.daily_logname = datetime.now().strftime("%d%m%Y") + ".log"
     daily_logfile = open('logs/data-gathering/'
-                         + daily_logname, "a+", encoding="utf-8")
+                         + globals.daily_logname, "a+", encoding="utf-8")
 
-    if os.path.getsize('logs/data-gathering/' + daily_logname):
+    if os.path.getsize('logs/data-gathering/' + globals.daily_logname):
         log_daily(" = Separate code execution = \n")
     else:
         log_daily(" = Creation of this file = \n")
