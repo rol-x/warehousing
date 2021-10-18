@@ -298,6 +298,7 @@ def set_update_flag():
     update_flag = open('./flags/update_flag', 'w')
     update_flag.write('1')
     update_flag.close()
+    log_daily("Update flag set to 1")
 
 
 # Update the flag about the end of the update
@@ -305,6 +306,7 @@ def reset_update_flag():
     update_flag = open('./flags/update_flag', 'w')
     update_flag.write('0')
     update_flag.close()
+    log_daily("Update flag set to 0")
 
 
 # Prepare the daily log file.
@@ -356,8 +358,6 @@ def generate_date_ID():
                         & (date_df['year'] == int(year))]['date_ID']
 
     if(len(same_date) > 0):
-        log(f'Date {day}/{month}/{year} '
-            + f'already added (date ID: {same_date.values[0]})')
         globals.this_date_ID = same_date.values[0]
     else:
         # Save the date locally

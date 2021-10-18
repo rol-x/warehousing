@@ -81,8 +81,8 @@ def reset_update_flag():
 def secure_load_df(entity_name):
     '''Try to securely load a dataframe from a .csv file.'''
     try:
-        df = pd.read_csv('./data' + entity_name + '.csv', sep=';',
-                         error_bad_lines=False)
+        df = pd.read_csv('./data' + entity_name + '.csv',
+                         sep=';', error_bad_lines=False)
     except pd.errors.ParserError as parser_err:
         log(parser_err)
         log("Importing data from csv failed - aborting.\n")

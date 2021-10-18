@@ -8,6 +8,8 @@ log_filename = ''
 def setup_logging():
     global log_filename
     log_filename = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
+    data_checksum = open('./flags/data-checksum.sha1', 'a+')
+    data_checksum.close()
 
 
 # Log a message to a local file and the console.

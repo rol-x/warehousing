@@ -20,6 +20,7 @@ def main():
     # Setup
     data_handler.prepare_files()
     data_handler.schedule_run()
+    data_handler.prepare_single_log_file()
     data_handler.set_update_flag()
     data_handler.prepare_expansion_list_file(globals.expansion_name)
     driver = create_webdriver()
