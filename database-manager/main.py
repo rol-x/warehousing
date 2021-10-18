@@ -1,7 +1,7 @@
 import time
 
 from handlers.file_handler import register_change
-from handlers.log_handler import log, set_log_filename
+from handlers.log_handler import log, setup_logging
 
 # TODO: Figure out whether sleep is working properly, or possible alternatives
 # TODO: Fill out main function
@@ -10,7 +10,7 @@ from handlers.log_handler import log, set_log_filename
 # Main function
 def main():
     # Set the current run log filename
-    set_log_filename()
+    setup_logging()
 
     # Wait until change in files is detected and any updates are finished
     register_change()
@@ -37,7 +37,7 @@ def main():
 
 # Main function
 if __name__ == '__main__':
-    time.sleep(60)
+    time.sleep(30)
     try:
         while True:
             main()

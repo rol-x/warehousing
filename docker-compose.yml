@@ -14,6 +14,7 @@ services:
     volumes:
       - ./data:/data
       - ./logs:/logs
+      - ./flags:/flags
     ports:
       - "4443:4443"
       - "4442:4442"
@@ -31,6 +32,7 @@ services:
     volumes:
       - ./data:/data
       - ./logs:/logs
+      - ./flags:/flags
     restart: always
 
   firefox_webdriver:

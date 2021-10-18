@@ -8,7 +8,7 @@ from handlers.log_handler import log
 
 # Detect changes in data directory based on calculated checksums
 def register_change():
-    last_hash = open("data-checksum.sha1", "r").readline()
+    last_hash = open("./flags/data-checksum.sha1", "r").readline()
     this_hash = generate_data_hash()
     change_registered = False
 
@@ -16,7 +16,7 @@ def register_change():
     while not change_registered:
         # Every thirty (30) minutes check whether the two hashes differ
         while this_hash == last_hash:
-            log("Checksums checked - no changes detected")
+            log("Checksums checked - no changes detected. Waiting 30 minutes.")
             time.sleep(60 * 30)
             this_hash = generate_data_hash()
         log("Change in data files detected")
@@ -24,16 +24,22 @@ def register_change():
         # Every thirty (30) seconds check whether the update flag is active
         timeout = False
         start = time.time()
-        while open("./update_flag", "r").readline() == '1':
-            log("Update flag active")
+        while open("./flags/update_flag", "r").readline() == '1':
+
+            # Exit on timeout after 4 hours
             if time.time() - start > 60 * 60 * 4:
                 log("Waiting for the update to end timed out")
                 reset_update_flag()
                 timeout = True
                 break
+
+            # Wait before continuing
+            log("Update flag active")
             time.sleep(30)
-        log("Update flag not active")
+
+        # On exit, if the update ended properly, register a change
         if not timeout:
+            log("Update flag not active")
             change_registered = True
 
     # On finished update or data migration the files are static
@@ -52,21 +58,21 @@ def generate_data_hash():
 
 # Save given data hash to an external file
 def save_hash(hash):
-    with open('data-checksum.sha1', 'w+') as hash_file:
+    with open('./flags/data-checksum.sha1', 'w+') as hash_file:
         hash_file.write(hash)
 
 
 # Set up the file with information about ongoing update.
 def set_update_flag():
     '''Set up the file with information about ongoing update.'''
-    update_flag = open('./update_flag', 'w')
+    update_flag = open('./flags/update_flag', 'w')
     update_flag.write('1')
     update_flag.close()
 
 
 # Update the flag about the end of the update
 def reset_update_flag():
-    update_flag = open('./update_flag', 'w')
+    update_flag = open('./flags/update_flag', 'w')
     update_flag.write('0')
     update_flag.close()
 

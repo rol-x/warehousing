@@ -5,7 +5,7 @@ log_filename = ''
 
 
 # Set the current log filename
-def set_log_filename():
+def setup_logging():
     global log_filename
     log_filename = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
 

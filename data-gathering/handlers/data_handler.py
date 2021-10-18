@@ -14,7 +14,7 @@ from handlers.log_handler import log, log_daily
 def schedule_run():
     '''Check the time and files status to run the code once a day.'''
     # Load the data
-    time.sleep(20)
+    time.sleep(15)
     date = load_df('date')
     now = datetime.now()
     id = date.index[-1]
@@ -98,7 +98,7 @@ def try_to_validate_data(date_ID):
 # Create the checksums file for storing validated datasets.
 def create_checksums_file():
     '''Create the checksums file for storing validated datasets.'''
-    checksums = open('validated-checksums.sha1', 'a+')
+    checksums = open('./flags/validated-checksums.sha1', 'a+')
     checksums.close()
 
 
@@ -113,7 +113,7 @@ def is_data_validated():
 # Get checksums of data files that has been validated
 def get_checksums():
     try:
-        checksums = open('validated-checksums.sha1', 'r').readlines()
+        checksums = open('./flags/validated-checksums.sha1', 'r').readlines()
     except FileNotFoundError:
         log_daily("No checksums file found.")
         checksums = []
@@ -127,7 +127,7 @@ def generate_checksum():
 
 # Save given data chceksum to an external file
 def save_checksum(checksum):
-    with open('validated-checksums.sha1', 'w+') as checksums_file:
+    with open('./flags/validated-checksums.sha1', 'w+') as checksums_file:
         checksums_file.write(checksum)
 
 
@@ -295,14 +295,14 @@ def get_size(entity_name):
 # Set up the file with information about ongoing update.
 def set_update_flag():
     '''Set up the file with information about ongoing update.'''
-    update_flag = open('update_flag', 'w')
+    update_flag = open('./flags/update_flag', 'w')
     update_flag.write('1')
     update_flag.close()
 
 
 # Update the flag about the end of the update
 def reset_update_flag():
-    update_flag = open('update_flag', 'w')
+    update_flag = open('./flags/update_flag', 'w')
     update_flag.write('0')
     update_flag.close()
 
@@ -315,7 +315,7 @@ def prepare_daily_log_file():
                          "a+", encoding="utf-8")
 
     timestamp = datetime.now().strftime("%H:%M:%S")
-    daily_logfile.write(timestamp + ": Data gathering run started.\n")
+    daily_logfile.write("\n" + timestamp + ": Data gathering run started.\n")
     daily_logfile.close()
 
 
@@ -413,8 +413,15 @@ def prepare_files():
     # Set global date ID and new date if needed
     generate_date_ID()
 
+    # Flags
+    if not os.path.exists('flags'):
+        os.mkdir('flags')
+
     # Create a file for storing checksums of validated datasets
     create_checksums_file()
+
+    # Create a file for storing the update flag with initial value 0
+    reset_update_flag()
 
 
 # Scan local files to chose the file part for sale offers.
