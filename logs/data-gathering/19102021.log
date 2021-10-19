@@ -292,3 +292,15 @@ receiveMessage@chrome://remote/content/marionette/actors/MarionetteEventsParent.
 10:30:03: Data gathering run started.
 10:30:03: Update flag set to 0
 10:30:03: Update flag set to 1
+
+10:48:10: Data gathering run started.
+10:48:10: Update flag set to 0
+10:48:10: Update flag set to 1
+10:48:50: Update flag set to 0
+10:48:50: HTTPConnectionPool(host='firefox_webdriver', port=4444): Max retries exceeded with url: /wd/hub/session/d9e88098-046e-4e18-b817-ac2c0541656d/url (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6841d57ca0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+
+10:50:24: Data gathering run started.
+10:50:24: Update flag set to 0
+10:50:24: Update flag set to 1
+10:51:18: Update flag set to 0
+10:51:18: module 'selenium.common.exceptions' has no attribute 'ErrorInResponseException'

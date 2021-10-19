@@ -10,8 +10,8 @@ webdriver_hostname = 'firefox_webdriver'
 force_update = True
 
 # Variables connected to this single run of the code
-log_filename = 'init.log'
-daily_logname = 'init_daily.log'
+log_filename = 'other.log'
+daily_logname = 'other_daily.log'
 this_date_ID = 0
 file_part = 1
 
