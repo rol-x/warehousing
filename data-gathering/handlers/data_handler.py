@@ -449,11 +449,11 @@ def save_date(date_ID, day, month, year, weekday):
     '''Save a single card date to the date dataframe in .csv file.'''
 
     # Logging
-    log('== Add date ==')
-    log('Day:           ' + str(day))
-    log('Month:         ' + str(month))
-    log('Year:          ' + str(year))
-    log('Date ID:       ' + str(date_ID) + '\n')
+    log_daily('== Add date ==')
+    log_daily('Day:           ' + str(day))
+    log_daily('Month:         ' + str(month))
+    log_daily('Year:          ' + str(year))
+    log_daily('Date ID:       ' + str(date_ID) + '\n')
 
     # Writing
     with open('data/date.csv', 'a', encoding="utf-8") as date_csv:
