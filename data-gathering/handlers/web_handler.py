@@ -36,7 +36,9 @@ def connect_webdriver():
 def reconnect(driver):
     '''Return the Firefox webdriver in headless mode.'''
     log('Restarting the webdriver connection')
-    realistic_pause(2*globals.wait_coef)
+    realistic_pause(globals.wait_coef)
+    driver.close()
+    realistic_pause(globals.wait_coef)
     driver = connect_webdriver()
     return driver
 
@@ -144,7 +146,7 @@ def click_load_more_button(driver):
     '''Deplete the Load More button to have a complete list of card sellers.'''
     elapsed_t = 0.0
     start_t = time()
-    realistic_pause(0.5*globals.wait_coef)
+    realistic_pause(0.6*globals.wait_coef)
     while True:
         try:
             # Locate the button element
@@ -157,7 +159,7 @@ def click_load_more_button(driver):
 
             # Click the button and wait
             driver.execute_script("arguments[0].click();", load_more_button)
-            realistic_pause(0.2*globals.wait_coef)
+            realistic_pause(0.25*globals.wait_coef)
 
             # Check for timeout
             elapsed_t = time() - start_t

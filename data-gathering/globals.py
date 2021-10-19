@@ -1,13 +1,13 @@
 """Store and initialize global variables in the program."""
 
 # Variables for user custom program configuration
-wait_coef = 3.0
+wait_coef = 3.3
 button_timeout = 120.0
 expansion_name = 'Battlebond'
 max_tries = 3
 start_from = 1
 webdriver_hostname = 'firefox_webdriver'
-force_update = True
+force_update = False
 
 # Variables connected to this single run of the code
 log_filename = 'other.log'
