@@ -104,3 +104,181 @@ receiveMessage@chrome://remote/content/marionette/actors/MarionetteEventsParent.
 06:21:35: Update flag set to 1
 06:24:05: Update flag set to 0
 06:24:05: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+06:25:47: Data gathering run started.
+06:25:47: Update flag set to 0
+06:26:02: Data from today already gathered. Validating.
+06:26:03: The number of cards for date ID 22 is incorrect
+06:26:03: Expected: 264    got: 250
+06:26:03: Dataset invalid. Proceeding to run.
+06:26:03: Update flag set to 1
+07:43:06: Update flag set to 0
+07:43:06: Message: Could not start a new session. New session request timed out
+Build info: version: '4.0.0', revision: '3a21814679'
+System info: host: '5168139481fc', ip: '192.168.0.2', os.name: 'Linux', os.arch: 'amd64', os.version: '5.10.16.3-microsoft-standard-WSL2', java.version: '11.0.11'
+Driver info: driver.version: unknown
+Stacktrace:
+    at org.openqa.selenium.grid.sessionqueue.local.LocalNewSessionQueue.addToQueue (LocalNewSessionQueue.java:199)
+    at org.openqa.selenium.grid.sessionqueue.NewSessionQueue.lambda$new$0 (NewSessionQueue.java:68)
+    at org.openqa.selenium.remote.http.Route$TemplatizedRoute.handle (Route.java:192)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.grid.sessionqueue.NewSessionQueue.execute (NewSessionQueue.java:120)
+    at org.openqa.selenium.remote.tracing.SpanWrappedHttpHandler.execute (SpanWrappedHttpHandler.java:86)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.grid.router.Router.execute (Router.java:91)
+    at org.openqa.selenium.grid.web.EnsureSpecCompliantResponseHeaders.lambda$apply$0 (EnsureSpecCompliantResponseHeaders.java:34)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$NestedRoute.handle (Route.java:270)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.AddWebDriverSpecHeaders.lambda$apply$0 (AddWebDriverSpecHeaders.java:35)
+    at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0 (ErrorFilter.java:44)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0 (ErrorFilter.java:44)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.netty.server.SeleniumHandler.lambda$channelRead0$0 (SeleniumHandler.java:44)
+    at java.util.concurrent.Executors$RunnableAdapter.call (Executors.java:515)
+    at java.util.concurrent.FutureTask.run (FutureTask.java:264)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker (ThreadPoolExecutor.java:1128)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run (ThreadPoolExecutor.java:628)
+    at java.lang.Thread.run (Thread.java:829)
+
+07:43:09: Data gathering run started.
+07:43:09: Update flag set to 0
+07:43:24: Data from today already gathered. Validating.
+07:43:25: The number of cards for date ID 22 is incorrect
+07:43:25: Expected: 264    got: 250
+07:43:25: Dataset invalid. Proceeding to run.
+07:43:25: Update flag set to 1
+07:43:36: Update flag set to 0
+07:43:36: Message: Reached error page: about:neterror?e=dnsNotFound&u=https%3A//www.cardmarket.com/en/Magic/Products/Singles/Battlebond%3Fsite%3D1&c=UTF-8&d=We%20can%E2%80%99t%20connect%20to%20the%20server%20at%20www.cardmarket.com.
+Stacktrace:
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.jsm:181:5
+UnknownError@chrome://remote/content/shared/webdriver/Errors.jsm:488:5
+checkReadyState@chrome://remote/content/marionette/navigate.js:64:24
+onNavigation@chrome://remote/content/marionette/navigate.js:312:39
+emit@resource://gre/modules/EventEmitter.jsm:160:20
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteEventsParent.jsm:42:25
+
+
+07:43:39: Data gathering run started.
+07:43:39: Update flag set to 0
+07:43:54: Data from today already gathered. Validating.
+07:43:55: The number of cards for date ID 22 is incorrect
+07:43:55: Expected: 264    got: 250
+07:43:55: Dataset invalid. Proceeding to run.
+07:43:55: Update flag set to 1
+07:48:55: Update flag set to 0
+07:48:55: Message: Could not start a new session. New session request timed out
+Build info: version: '4.0.0', revision: '3a21814679'
+System info: host: '5168139481fc', ip: '192.168.0.2', os.name: 'Linux', os.arch: 'amd64', os.version: '5.10.16.3-microsoft-standard-WSL2', java.version: '11.0.11'
+Driver info: driver.version: unknown
+Stacktrace:
+    at org.openqa.selenium.grid.sessionqueue.local.LocalNewSessionQueue.addToQueue (LocalNewSessionQueue.java:199)
+    at org.openqa.selenium.grid.sessionqueue.NewSessionQueue.lambda$new$0 (NewSessionQueue.java:68)
+    at org.openqa.selenium.remote.http.Route$TemplatizedRoute.handle (Route.java:192)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.grid.sessionqueue.NewSessionQueue.execute (NewSessionQueue.java:120)
+    at org.openqa.selenium.remote.tracing.SpanWrappedHttpHandler.execute (SpanWrappedHttpHandler.java:86)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.grid.router.Router.execute (Router.java:91)
+    at org.openqa.selenium.grid.web.EnsureSpecCompliantResponseHeaders.lambda$apply$0 (EnsureSpecCompliantResponseHeaders.java:34)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$NestedRoute.handle (Route.java:270)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.AddWebDriverSpecHeaders.lambda$apply$0 (AddWebDriverSpecHeaders.java:35)
+    at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0 (ErrorFilter.java:44)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0 (ErrorFilter.java:44)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.netty.server.SeleniumHandler.lambda$channelRead0$0 (SeleniumHandler.java:44)
+    at java.util.concurrent.Executors$RunnableAdapter.call (Executors.java:515)
+    at java.util.concurrent.FutureTask.run (FutureTask.java:264)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker (ThreadPoolExecutor.java:1128)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run (ThreadPoolExecutor.java:628)
+    at java.lang.Thread.run (Thread.java:829)
+
+07:48:58: Data gathering run started.
+07:48:58: Update flag set to 0
+07:49:13: Data from today already gathered. Validating.
+07:49:13: The number of cards for date ID 22 is incorrect
+07:49:13: Expected: 264    got: 250
+07:49:13: Dataset invalid. Proceeding to run.
+07:49:13: Update flag set to 1
+07:49:21: Update flag set to 0
+07:49:21: Message: Reached error page: about:neterror?e=dnsNotFound&u=https%3A//www.cardmarket.com/en/Magic/Products/Singles/Battlebond%3Fsite%3D1&c=UTF-8&d=We%20can%E2%80%99t%20connect%20to%20the%20server%20at%20www.cardmarket.com.
+Stacktrace:
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.jsm:181:5
+UnknownError@chrome://remote/content/shared/webdriver/Errors.jsm:488:5
+checkReadyState@chrome://remote/content/marionette/navigate.js:64:24
+onNavigation@chrome://remote/content/marionette/navigate.js:312:39
+emit@resource://gre/modules/EventEmitter.jsm:160:20
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteEventsParent.jsm:42:25
+
+
+07:49:24: Data gathering run started.
+07:49:24: Update flag set to 0
+07:49:39: Data from today already gathered. Validating.
+07:49:40: The number of cards for date ID 22 is incorrect
+07:49:40: Expected: 264    got: 250
+07:49:40: Dataset invalid. Proceeding to run.
+07:49:40: Update flag set to 1
+07:53:34: Update flag set to 0
+07:53:34: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+07:56:10: Data gathering run started.
+07:56:10: Update flag set to 0
+07:56:25: Data from today already gathered. Validating.
+07:56:26: The number of cards for date ID 22 is incorrect
+07:56:26: Expected: 264    got: 250
+07:56:26: Dataset invalid. Proceeding to run.
+07:56:26: Update flag set to 1
+08:02:58: Update flag set to 0
+
+08:02:58: Data gathering run started.
+08:02:58: Update flag set to 0
+08:03:13: Data from today already gathered. Validating.
+08:03:14: Data validation complete.
+08:03:14: Saving checksum: c0173c7248373d910780e0211361a71bad5b686f
+08:03:15: Waiting for 1 hour.
+
+08:13:30: Data gathering run started.
+08:13:30: Update flag set to 0
+08:13:30: Data from today already gathered. Validating.
+08:13:31: Returning checksums: ['57b1125cf5034f7f9008b24b12e15dc7ce6741b4\n', '545aed86d25e1f908cab61a73ad86db55fc39a40\n', 'c0173c7248373d910780e0211361a71bad5b686f\n']
+08:13:31: Data validation complete.
+08:13:32: Saving checksum: c0173c7248373d910780e0211361a71bad5b686f
+08:13:33: Waiting for 1 hour.
+
+08:17:28: Data gathering run started.
+08:17:28: Update flag set to 0
+08:17:28: Data from today already gathered. Validating.
+08:17:29: Returning checksums: ['57b1125cf5034f7f9008b24b12e15dc7ce6741b4', '545aed86d25e1f908cab61a73ad86db55fc39a40', 'c0173c7248373d910780e0211361a71bad5b686f', 'c0173c7248373d910780e0211361a71bad5b686f']
+08:17:29: c0173c7248373d910780e0211361a71bad5b686f found in checksums
+08:17:29: Dataset already validated.
+08:17:29: Waiting for 1 hour.
+
+08:33:30: Data gathering run started.
+08:33:30: Update flag set to 0
+08:33:30: Data from today already gathered. Validating.
+08:33:30: Dataset already validated.
+08:33:30: Waiting for 1 hour.
