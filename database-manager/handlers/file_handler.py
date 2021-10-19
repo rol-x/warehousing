@@ -20,7 +20,7 @@ def register_change():
             log("Checksums checked - no changes detected. Waiting 15 minutes.")
             time.sleep(60 * 15)
             this_hash = generate_data_hash()
-        log("Change in data files detected.")
+        log(" - Change in data files detected.")
 
         # Every sixty (60) seconds check whether the update flag is active
         timeout = False
@@ -35,27 +35,27 @@ def register_change():
                 break
 
             # Wait before continuing
-            log("Update in progress.")
+            log(" - Update detected. Waiting 60 seconds.")
             time.sleep(60)
 
         # On exit, if the update ended properly, register a change
         if not timeout:
-            log("No update taking place - registering a change.")
+            log("   - No update detected. Registering a change.")
             this_hash = generate_data_hash()
             if this_hash in get_checksums():
-                log("Dataset checksum found in validated checksums.")
+                log("   - Dataset checksum found in validated checksums.")
                 change_registered = True
                 break
 
             # When the data is downloaded, but not checked for completeness
-            log("Data gathered, but not validated yet. Waiting 60 seconds.")
+            log("   - Waiting for data to be validated. Waiting 60 seconds.")
             time.sleep(60)
 
     # On finished update or data migration the files are static
-    log("Changes ready to commence.")
-    log("Old hash: " + last_hash)
-    log("New hash: " + this_hash)
-    log("Saving new hash to the file.")
+    log("     - Changes ready to commence.")
+    log("     - Old hash: " + last_hash)
+    log("     - New hash: " + this_hash)
+    log("     - Saving new hash to the file.")
     save_hash(this_hash)
 
 
