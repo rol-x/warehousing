@@ -1,0 +1,104 @@
+
+01:56:36: Data gathering run started.
+01:56:36: Update flag set to 0
+
+01:57:22: Data gathering run started.
+01:57:22: Update flag set to 0
+01:57:37: Data from today already gathered. Validating.
+01:57:38: The number of cards for date ID 22 is incorrect
+01:57:38: Expected: 264    got: 0
+01:57:38: Dataset invalid. Proceeding to run.
+01:57:38: Update flag set to 1
+03:16:40: Update flag set to 0
+03:16:41: Message: Unable to execute request for an existing session: java.util.concurrent.TimeoutException
+Build info: version: '4.0.0', revision: '3a21814679'
+System info: host: '6bf5b61b33e0', ip: '172.31.0.2', os.name: 'Linux', os.arch: 'amd64', os.version: '5.10.16.3-microsoft-standard-WSL2', java.version: '11.0.11'
+Driver info: driver.version: unknown
+Stacktrace:
+java.lang.RuntimeException: Unable to execute request for an existing session: java.util.concurrent.TimeoutException
+Build info: version: '4.0.0', revision: '3a21814679'
+System info: host: '6bf5b61b33e0', ip: '172.31.0.2', os.name: 'Linux', os.arch: 'amd64', os.version: '5.10.16.3-microsoft-standard-WSL2', java.version: '11.0.11'
+Driver info: driver.version: unknown
+	at org.openqa.selenium.grid.router.HandleSession.execute(HandleSession.java:139)
+	at org.openqa.selenium.remote.http.Route$PredicatedRoute.handle(Route.java:373)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.remote.http.Route$CombinedRoute.handle(Route.java:336)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.grid.router.Router.execute(Router.java:91)
+	at org.openqa.selenium.grid.web.EnsureSpecCompliantResponseHeaders.lambda$apply$0(EnsureSpecCompliantResponseHeaders.java:34)
+	at org.openqa.selenium.remote.http.Filter$1.execute(Filter.java:64)
+	at org.openqa.selenium.remote.http.Route$CombinedRoute.handle(Route.java:336)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.remote.http.Route$NestedRoute.handle(Route.java:270)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.remote.http.Route$CombinedRoute.handle(Route.java:336)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.remote.http.Route$CombinedRoute.handle(Route.java:336)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.remote.AddWebDriverSpecHeaders.lambda$apply$0(AddWebDriverSpecHeaders.java:35)
+	at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0(ErrorFilter.java:44)
+	at org.openqa.selenium.remote.http.Filter$1.execute(Filter.java:64)
+	at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0(ErrorFilter.java:44)
+	at org.openqa.selenium.remote.http.Filter$1.execute(Filter.java:64)
+	at org.openqa.selenium.netty.server.SeleniumHandler.lambda$channelRead0$0(SeleniumHandler.java:44)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:829)
+Caused by: java.util.concurrent.TimeoutException
+	at java.base/java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:1886)
+	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2021)
+	at org.asynchttpclient.netty.NettyResponseFuture.get(NettyResponseFuture.java:206)
+	at org.openqa.selenium.remote.http.netty.NettyHttpHandler.makeCall(NettyHttpHandler.java:66)
+	at org.openqa.selenium.remote.http.AddSeleniumUserAgent.lambda$apply$0(AddSeleniumUserAgent.java:42)
+	at org.openqa.selenium.remote.http.Filter.lambda$andFinally$1(Filter.java:56)
+	at org.openqa.selenium.remote.http.netty.NettyHttpHandler.execute(NettyHttpHandler.java:51)
+	at org.openqa.selenium.remote.http.AddSeleniumUserAgent.lambda$apply$0(AddSeleniumUserAgent.java:42)
+	at org.openqa.selenium.remote.http.Filter.lambda$andFinally$1(Filter.java:56)
+	at org.openqa.selenium.remote.http.netty.NettyClient.execute(NettyClient.java:119)
+	at org.openqa.selenium.remote.tracing.TracedHttpClient.execute(TracedHttpClient.java:55)
+	at org.openqa.selenium.grid.web.ReverseProxyHandler.execute(ReverseProxyHandler.java:92)
+	at org.openqa.selenium.grid.node.ProtocolConvertingSession.execute(ProtocolConvertingSession.java:75)
+	at org.openqa.selenium.grid.node.local.SessionSlot.execute(SessionSlot.java:123)
+	at org.openqa.selenium.grid.node.local.LocalNode.executeWebDriverCommand(LocalNode.java:388)
+	at org.openqa.selenium.grid.node.ForwardWebDriverCommand.execute(ForwardWebDriverCommand.java:35)
+	at org.openqa.selenium.remote.http.Route$PredicatedRoute.handle(Route.java:373)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.remote.tracing.SpanWrappedHttpHandler.execute(SpanWrappedHttpHandler.java:86)
+	at org.openqa.selenium.remote.http.Filter$1.execute(Filter.java:64)
+	at org.openqa.selenium.remote.http.Route$CombinedRoute.handle(Route.java:336)
+	at org.openqa.selenium.remote.http.Route.execute(Route.java:68)
+	at org.openqa.selenium.grid.node.Node.execute(Node.java:240)
+	at org.openqa.selenium.grid.web.CombinedHandler.execute(CombinedHandler.java:59)
+	at org.openqa.selenium.grid.web.RoutableHttpClientFactory$1.execute(RoutableHttpClientFactory.java:72)
+	at org.openqa.selenium.grid.web.ReverseProxyHandler.execute(ReverseProxyHandler.java:92)
+	at org.openqa.selenium.grid.router.HandleSession.execute(HandleSession.java:110)
+	... 26 more
+
+
+03:16:50: Data gathering run started.
+03:16:50: Update flag set to 0
+03:17:05: Data from today already gathered. Validating.
+03:17:06: The number of cards for date ID 22 is incorrect
+03:17:06: Expected: 264    got: 169
+03:17:06: Dataset invalid. Proceeding to run.
+03:17:06: Update flag set to 1
+06:21:15: Update flag set to 0
+06:21:15: Message: Reached error page: about:neterror?e=connectionFailure&u=https%3A//www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Borderland-Marauder&c=UTF-8&d=Firefox%20can%E2%80%99t%20establish%20a%20connection%20to%20the%20server%20at%20www.cardmarket.com.
+Stacktrace:
+WebDriverError@chrome://remote/content/shared/webdriver/Errors.jsm:181:5
+UnknownError@chrome://remote/content/shared/webdriver/Errors.jsm:488:5
+checkReadyState@chrome://remote/content/marionette/navigate.js:64:24
+onNavigation@chrome://remote/content/marionette/navigate.js:312:39
+emit@resource://gre/modules/EventEmitter.jsm:160:20
+receiveMessage@chrome://remote/content/marionette/actors/MarionetteEventsParent.jsm:42:25
+
+
+06:21:18: Data gathering run started.
+06:21:18: Update flag set to 0
+06:21:33: Data from today already gathered. Validating.
+06:21:35: The number of cards for date ID 22 is incorrect
+06:21:35: Expected: 264    got: 250
+06:21:35: Dataset invalid. Proceeding to run.
+06:21:35: Update flag set to 1
