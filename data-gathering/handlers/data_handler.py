@@ -223,10 +223,10 @@ def drop_duplicate_rows(df):
 def drop_identical_records(df, id_col):
     '''Drop logically identical records (same data).'''
     tb_dropped = len(df.index) - \
-        len(df.drop(id_col, 1).drop_duplicates().index)
+        len(df.drop(id_col, axis=1).drop_duplicates().index)
     if tb_dropped > 0:
-        tb_saved = df.drop(id_col, 1).drop_duplicates()
-        tb_removed = pd.concat(df.drop(id_col, 1), tb_saved) \
+        tb_saved = df.drop(id_col, axis=1).drop_duplicates()
+        tb_removed = pd.concat(df.drop(id_col, axis=1), tb_saved) \
             .drop_duplicates(keep=None).index
         df.drop(tb_removed, inplace=True)
         return tb_dropped

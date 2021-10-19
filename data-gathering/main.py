@@ -11,7 +11,6 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
                                   get_card_names, is_valid_card_page,
                                   realistic_pause, reconnect, urlify)
 
-# TODO: Specify parameters in drop() method explicitly
 # TODO: Change singular to plural in entities use, not in model
 
 
