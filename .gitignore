@@ -1,0 +1,10 @@
+data-exploration/.ipynb_checkpoints/
+__pycache__/
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyproj
+.vscode
+.vscode/settings.json
+geckodriver.log
+.old

@@ -1,0 +1,25 @@
+01:06:00:  = Creation of this file = 
+
+01:06:00: Date 16/10/2021 already added (date ID: 19)
+01:06:02: Webdriver ready
+
+01:06:05: Local data validated (removed 0 records)
+
+01:06:05: Task - Getting all card names from current expansion
+01:06:06: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=1
+01:06:06: Done - All card names from Battlebond saved
+
+01:06:06:  == Skyshroud Claim ==    (1/264  0.38%)
+01:06:10: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Skyshroud-Claim
+01:06:10:                 Expanding page...
+
+01:06:15:  = Card stats = 
+01:06:15: Card ID:  1
+01:06:15: Already saved today
+
+01:06:15:  = Sellers = 
+01:06:15: Task - Updating sellers
+01:06:15: Done - 0 new sellers saved  (out of: 137, total: 6700)
+
+01:06:15:  = Offers = 
+01:06:15: Task - Updating sale offers
