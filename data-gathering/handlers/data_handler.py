@@ -14,7 +14,6 @@ from handlers.log_handler import log, log_daily
 def schedule_run():
     '''Check the time and files status to run the code once a day.'''
     # Load the data
-    time.sleep(15)
     date = load_df('date')
     now = datetime.now()
     id = date.index[-1]
@@ -113,7 +112,9 @@ def is_data_checksum_saved():
 # Get checksums of data files that has been validated
 def get_checksums():
     try:
-        checksums = open('./flags/validated-checksums.sha1', 'r').readlines()
+        checksums_file = open('./flags/validated-checksums.sha1', 'r')
+        checksums = [line.strip('\n') for line in checksums_file.readlines()]
+        checksums_file.close()
     except FileNotFoundError:
         log_daily("No checksums file found.")
         checksums = []

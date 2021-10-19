@@ -3,7 +3,6 @@ import time
 from handlers.file_handler import register_change
 from handlers.log_handler import log, setup_logging
 
-# TODO: Figure out whether sleep is working properly, or possible alternatives
 # TODO: Fill out main function
 
 
@@ -37,7 +36,7 @@ def main():
 
 # Main function
 if __name__ == '__main__':
-    time.sleep(30)
+    time.sleep(20)
     try:
         while True:
             main()

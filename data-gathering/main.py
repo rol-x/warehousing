@@ -1,4 +1,6 @@
 """Scrape the card market website to get all the neccessary data."""
+import time
+
 import globals
 import handlers.data_handler as data_handler
 from entity.card import add_card, get_card_ID, is_card_saved
@@ -7,7 +9,7 @@ from entity.sale_offer import add_offers
 from entity.seller import get_seller_names
 from handlers.log_handler import log, log_daily, log_progress, log_url
 from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
-                                  create_soup, connect_webdriver,
+                                  connect_webdriver, create_soup,
                                   get_card_names, is_valid_card_page,
                                   realistic_pause, reconnect, urlify)
 
@@ -106,6 +108,7 @@ def main():
 
 # Main function
 if __name__ == '__main__':
+    time.sleep(10)
     try:
         while True:
             main()

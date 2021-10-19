@@ -22,7 +22,7 @@ def register_change():
             this_hash = generate_data_hash()
         log("Change in data files detected.")
 
-        # Every thirty (30) seconds check whether the update flag is active
+        # Every sixty (60) seconds check whether the update flag is active
         timeout = False
         start = time.time()
         while open("./flags/update-flag", "r").readline() == '1':
@@ -36,7 +36,7 @@ def register_change():
 
             # Wait before continuing
             log("Update in progress.")
-            time.sleep(30)
+            time.sleep(60)
 
         # On exit, if the update ended properly, register a change
         if not timeout:
@@ -47,8 +47,9 @@ def register_change():
                 change_registered = True
                 break
 
-            log("Data gathered, but not validated yet. Waiting 30 seconds.")
-            time.sleep(30)
+            # When the data is downloaded, but not checked for completeness
+            log("Data gathered, but not validated yet. Waiting 60 seconds.")
+            time.sleep(60)
 
     # On finished update or data migration the files are static
     log("Changes ready to commence.")
@@ -87,7 +88,9 @@ def reset_update_flag():
 # Get checksums of data files that has been validated
 def get_checksums():
     try:
-        checksums = open('./flags/validated-checksums.sha1', 'r').readlines()
+        checksums_file = open('./flags/validated-checksums.sha1', 'r')
+        checksums = [line.strip('\n') for line in checksums_file.readlines()]
+        checksums_file.close()
     except FileNotFoundError:
         log("No checksums file found.")
         checksums = []
