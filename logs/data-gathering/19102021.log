@@ -102,3 +102,5 @@ receiveMessage@chrome://remote/content/marionette/actors/MarionetteEventsParent.
 06:21:35: Expected: 264    got: 250
 06:21:35: Dataset invalid. Proceeding to run.
 06:21:35: Update flag set to 1
+06:24:05: Update flag set to 0
+06:24:05: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
