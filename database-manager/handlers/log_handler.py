@@ -8,7 +8,7 @@ log_filename = 'init.log'
 # Set the current log filename
 def setup_logging():
     global log_filename
-    log_filename = datetime.now().strftime("%d%m%Y_%H") + ".log"
+    log_filename = datetime.now().strftime("%d%m%Y") + ".log"
     if not os.path.exists('./logs/database-manager'):
         os.mkdir('./logs/database-manager')
     data_checksum = open('./flags/data-checksum.sha1', 'a+')
