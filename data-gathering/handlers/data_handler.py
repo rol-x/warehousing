@@ -19,28 +19,31 @@ def schedule_run():
     now = datetime.now()
     id = date.index[-1]
 
-    # Wait until the newest date is different than today
+    # Wait until the the newest date is not today
     while date.loc[id, 'day'] == now.day and \
         date.loc[id, 'month'] == now.month and \
             date.loc[id, 'year'] == now.year:
 
-        # However, check the files contents for incorrect or incomplete data
+        # Run the code always if the option is set
+        if globals.force_update:
+            break
+
+        # Check today's data for completeness
         log_daily("Data from today already gathered. Validating.")
 
-        # If the data is not complete, break out of the wait loop
-        if not is_data_validated():
-            if not try_to_validate_data(date.loc[id, 'date_ID']):
-                log_daily("Data invalid. Proceeding to run.")
+        # The data with its checksum have already been verified
+        if is_data_checksum_saved():
+            log_daily("Dataset already validated.")
+        else:
+            # If the data is not complete, break out of the wait loop
+            if not is_data_complete(date.loc[id, 'date_ID']):
+                log_daily("Dataset invalid. Proceeding to run.")
                 break
 
             # Data validation successful
             log_daily("Data validation complete.")
             log_daily("Saving checksum: " + generate_checksum())
             save_checksum(generate_checksum())
-
-        # Data already validated
-        else:
-            log_daily("Data already validated.")
 
         # If the data doesn't need to be gathered, wait 1 hour
         log_daily("Waiting for 1 hour.")
@@ -53,14 +56,11 @@ def schedule_run():
 
 
 # Return whether the data saved for specified date is complete.
-def try_to_validate_data(date_ID):
+def is_data_complete(date_ID):
     '''Return whether the data saved for specified date is complete.'''
-    if globals.force_update:
-        return True
 
     # Load the data
-    extension_name = 'Battlebond'
-    card_list = open('./data/' + extension_name + '.txt').readlines()
+    card_list = open('./data/' + globals.expansion_name + '.txt').readlines()
     card_stats = load_df('card_stats')
     seller = load_df('seller')
     sale_offer = load_df('sale_offer')
@@ -103,7 +103,7 @@ def create_checksums_file():
 
 
 # Return whether the data in the files has already been validated.
-def is_data_validated():
+def is_data_checksum_saved():
     '''Return whether the data in the files has already been validated.'''
     if generate_checksum() in get_checksums():
         return True
@@ -128,7 +128,7 @@ def generate_checksum():
 # Save given data chceksum to an external file
 def save_checksum(checksum):
     with open('./flags/validated-checksums.sha1', 'a+') as checksums_file:
-        checksums_file.write(checksum)
+        checksums_file.write(checksum + "\n")
 
 
 # Load and validate local files, returning the number of removed rows.
@@ -295,7 +295,7 @@ def get_size(entity_name):
 # Set up the file with information about ongoing update.
 def set_update_flag():
     '''Set up the file with information about ongoing update.'''
-    update_flag = open('./flags/update_flag', 'w')
+    update_flag = open('./flags/update-flag', 'w')
     update_flag.write('1')
     update_flag.close()
     log_daily("Update flag set to 1")
@@ -303,7 +303,7 @@ def set_update_flag():
 
 # Update the flag about the end of the update
 def reset_update_flag():
-    update_flag = open('./flags/update_flag', 'w')
+    update_flag = open('./flags/update-flag', 'w')
     update_flag.write('0')
     update_flag.close()
     log_daily("Update flag set to 0")

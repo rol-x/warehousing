@@ -14,40 +14,47 @@ def register_change():
 
     # Timeout after update over four (4) hours
     while not change_registered:
-        # Every thirty (30) minutes check whether the two hashes differ
+
+        # Every thirty (15) minutes check whether the two hashes differ
         while this_hash == last_hash:
-            log("Checksums checked - no changes detected. Waiting 30 minutes.")
-            time.sleep(60 * 30)
+            log("Checksums checked - no changes detected. Waiting 15 minutes.")
+            time.sleep(60 * 15)
             this_hash = generate_data_hash()
-        log("Change in data files detected")
+        log("Change in data files detected.")
 
         # Every thirty (30) seconds check whether the update flag is active
         timeout = False
         start = time.time()
-        while open("./flags/update_flag", "r").readline() == '1':
+        while open("./flags/update-flag", "r").readline() == '1':
 
             # Exit on timeout after 4 hours
             if time.time() - start > 60 * 60 * 4:
-                log("Waiting for the update to end timed out")
+                log("Waiting for the update to end timed out.")
                 reset_update_flag()
                 timeout = True
                 break
 
             # Wait before continuing
-            log("Update flag active")
+            log("Update in progress.")
             time.sleep(30)
 
         # On exit, if the update ended properly, register a change
         if not timeout:
-            log("Update flag not active")
-            change_registered = True
+            log("No update taking place - registering a change.")
+            this_hash = generate_data_hash()
+            if this_hash in get_checksums():
+                log("Dataset checksum found in validated checksums.")
+                change_registered = True
+                break
+
+            log("Data gathered, but not validated yet. Waiting 30 seconds.")
+            time.sleep(30)
 
     # On finished update or data migration the files are static
-    this_hash = generate_data_hash()
-    log("Changes ready to commence")
+    log("Changes ready to commence.")
     log("Old hash: " + last_hash)
     log("New hash: " + this_hash)
-    log("Saving new hash to the file")
+    log("Saving new hash to the file.")
     save_hash(this_hash)
 
 
@@ -65,16 +72,26 @@ def save_hash(hash):
 # Set up the file with information about ongoing update.
 def set_update_flag():
     '''Set up the file with information about ongoing update.'''
-    update_flag = open('./flags/update_flag', 'w')
+    update_flag = open('./flags/update-flag', 'w')
     update_flag.write('1')
     update_flag.close()
 
 
 # Update the flag about the end of the update
 def reset_update_flag():
-    update_flag = open('./flags/update_flag', 'w')
+    update_flag = open('./flags/update-flag', 'w')
     update_flag.write('0')
     update_flag.close()
+
+
+# Get checksums of data files that has been validated
+def get_checksums():
+    try:
+        checksums = open('./flags/validated-checksums.sha1', 'r').readlines()
+    except FileNotFoundError:
+        log("No checksums file found.")
+        checksums = []
+    return checksums
 
 
 # Try to securely load a dataframe from a .csv file.
