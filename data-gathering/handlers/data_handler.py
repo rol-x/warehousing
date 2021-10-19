@@ -421,7 +421,7 @@ def prepare_files():
     create_checksums_file()
 
     # Create a file for storing the update flag with initial value 0
-    reset_update_flag()
+    with open('./flags/update-flag', 'a+'): pass
 
 
 # Scan local files to chose the file part for sale offers.
