@@ -17,14 +17,13 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
 
 
 # Main function
-def main():
+def main(driver):
     # Setup
     data_handler.prepare_files()
     data_handler.schedule_run()
     data_handler.prepare_single_log_file()
     data_handler.set_update_flag()
     data_handler.prepare_expansion_list_file(globals.expansion_name)
-    driver = connect_webdriver()
 
     # Validate the local data (pre-acquisition)
     removed = data_handler.validate_local_data()
@@ -109,9 +108,10 @@ def main():
 # Main function
 if __name__ == '__main__':
     time.sleep(10)
+    driver = connect_webdriver()
     try:
         while True:
-            main()
+            main(driver)
     except Exception as exception:
         data_handler.reset_update_flag()
         log_daily(exception)
