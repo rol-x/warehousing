@@ -14,6 +14,9 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
                                   realistic_pause, reconnect, urlify)
 
 # TODO: Change singular to plural in entities use, not in model
+# TODO: Research refreshing connection to standalone webdriver
+# TODO: Research waiting for elements in Selenium framework
+# TODO: Distill packages from functions in handlers and entity folders
 
 
 # Main function
