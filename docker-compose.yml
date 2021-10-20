@@ -42,8 +42,6 @@ services:
       - ./logs:/logs
       - ./flags:/flags
     restart: always
-    ports:
-      - "3307:3307"
 
   mysql_database:
     container_name: mysql_database
