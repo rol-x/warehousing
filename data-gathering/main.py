@@ -25,7 +25,6 @@ def main():
     data_handler.prepare_files()
     data_handler.schedule_run()
     data_handler.prepare_single_log_file()
-    data_handler.set_update_flag()
     data_handler.prepare_expansion_list_file(config.EXPANSION_NAME)
     driver = connect_webdriver()
 
@@ -105,17 +104,15 @@ def main():
     removed = data_handler.validate_local_data()
     log(f"Local data validated (removed {removed} records)\n")
     log(" = Program execution finished = ")
-    data_handler.reset_update_flag()
 
 
 # Main function
 if __name__ == '__main__':
     print("Started: data-gathering")
-    time.sleep(10)
+    time.sleep(config.CONTAINER_DELAY)
     try:
         while True:
             main()
     except Exception as exception:
-        data_handler.reset_update_flag()
         log_daily(exception)
         raise SystemExit from exception

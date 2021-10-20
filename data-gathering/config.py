@@ -14,6 +14,7 @@ LOG_FILENAME = 'other.log'
 DAILY_LOGNAME = 'other_daily.log'
 THIS_DATE_ID = 0
 FILE_PART = 1
+CONTAINER_DELAY = 10
 
 # Fixed variables
 BASE_URL = 'https://www.cardmarket.com/en/Magic/Products/Singles/'

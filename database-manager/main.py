@@ -1,6 +1,7 @@
 import time
 
-from handlers.file_handler import register_change
+import config
+from handlers import file_handler
 from handlers.log_handler import log, setup_logging
 
 # TODO: Write simple database connection, create empty tables if there are none
@@ -14,8 +15,11 @@ def main():
     # Set the current run log filename
     setup_logging()
 
+    # Create the file for database files checksum
+    file_handler.setup_database_checksum()
+
     # Wait until change in files is detected and any updates are finished
-    register_change()
+    file_handler.register_change()
 
     # Create a connection to the database
     log("Database update here")
@@ -24,7 +28,7 @@ def main():
 # Main function
 if __name__ == '__main__':
     print("Started: database-manager")
-    time.sleep(20)
+    time.sleep(config.CONTAINER_DELAY)
     try:
         while True:
             main()
