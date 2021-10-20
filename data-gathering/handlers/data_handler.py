@@ -369,47 +369,59 @@ def generate_date_ID():
 # Prepare the local data and log files.
 def prepare_files():
     '''Prepare the local data and log files.'''
-    # Logs
+    # Create main logs directory
     if not os.path.exists('logs'):
         os.mkdir('logs')
+
+    # Create service logs directory
     if not os.path.exists('./logs/data-gathering'):
         os.mkdir('./logs/data-gathering')
 
+    # Prepare a daily log file
     prepare_daily_log_file()
 
-    # Data
+    # Create data directory
     if not os.path.exists('data'):
         os.mkdir('data')
 
+    # Create sellers file
     with open('./data/seller.csv', 'a+', encoding="utf-8") as seller_csv:
         if not os.path.getsize('./data/seller.csv'):
             seller_csv.write('seller_ID;seller_name;seller_type'
                              + ';member_since;country;address\n')
 
+    # Create cards file
     with open('./data/card.csv', 'a+', encoding="utf-8") as card_csv:
         if not os.path.getsize('./data/card.csv'):
             card_csv.write('card_ID;card_name;expansion_name;rarity\n')
 
+    # Create card stats file
     with open('./data/card_stats.csv', 'a+', encoding="utf-8") \
             as card_stats_csv:
         if not os.path.getsize('./data/card_stats.csv'):
             card_stats_csv.write('card_ID;price_from;30_avg_price;7_avg_price;'
                                  + '1_avg_price;available_items;date_ID\n')
 
+    # Create date file
     with open('./data/date.csv', 'a+', encoding="utf-8") as date_csv:
         if not os.path.getsize('./data/date.csv'):
             date_csv.write('date_ID;day;month;year;day_of_week\n')
 
+    # Create sale offers file
     filename = determine_offers_file()
     with open(f'./data/{filename}', 'a+', encoding="utf-8") as sale_offer_csv:
         if not os.path.getsize(f'./data/{filename}'):
             sale_offer_csv.write('seller_ID;price;card_ID;card_condition;'
                                  + 'language;is_foiled;amount;date_ID\n')
 
+    # Create expansion card names list file
+    with open(f'./data/{config.EXPANSION_NAME}.txt', 'a+', encoding="utf-8"):
+        pass
+
     # Set global date ID and new date if needed
     generate_date_ID()
 
-    # Flags
+    # Create flags directory
     if not os.path.exists('flags'):
         os.mkdir('flags')
 
