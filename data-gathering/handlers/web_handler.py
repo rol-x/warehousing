@@ -93,8 +93,7 @@ def get_card_names(driver, expansion_name):
     exp_filename = urlify(expansion_name)
     with open('./data/' + exp_filename + '.txt', 'r',
               encoding="utf-8") as exp_file:
-        saved_cards = exp_file.read().split('\n')[:-1]
-    exp_file.close()
+        saved_cards = [line.strip('\n') for line in exp_file.readlines()]
     log("Task - Getting all card names from current expansion")
 
     all_cards = []
@@ -136,7 +135,6 @@ def get_card_names(driver, expansion_name):
               encoding="utf-8") as exp_file:
         for card_name in all_cards:
             exp_file.write(card_name + '\n')
-        exp_file.close()
 
     # Return the complete cards list
     log(f"Done - All card names from {expansion_name} saved\n")

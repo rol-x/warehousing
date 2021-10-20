@@ -14,51 +14,73 @@ from handlers.log_handler import log, log_daily
 def schedule_run():
     '''Check the time and files status to run the code once a day.'''
 
-    # Load the data and check if it's empty
+    # Load the data and compare against today
     date = load_df('date')
-    if len(date.index) == 0:
-        log_daily(' - Empty data files. Proceeding to run.')
-        return
-
-    # Compare against today
     now = datetime.now()
     row_id = date.index[-1]
 
-    # Wait until the the newest date is not today
+    # Run immediately if it's the first run
+    if is_first_run():
+        log_daily(" - Fresh start detected. Proceeding to run.")
+        return
+
+    # Run the code always if the option is set
+    if config.FORCE_UPDATE:
+        log_daily(" - Force update flag active. Proceeding to run.")
+        config.FORCE_UPDATE = False
+        return
+
+    # If such record for today already exists
     while date.loc[row_id, 'day'] == now.day and \
         date.loc[row_id, 'month'] == now.month and \
             date.loc[row_id, 'year'] == now.year:
 
-        # Run the code always if the option is set
-        if config.FORCE_UPDATE:
-            config.FORCE_UPDATE = False
+        # Log and check whether another run is needed
+        log_daily(" - Relevant data discovered. Checking for completeness.")
+
+        # If yes, break out of the wait loop
+        if not is_data_complete(date.loc[row_id, 'date_ID']):
+            log_daily("   - Gathered data is incomplete. Proceeding to run.")
             break
 
-        # Check today's data for completeness
-        log_daily(" - Data from today already gathered. Validating.")
-
-        # The data with its checksum have already been verified
-        if is_data_checksum_saved():
-            log_daily("   - Dataset already validated.")
-        else:
-            # If the data is not complete, break out of the wait loop
-            if not is_data_complete(date.loc[row_id, 'date_ID']):
-                log_daily("   - Dataset invalid. Proceeding to run.")
-                break
-
-            # Data validation successful
-            log_daily(" - Data validation completed successfully.")
-            log_daily(" - Saving checksum: " + generate_checksum())
+        # Save this complete dataset as validated in checksum form
+        if not is_data_checksum_saved():
+            log_daily("   - Data validation completed successfully.")
+            log_daily("   - Saving checksum: " + generate_checksum())
             save_checksum(generate_checksum())
+        # Or note that it's already validated and continue waiting
+        else:
+            log_daily("   - Dataset already validated. All needed data saved.")
 
         # If the data doesn't need to be gathered, wait 1 hour
-        log_daily(" - Waiting for 1 hour.")
+        log_daily(" - Job is done. Waiting for 1 hour.")
         time.sleep(60 * 60)
 
         # Reload the data after waiting
         date = load_df('date')
         row_id = date.index[-1]
         now = datetime.now()
+
+
+# Check whether all the datasets in local files are empty
+def is_first_run():
+    # Load the data
+    with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \
+            as exp_file:
+        card_list = exp_file.readlines()
+    card = load_df('card')
+    card_stats = load_df('card_stats')
+    seller = load_df('seller')
+    sale_offer = load_df('sale_offer')
+
+    # Return if all of the data-related files have empty dataframes inside
+    if len(card.index) == 0 \
+        and len(card_stats.index) == 0 \
+        and len(seller.index) == 0 \
+        and len(sale_offer.index) == 0 \
+            and len(card_list) == 0:
+        return True
+    return False
 
 
 # Return whether the data saved for specified date is complete.
@@ -69,19 +91,24 @@ def is_data_complete(date_ID):
     with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \
             as exp_file:
         card_list = exp_file.readlines()
+    card = load_df('card')
     card_stats = load_df('card_stats')
     seller = load_df('seller')
     sale_offer = load_df('sale_offer')
 
-    if len(card_list) == 0 or len(card_stats.index) == 0 \
-            or len(sale_offer.index) == 0 or len(seller.index) == 0:
+    # Check for any empty file
+    if len(card.index) == 0 \
+        or len(card_stats.index) == 0 \
+        or len(seller.index) == 0 \
+        or len(sale_offer.index) == 0 \
+            or len(card_list) == 0:
         return False
 
     # TODO: Add faulty data.csv file exceptions
 
     # Check whether the number of card stats is correct
     if len(card_stats[card_stats['date_ID'] == date_ID]) != len(card_list):
-        log_daily(f"The number of cards for date ID {date_ID} is incorrect")
+        log_daily(f"The number of cards for date ID [{date_ID}] is incorrect")
         log_daily(f"Expected: {len(card_list)}    got: "
                   + str(len(card_stats[card_stats['date_ID'] == date_ID])))
         return False
@@ -93,7 +120,8 @@ def is_data_complete(date_ID):
 
     # Check if there isn't more sellers yesterday than today
     if len(sellers_before) > len(sellers_today):
-        log_daily(f"The number of sellers for date ID: {date_ID} is incorrect")
+        log_daily("The number of sellers for date ID ["
+                  + date_ID + "] is incorrect")
         log_daily(f"Expected: >= {len(sellers_before)}    "
                   + f"got: {len(sellers_today)}")
         return False
@@ -371,7 +399,7 @@ def generate_date_ID():
 
     if(len(same_date) > 0):
         config.THIS_DATE_ID = same_date.values[0]
-        log_daily(f"Date ID: {config.THIS_DATE_ID} already added.")
+        log_daily(f"Date ID [{config.THIS_DATE_ID}] already added.")
     else:
         # Save the date locally
         config.THIS_DATE_ID = date_ID
