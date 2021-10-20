@@ -24,7 +24,7 @@ def schedule_run():
             date.loc[row_id, 'year'] == now.year:
 
         # Run the code always if the option is set
-        if config.force_update:
+        if config.FORCE_UPDATE:
             break
 
         # Check today's data for completeness
@@ -59,7 +59,7 @@ def is_data_complete(date_ID):
     '''Return whether the data saved for specified date is complete.'''
 
     # Load the data
-    with open('./data/' + config.expansion_name + '.txt', encoding="utf-8") as exp:
+    with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") as exp:
         card_list = exp.readlines()
     card_stats = load_df('card_stats')
     seller = load_df('seller')
@@ -245,16 +245,16 @@ def reset_id(df, id_col):
 # Save the dataframe replacing the existing file.
 def save_data(df, filename):
     '''Save the dataframe replacing the existing file.'''
-    if filename == 'sale_offer' and config.file_part > 1:
-        filename += f'_{config.file_part}'
+    if filename == 'sale_offer' and config.FILE_PART > 1:
+        filename += f'_{config.FILE_PART}'
     df.to_csv(f"data/{filename}.csv", sep=';', index=False)
 
 
 # Try to load a .csv file content into a dataframe.
 def load_df(entity_name):
     '''Try to return a dataframe from the respective .csv file.'''
-    if entity_name == 'sale_offer' and config.file_part > 1:
-        entity_name += f'_{config.file_part}'
+    if entity_name == 'sale_offer' and config.FILE_PART > 1:
+        entity_name += f'_{config.FILE_PART}'
     try:
         df = pd.read_csv('./data/' + entity_name + '.csv', sep=';')
     except pd.errors.EmptyDataError as empty_err:
@@ -311,8 +311,8 @@ def reset_update_flag():
 # Prepare the daily log file.
 def prepare_daily_log_file():
     '''Prepare the daily log file.'''
-    config.daily_logname = datetime.now().strftime("%d%m%Y") + ".log"
-    with open('./logs/data-gathering/' + config.daily_logname,
+    config.DAILY_LOGNAME = datetime.now().strftime("%d%m%Y") + ".log"
+    with open('./logs/data-gathering/' + config.DAILY_LOGNAME,
                          "a+", encoding="utf-8") as daily_logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         daily_logfile.write("\n" + timestamp + ": Data gathering run started.\n")
@@ -321,11 +321,11 @@ def prepare_daily_log_file():
 # Prepare the local log files for single run.
 def prepare_single_log_file():
     '''Prepare the local log files for single run.'''
-    config.log_filename = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
-    with open('./logs/data-gathering/' + config.log_filename,
+    config.LOG_FILENAME = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
+    with open('./logs/data-gathering/' + config.LOG_FILENAME,
                    "a+", encoding="utf-8") as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
-        if os.path.getsize('./logs/data-gathering/' + config.log_filename):
+        if os.path.getsize('./logs/data-gathering/' + config.LOG_FILENAME):
             logfile.write(timestamp + " = Separate code execution = \n")
         else:
             logfile.write(timestamp + " = Creation of this file = \n")
@@ -353,10 +353,10 @@ def generate_date_ID():
                         & (date_df['year'] == int(year))]['date_ID']
 
     if(len(same_date) > 0):
-        config.this_date_ID = same_date.values[0]
+        config.THIS_DATE_ID = same_date.values[0]
     else:
         # Save the date locally
-        config.this_date_ID = date_ID
+        config.THIS_DATE_ID = date_ID
         save_date(date_ID, day, month, year, weekday)
 
 
@@ -417,12 +417,12 @@ def prepare_files():
 # Scan local files to chose the file part for sale offers.
 def determine_offers_file():
     '''Scan local files to chose the file part for sale offers.'''
-    filename = f'sale_offer_{config.file_part}.csv' if config.file_part > 1 else 'sale_offer.csv'
+    filename = f'sale_offer_{config.FILE_PART}.csv' if config.FILE_PART > 1 else 'sale_offer.csv'
     if not os.path.isfile(f'./data/{filename}'):
         return filename
     if os.path.getsize(f'./data/{filename}') < 40000000.0:
         return filename
-    config.file_part += 1
+    config.FILE_PART += 1
     return determine_offers_file()
 
 
