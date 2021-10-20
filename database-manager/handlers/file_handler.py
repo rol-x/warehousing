@@ -1,4 +1,5 @@
 import time
+import os
 
 import pandas as pd
 from checksumdir import dirhash
@@ -8,6 +9,13 @@ from handlers.log_handler import log
 
 # Detect changes in data directory based on calculated checksums
 def register_change():
+    if not os.path.getsize('/flags/validated-checksums.sha1'):
+        log("No validated checksums yet. Waiting for "
+            + "data-gathering to complete the first run.")
+    while not os.path.getsize('./flags/validated-checksums.sha1'):
+        time.sleep(15)
+
+    # Compare the hashes
     last_hash = get_checksums()[-1]
     this_hash = generate_data_hash()
     change_registered = False
@@ -20,7 +28,7 @@ def register_change():
             log("Checksums checked - no changes detected. Waiting 15 minutes.")
             time.sleep(15 * 60)
             this_hash = generate_data_hash()
-        log(" - Change in data files detected.")
+        log("Change in data files detected.")
 
         # Every sixty (60) seconds check whether the update flag is active
         timeout = False

@@ -155,8 +155,8 @@ def is_data_checksum_saved():
 # Get checksums of data files that has been validated
 def get_checksums():
     try:
-        with open('./flags/validated-checksums.sha1', 'r', encoding="utf-8") \
-                as hash_file:
+        with open('./flags/validated-checksums.sha1', 'r',
+                  encoding="utf-8") as hash_file:
             checksums = [line.strip('\n') for line in hash_file.readlines()]
     except FileNotFoundError:
         log_daily("No checksums file found.")
@@ -171,8 +171,8 @@ def generate_checksum():
 
 # Save given data chceksum to an external file
 def save_checksum(checksum):
-    with open('./flags/validated-checksums.sha1', 'a+', encoding="utf-8") \
-            as checksums_file:
+    with open('./flags/validated-checksums.sha1', 'a+',
+              encoding="utf-8") as checksums_file:
         checksums_file.write(checksum + "\n")
 
 
@@ -436,8 +436,8 @@ def prepare_files():
             card_csv.write('card_ID;card_name;expansion_name;rarity\n')
 
     # Create card stats file
-    with open('./data/card_stats.csv', 'a+', encoding="utf-8") \
-            as card_stats_csv:
+    with open('./data/card_stats.csv', 'a+',
+              encoding="utf-8") as card_stats_csv:
         if not os.path.getsize('./data/card_stats.csv'):
             card_stats_csv.write('card_ID;price_from;30_avg_price;7_avg_price;'
                                  + '1_avg_price;available_items;date_ID\n')
