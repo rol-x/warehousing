@@ -11,7 +11,7 @@ from handlers.log_handler import log, log_daily
 
 
 # Check the time and files status to run the code once a day.
-def schedule_run():
+def schedule_the_run():
     '''Check the time and files status to run the code once a day.'''
 
     # Load the data and compare against today
@@ -316,7 +316,7 @@ def load_df(entity_name):
 def secure_load_df(entity_name):
     '''Try to securely load a dataframe from a .csv file.'''
     try:
-        df = pd.read_csv('data' + entity_name + '.csv', sep=';',
+        df = pd.read_csv('./data' + entity_name + '.csv', sep=';',
                          error_bad_lines=False)
     except pd.errors.ParserError as parser_err:
         log(parser_err)
@@ -390,8 +390,8 @@ def generate_date_ID():
 def prepare_files():
     '''Prepare the local data and log files.'''
     # Create main logs directory
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
+    if not os.path.exists('./logs'):
+        os.mkdir('./logs')
 
     # Create service logs directory
     if not os.path.exists('./logs/data-gathering'):
@@ -401,8 +401,8 @@ def prepare_files():
     prepare_daily_log_file()
 
     # Create data directory
-    if not os.path.exists('data'):
-        os.mkdir('data')
+    if not os.path.exists('./data'):
+        os.mkdir('./data')
 
     # Create sellers file
     with open('./data/seller.csv', 'a+', encoding="utf-8") as seller_csv:
@@ -442,8 +442,8 @@ def prepare_files():
     generate_date_ID()
 
     # Create flags directory
-    if not os.path.exists('flags'):
-        os.mkdir('flags')
+    if not os.path.exists('./flags'):
+        os.mkdir('./flags')
 
     # Create a file for storing checksums of validated datasets
     create_checksums_file()
