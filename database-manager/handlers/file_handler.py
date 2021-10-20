@@ -1,6 +1,6 @@
 import os
 import time
-from shutil import copytree
+from shutil import copytree, rmtree
 
 import config
 import pandas as pd
@@ -66,7 +66,7 @@ def isolate_data():
 
 # Remove created temporary directory for data files
 def clean_up():
-    os.remove('./.data')
+    rmtree('./.data')
     log("Cleaned up.")
 
 
