@@ -8,7 +8,7 @@ from selenium import common, webdriver
 from selenium.webdriver.firefox.options import Options
 from urllib3.exceptions import MaxRetryError
 
-from handlers.data_handler import load_df, reset_update_flag
+from handlers.data_handler import load_df
 from handlers.log_handler import log, log_url
 
 
@@ -28,7 +28,6 @@ def connect_webdriver():
             + 'Check if the container is running.')
         log('If it is, check the hostname in config.py '
             + 'and other connection settings.\n')
-        reset_update_flag()
         raise SystemExit from exception
 
 

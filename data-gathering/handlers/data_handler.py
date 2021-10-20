@@ -46,8 +46,8 @@ def schedule_run():
         # Save this complete dataset as validated in checksum form
         if not is_data_checksum_saved():
             log_daily("   - Data validation completed successfully.")
-            log_daily("   - Saving checksum: " + generate_checksum())
-            save_checksum(generate_checksum())
+            log_daily("   - Saving checksum: " + calculate_data_checksum())
+            save_checksum(calculate_data_checksum())
         # Or note that it's already validated and continue waiting
         else:
             log_daily("   - Dataset already validated. All needed data saved.")
@@ -147,25 +147,21 @@ def create_checksums_file():
 # Return whether the data in the files has already been validated.
 def is_data_checksum_saved():
     '''Return whether the data in the files has already been validated.'''
-    if generate_checksum() in get_checksums():
+    if calculate_data_checksum() in get_validated_checksums():
         return True
     return False
 
 
 # Get checksums of data files that has been validated
-def get_checksums():
-    try:
-        with open('./flags/validated-checksums.sha1', 'r',
-                  encoding="utf-8") as hash_file:
-            checksums = [line.strip('\n') for line in hash_file.readlines()]
-    except FileNotFoundError:
-        log_daily("No checksums file found.")
-        checksums = []
+def get_validated_checksums():
+    with open('./flags/validated-checksums.sha1', 'r',
+              encoding="utf-8") as checksum_file:
+        checksums = [line.strip('\n') for line in checksum_file.readlines()]
     return checksums
 
 
-# Return generated hash based on the contents of data directory
-def generate_checksum():
+# Return calculated checksum based on the contents of data directory
+def calculate_data_checksum():
     return str(dirhash('./data', 'sha1'))
 
 
@@ -325,7 +321,6 @@ def secure_load_df(entity_name):
     except pd.errors.ParserError as parser_err:
         log(parser_err)
         log("Importing data from csv failed - aborting.\n")
-        reset_update_flag()
         raise SystemExit from parser_err
     return df
 
@@ -335,21 +330,6 @@ def get_size(entity_name):
     '''Return the number of rows of a specified dataframe.'''
     entity_df = load_df(entity_name)
     return len(entity_df.index)
-
-
-# Set up the file with information about ongoing update.
-def set_update_flag():
-    '''Set up the file with information about ongoing update.'''
-    with open('./flags/update-flag', 'w', encoding="utf-8") as update_flag:
-        update_flag.write('1')
-    log_daily("Update flag set to 1")
-
-
-# Update the flag about the end of the update
-def reset_update_flag():
-    with open('./flags/update-flag', 'w', encoding="utf-8") as update_flag:
-        update_flag.write('0')
-    log_daily("Update flag set to 0")
 
 
 # Prepare the daily log file.
