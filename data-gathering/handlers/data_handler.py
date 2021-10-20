@@ -319,8 +319,8 @@ def prepare_daily_log_file():
     with open('./logs/data-gathering/' + config.DAILY_LOGNAME,
               "a+", encoding="utf-8") as daily_logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
-        daily_logfile.write("\n"
-                            + timestamp + ": Logfile creation.\n")
+        daily_logfile.write("\n" + timestamp
+                            + ": Service data-gathering is running.\n")
 
 
 # Prepare the local log files for single run.
