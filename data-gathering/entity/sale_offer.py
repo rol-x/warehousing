@@ -1,9 +1,10 @@
 import config
 import pandas as pd
-from entity.card import get_card_ID
-from entity.seller import get_seller_ID
 from handlers.data_handler import load_df
 from handlers.log_handler import log
+
+from entity.card import get_card_ID
+from entity.seller import get_seller_ID
 
 
 # Extract information about the offers from provided card soup.

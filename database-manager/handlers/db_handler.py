@@ -1,5 +1,6 @@
-from log_handler import log
 import mysql.connector
+
+from handlers.log_handler import log
 
 
 def connect_to_database():
