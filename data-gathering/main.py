@@ -16,13 +16,13 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
 # TODO: Change singular to plural in entities use, not in model
 # TODO: Research refreshing connection to standalone webdriver
 # TODO: Research waiting for elements in Selenium framework
-# TODO: Distill packages from functions in handlers and entity folders jijin ji asc as
+# TODO: Distill packages from functions in handlers and entity folders
 
 
 # Main function
 def main():
     # Setup
-    data_handler.prepare_file()
+    data_handler.prepare_files()
     data_handler.schedule_run()
     data_handler.prepare_single_log_file()
     data_handler.set_update_flag()
