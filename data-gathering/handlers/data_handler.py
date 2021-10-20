@@ -73,7 +73,7 @@ def is_data_complete(date_ID):
     seller = load_df('seller')
     sale_offer = load_df('sale_offer')
 
-    if len(card_list.index) == 0 or len(card_stats.index) == 0 \
+    if len(card_list) == 0 or len(card_stats.index) == 0 \
             or len(sale_offer.index) == 0 or len(seller.index) == 0:
         return False
 
