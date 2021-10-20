@@ -25,8 +25,8 @@ def add_offers(card_page):
     seller_names = []
     for seller_info in sellers_info:
         seller_names.append(seller_info.find("span", {"class": "d-flex "
-                                                + "has-content-centered "
-                                                + "mr-1"}))
+                                             + "has-content-centered "
+                                             + "mr-1"}))
 
     prices = table.findAll("span", {"class": "font-weight-bold color-primary "
                                     + "small text-right text-nowrap"})
@@ -44,7 +44,7 @@ def add_offers(card_page):
     offers_dict = {"seller_ID": [], "price": [], "card_ID": [],
                    "card_condition": [], "language": [], "is_foiled": [],
                    "amount": [], "date_ID": []}
-    for i in enumerate(seller_names):
+    for i, seller_name in enumerate(seller_names):
         card_attrs = []
         price = float(str(prices[2*i].string)[:-2].replace(".", "")
                       .replace(",", "."))
@@ -69,7 +69,7 @@ def add_offers(card_page):
             log("Incomplete card attributes!")
 
         # Load the entry into the dictionary
-        offers_dict['seller_ID'].append(get_seller_ID(seller_names[i].string))
+        offers_dict['seller_ID'].append(get_seller_ID(seller_name.string))
         offers_dict['price'].append(price)
         offers_dict['card_ID'].append(get_card_ID(card_name))
         offers_dict['card_condition'].append(card_attrs[0])
@@ -93,14 +93,15 @@ def update_sale_offers(offers_dict):
     saved = load_df('sale_offer')
     scraped = pd.DataFrame(offers_dict)
     this_card_today = saved[(saved['card_ID'] == scraped['card_ID'].values[0])
-                          & (saved['date_ID'] == config.THIS_DATE_ID)]
+                            & (saved['date_ID'] == config.THIS_DATE_ID)]
     saved.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
-    fresh = pd.concat([saved, scraped]).reset_index(drop=True).drop_duplicates()
-    filename = f'sale_offer_{config.FILE_PART}.csv' if config.FILE_PART > 1 else 'sale_offer.csv'
-    fresh.to_csv(f'./data/{filename}', ';', index=False)
+    data = pd.concat([saved, scraped]).reset_index(drop=True).drop_duplicates()
+    filename = f'sale_offer_{config.FILE_PART}.csv' if config.FILE_PART > 1 \
+        else 'sale_offer.csv'
+    data.to_csv(f'./data/{filename}', ';', index=False)
 
     # Log task finished
-    log(f"Done - {len(fresh) - len(saved)} sale offers saved  (before: "
-        + f"{len(this_card_today)}, total: {len(fresh)})\n\n")
+    log(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
+        + f"{len(this_card_today)}, total: {len(data)})\n\n")
