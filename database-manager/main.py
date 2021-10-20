@@ -1,7 +1,7 @@
 import time
 
 import config
-from handlers import file_handler
+from handlers import db_handler, file_handler
 from handlers.log_handler import log, setup_logging
 
 # TODO: Write simple database connection, create empty tables if there are none
@@ -19,10 +19,28 @@ def main():
     file_handler.setup_database_checksum()
 
     # Wait until change in files is detected and any updates are finished
-    file_handler.register_change()
+    file_handler.wait_for_new_data()
 
-    # Create a connection to the database
-    log("Database update here")
+    # Copy data directory to temporary location to prevent mid-update changes
+    file_handler.isolate_data()
+
+    # Test query
+    cursor = db_handler.connect_to_database()
+    cursor.execute("SHOW DATABASES")
+    for row in cursor:
+        log(row)
+
+    # Something
+    db_handler.run_update()
+
+    # Close the connection to the database
+    cursor.close()
+
+    # Remove temporary database data files
+    file_handler.clean_up()
+
+    # Update the database files checksum stored locally
+    file_handler.save_database_checksum(config.NEW_CHECKSUM)
 
 
 # Main function
