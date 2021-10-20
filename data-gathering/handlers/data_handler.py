@@ -67,6 +67,12 @@ def is_data_complete(date_ID):
     seller = load_df('seller')
     sale_offer = load_df('sale_offer')
 
+    if len(card_list) == 0 or len(card_stats) == 0 \
+            or len(sale_offer) == 0 or len(seller) == 0:
+        return False
+
+    # TODO: Add faulty data.csv file exceptions
+
     # Check whether the number of card stats is correct
     if len(card_stats[card_stats['date_ID'] == date_ID]) != len(card_list):
         log_daily(f"The number of cards for date ID {date_ID} is incorrect")
