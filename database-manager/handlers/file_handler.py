@@ -18,7 +18,7 @@ def register_change():
         # Every thirty (15) minutes check whether the two hashes differ
         while this_hash == last_hash:
             log("Checksums checked - no changes detected. Waiting 15 minutes.")
-            time.sleep(60 * 15)
+            time.sleep(15 * 60)
             this_hash = generate_data_hash()
         log(" - Change in data files detected.")
 
@@ -36,8 +36,9 @@ def register_change():
                     break
 
             # Timeout after 4 hours
-            if time.time() - start > 60 * 60 * 4:
-                log("Waiting for the update to end timed out.")
+            if time.time() - start > 4 * 60 * 60:
+                log("Waiting for the update end timed out. Waiting 12 hours.")
+                time.sleep(12 * 60 * 60)
                 timeout = True
                 break
 

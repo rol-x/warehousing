@@ -29,24 +29,24 @@ def schedule_run():
             break
 
         # Check today's data for completeness
-        log_daily("Data from today already gathered. Validating.")
+        log_daily(" - Data from today already gathered. Validating.")
 
         # The data with its checksum have already been verified
         if is_data_checksum_saved():
-            log_daily("Dataset already validated.")
+            log_daily("   - Dataset already validated.")
         else:
             # If the data is not complete, break out of the wait loop
             if not is_data_complete(date.loc[row_id, 'date_ID']):
-                log_daily("Dataset invalid. Proceeding to run.")
+                log_daily("   - Dataset invalid. Proceeding to run.")
                 break
 
             # Data validation successful
-            log_daily("Data validation complete.")
-            log_daily("Saving checksum: " + generate_checksum())
+            log_daily(" - Data validation completed successfully.")
+            log_daily(" - Saving checksum: " + generate_checksum())
             save_checksum(generate_checksum())
 
         # If the data doesn't need to be gathered, wait 1 hour
-        log_daily("Waiting for 1 hour.")
+        log_daily(" - Waiting for 1 hour.")
         time.sleep(60 * 60)
 
         # Reload the data after waiting
@@ -320,7 +320,7 @@ def prepare_daily_log_file():
               "a+", encoding="utf-8") as daily_logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         daily_logfile.write("\n"
-                            + timestamp + ": Data gathering run started.\n")
+                            + timestamp + ": Logfile creation.\n")
 
 
 # Prepare the local log files for single run.
@@ -331,9 +331,9 @@ def prepare_single_log_file():
               "a+", encoding="utf-8") as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         if os.path.getsize('./logs/data-gathering/' + config.LOG_FILENAME):
-            logfile.write(timestamp + " = Separate code execution = \n")
+            logfile.write(timestamp + ": = Separate code execution = \n")
         else:
-            logfile.write(timestamp + " = Creation of this file = \n")
+            logfile.write(timestamp + ": = Creation of this file = \n")
 
 
 # Get the current date ID.
@@ -359,6 +359,7 @@ def generate_date_ID():
 
     if(len(same_date) > 0):
         config.THIS_DATE_ID = same_date.values[0]
+        log_daily(f"Date ID: {config.THIS_DATE_ID} already added.")
     else:
         # Save the date locally
         config.THIS_DATE_ID = date_ID
