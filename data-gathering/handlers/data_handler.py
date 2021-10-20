@@ -13,8 +13,14 @@ from handlers.log_handler import log, log_daily
 # Check the time and files status to run the code once a day.
 def schedule_run():
     '''Check the time and files status to run the code once a day.'''
-    # Load the data
+
+    # Load the data and check if it's empty
     date = load_df('date')
+    if len(date.index) == 0:
+        log_daily(' - Empty data files. Proceeding to run.')
+        return
+
+    # Compare against today
     now = datetime.now()
     row_id = date.index[-1]
 
@@ -67,8 +73,8 @@ def is_data_complete(date_ID):
     seller = load_df('seller')
     sale_offer = load_df('sale_offer')
 
-    if len(card_list) == 0 or len(card_stats) == 0 \
-            or len(sale_offer) == 0 or len(seller) == 0:
+    if len(card_list.index) == 0 or len(card_stats.index) == 0 \
+            or len(sale_offer.index) == 0 or len(seller.index) == 0:
         return False
 
     # TODO: Add faulty data.csv file exceptions
