@@ -1,30 +1,17 @@
-from mysql.connector import connect, Exception
 from log_handler import log
 import mysql.connector
 
 
 def connect_to_database():
-    database = mysql.connector.connect(
-                host="localhost",
-                user="yourusername",
-                password="yourpassword")
-    return database.cursor()
-
-
-def run_query(query):
     try:
-        with connect(
-            host="localhost",
-            user="database-manager",
-            password="P@ssword"
-        ) as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                result = cursor.fetchall()
+        database = mysql.connector.connect(
+                    host="localhost",
+                    user="database-manager",
+                    password="P@ssword")
     except Exception as exception:
         log(exception)
-        raise Exception
-    return result
+        raise SystemExit from exception
+    return database.cursor()
 
 
 def run_update():
