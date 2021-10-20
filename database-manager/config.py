@@ -4,5 +4,6 @@
 
 # Variables connected to this single run of the code
 CONTAINER_DELAY = 20
+NEW_CHECKSUM = ''
 
 # Fixed variables
