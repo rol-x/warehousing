@@ -98,13 +98,9 @@ def reset_update_flag():
 
 # Get checksums of data files that has been validated
 def get_checksums():
-    try:
-        with open('./flags/validated-checksums.sha1', 'r',
-                  encoding="utf-8") as hashes:
-            checksums = [line.strip('\n') for line in hashes.readlines()]
-    except FileNotFoundError:
-        log("No checksums file found.")
-        checksums = []
+    with open('./flags/validated-checksums.sha1', 'r',
+              encoding="utf-8") as checksums_file:
+        checksums = [line.strip('\n') for line in checksums_file.readlines()]
     return checksums
 
 
