@@ -448,10 +448,6 @@ def prepare_files():
     # Create a file for storing checksums of validated datasets
     create_checksums_file()
 
-    # Create a file for storing the update flag with initial value 0
-    with open('./flags/update-flag', 'a+', encoding="utf-8"):
-        pass
-
 
 # Scan local files to chose the file part for sale offers.
 def determine_offers_file():
