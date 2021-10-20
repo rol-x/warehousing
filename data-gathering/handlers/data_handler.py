@@ -3,7 +3,7 @@ import os
 import time
 from datetime import datetime
 
-import globals
+import config
 import pandas as pd
 from checksumdir import dirhash
 
@@ -16,15 +16,15 @@ def schedule_run():
     # Load the data
     date = load_df('date')
     now = datetime.now()
-    id = date.index[-1]
+    row_id = date.index[-1]
 
     # Wait until the the newest date is not today
-    while date.loc[id, 'day'] == now.day and \
-        date.loc[id, 'month'] == now.month and \
-            date.loc[id, 'year'] == now.year:
+    while date.loc[row_id, 'day'] == now.day and \
+        date.loc[row_id, 'month'] == now.month and \
+            date.loc[row_id, 'year'] == now.year:
 
         # Run the code always if the option is set
-        if globals.force_update:
+        if config.force_update:
             break
 
         # Check today's data for completeness
@@ -35,7 +35,7 @@ def schedule_run():
             log_daily("Dataset already validated.")
         else:
             # If the data is not complete, break out of the wait loop
-            if not is_data_complete(date.loc[id, 'date_ID']):
+            if not is_data_complete(date.loc[row_id, 'date_ID']):
                 log_daily("Dataset invalid. Proceeding to run.")
                 break
 
@@ -50,7 +50,7 @@ def schedule_run():
 
         # Reload the data after waiting
         date = load_df('date')
-        id = date.index[-1]
+        row_id = date.index[-1]
         now = datetime.now()
 
 
@@ -59,7 +59,8 @@ def is_data_complete(date_ID):
     '''Return whether the data saved for specified date is complete.'''
 
     # Load the data
-    card_list = open('./data/' + globals.expansion_name + '.txt').readlines()
+    with open('./data/' + config.expansion_name + '.txt', encoding="utf-8") as exp:
+        card_list = exp.readlines()
     card_stats = load_df('card_stats')
     seller = load_df('seller')
     sale_offer = load_df('sale_offer')
@@ -97,8 +98,8 @@ def is_data_complete(date_ID):
 # Create the checksums file for storing validated datasets.
 def create_checksums_file():
     '''Create the checksums file for storing validated datasets.'''
-    checksums = open('./flags/validated-checksums.sha1', 'a+')
-    checksums.close()
+    with open('./flags/validated-checksums.sha1', 'a+', encoding="utf-8"):
+        pass
 
 
 # Return whether the data in the files has already been validated.
@@ -112,9 +113,8 @@ def is_data_checksum_saved():
 # Get checksums of data files that has been validated
 def get_checksums():
     try:
-        checksums_file = open('./flags/validated-checksums.sha1', 'r')
-        checksums = [line.strip('\n') for line in checksums_file.readlines()]
-        checksums_file.close()
+        with open('./flags/validated-checksums.sha1', 'r', encoding="utf-8") as hash_file:
+            checksums = [line.strip('\n') for line in hash_file.readlines()]
     except FileNotFoundError:
         log_daily("No checksums file found.")
         checksums = []
@@ -128,7 +128,7 @@ def generate_checksum():
 
 # Save given data chceksum to an external file
 def save_checksum(checksum):
-    with open('./flags/validated-checksums.sha1', 'a+') as checksums_file:
+    with open('./flags/validated-checksums.sha1', 'a+', encoding="utf-8") as checksums_file:
         checksums_file.write(checksum + "\n")
 
 
@@ -245,18 +245,18 @@ def reset_id(df, id_col):
 # Save the dataframe replacing the existing file.
 def save_data(df, filename):
     '''Save the dataframe replacing the existing file.'''
-    if filename == 'sale_offer' and globals.file_part > 1:
-        filename += f'_{globals.file_part}'
+    if filename == 'sale_offer' and config.file_part > 1:
+        filename += f'_{config.file_part}'
     df.to_csv(f"data/{filename}.csv", sep=';', index=False)
 
 
 # Try to load a .csv file content into a dataframe.
 def load_df(entity_name):
     '''Try to return a dataframe from the respective .csv file.'''
-    if entity_name == 'sale_offer' and globals.file_part > 1:
-        entity_name += f'_{globals.file_part}'
+    if entity_name == 'sale_offer' and config.file_part > 1:
+        entity_name += f'_{config.file_part}'
     try:
-        df = pd.read_csv('data/' + entity_name + '.csv', sep=';')
+        df = pd.read_csv('./data/' + entity_name + '.csv', sep=';')
     except pd.errors.EmptyDataError as empty_err:
         log(f'Please prepare the headers and data in {entity_name}.csv!\n')
         log(str(empty_err))
@@ -282,7 +282,7 @@ def secure_load_df(entity_name):
         log(parser_err)
         log("Importing data from csv failed - aborting.\n")
         reset_update_flag()
-        raise SystemExit
+        raise SystemExit from parser_err
     return df
 
 
@@ -296,45 +296,39 @@ def get_size(entity_name):
 # Set up the file with information about ongoing update.
 def set_update_flag():
     '''Set up the file with information about ongoing update.'''
-    update_flag = open('./flags/update-flag', 'w')
-    update_flag.write('1')
-    update_flag.close()
+    with open('./flags/update-flag', 'w', encoding="utf-8") as update_flag:
+        update_flag.write('1')
     log_daily("Update flag set to 1")
 
 
 # Update the flag about the end of the update
 def reset_update_flag():
-    update_flag = open('./flags/update-flag', 'w')
-    update_flag.write('0')
-    update_flag.close()
+    with open('./flags/update-flag', 'w', encoding="utf-8") as update_flag:
+        update_flag.write('0')
     log_daily("Update flag set to 0")
 
 
 # Prepare the daily log file.
 def prepare_daily_log_file():
     '''Prepare the daily log file.'''
-    globals.daily_logname = datetime.now().strftime("%d%m%Y") + ".log"
-    daily_logfile = open('logs/data-gathering/' + globals.daily_logname,
-                         "a+", encoding="utf-8")
-
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    daily_logfile.write("\n" + timestamp + ": Data gathering run started.\n")
-    daily_logfile.close()
+    config.daily_logname = datetime.now().strftime("%d%m%Y") + ".log"
+    with open('./logs/data-gathering/' + config.daily_logname,
+                         "a+", encoding="utf-8") as daily_logfile:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        daily_logfile.write("\n" + timestamp + ": Data gathering run started.\n")
 
 
 # Prepare the local log files for single run.
 def prepare_single_log_file():
     '''Prepare the local log files for single run.'''
-    globals.log_filename = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
-    logfile = open('logs/data-gathering/' + globals.log_filename,
-                   "a+", encoding="utf-8")
-
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    if os.path.getsize('logs/data-gathering/' + globals.log_filename):
-        logfile.write(timestamp + " = Separate code execution = \n")
-    else:
-        logfile.write(timestamp + " = Creation of this file = \n")
-    logfile.close()
+    config.log_filename = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
+    with open('./logs/data-gathering/' + config.log_filename,
+                   "a+", encoding="utf-8") as logfile:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        if os.path.getsize('./logs/data-gathering/' + config.log_filename):
+            logfile.write(timestamp + " = Separate code execution = \n")
+        else:
+            logfile.write(timestamp + " = Creation of this file = \n")
 
 
 # Get the current date ID.
@@ -359,10 +353,10 @@ def generate_date_ID():
                         & (date_df['year'] == int(year))]['date_ID']
 
     if(len(same_date) > 0):
-        globals.this_date_ID = same_date.values[0]
+        config.this_date_ID = same_date.values[0]
     else:
         # Save the date locally
-        globals.this_date_ID = date_ID
+        config.this_date_ID = date_ID
         save_date(date_ID, day, month, year, weekday)
 
 
@@ -372,8 +366,8 @@ def prepare_files():
     # Logs
     if not os.path.exists('logs'):
         os.mkdir('logs')
-    if not os.path.exists('logs/data-gathering'):
-        os.mkdir('logs/data-gathering')
+    if not os.path.exists('./logs/data-gathering'):
+        os.mkdir('./logs/data-gathering')
 
     prepare_daily_log_file()
 
@@ -381,34 +375,29 @@ def prepare_files():
     if not os.path.exists('data'):
         os.mkdir('data')
 
-    seller_csv = open('data/seller.csv', 'a+', encoding="utf-8")
-    if not os.path.getsize('data/seller.csv'):
-        seller_csv.write('seller_ID;seller_name;seller_type'
-                         + ';member_since;country;address\n')
-    seller_csv.close()
+    with open('./data/seller.csv', 'a+', encoding="utf-8") as seller_csv:
+        if not os.path.getsize('./data/seller.csv'):
+            seller_csv.write('seller_ID;seller_name;seller_type'
+                            + ';member_since;country;address\n')
 
-    card_csv = open('data/card.csv', 'a+', encoding="utf-8")
-    if not os.path.getsize('data/card.csv'):
-        card_csv.write('card_ID;card_name;expansion_name;rarity\n')
-    card_csv.close()
+    with open('./data/card.csv', 'a+', encoding="utf-8") as card_csv:
+        if not os.path.getsize('./data/card.csv'):
+            card_csv.write('card_ID;card_name;expansion_name;rarity\n')
 
-    card_stats_csv = open('data/card_stats.csv', 'a+', encoding="utf-8")
-    if not os.path.getsize('data/card_stats.csv'):
-        card_stats_csv.write('card_ID;price_from;30_avg_price;7_avg_price;'
-                             + '1_avg_price;available_items;date_ID\n')
-    card_stats_csv.close()
+    with open('./data/card_stats.csv', 'a+', encoding="utf-8") as card_stats_csv:
+        if not os.path.getsize('./data/card_stats.csv'):
+            card_stats_csv.write('card_ID;price_from;30_avg_price;7_avg_price;'
+                                + '1_avg_price;available_items;date_ID\n')
 
-    date_csv = open('data/date.csv', 'a+', encoding="utf-8")
-    if not os.path.getsize('data/date.csv'):
-        date_csv.write('date_ID;day;month;year;day_of_week\n')
-    date_csv.close()
+    with open('./data/date.csv', 'a+', encoding="utf-8") as date_csv:
+        if not os.path.getsize('./data/date.csv'):
+            date_csv.write('date_ID;day;month;year;day_of_week\n')
 
     filename = determine_offers_file()
-    sale_offer_csv = open(f'data/{filename}', 'a+', encoding="utf-8")
-    if not os.path.getsize(f'data/{filename}'):
-        sale_offer_csv.write('seller_ID;price;card_ID;card_condition;'
-                             + 'language;is_foiled;amount;date_ID\n')
-    sale_offer_csv.close()
+    with open(f'./data/{filename}', 'a+', encoding="utf-8") as sale_offer_csv:
+        if not os.path.getsize(f'./data/{filename}'):
+            sale_offer_csv.write('seller_ID;price;card_ID;card_condition;'
+                                + 'language;is_foiled;amount;date_ID\n')
 
     # Set global date ID and new date if needed
     generate_date_ID()
@@ -421,29 +410,27 @@ def prepare_files():
     create_checksums_file()
 
     # Create a file for storing the update flag with initial value 0
-    with open('./flags/update-flag', 'a+'):
+    with open('./flags/update-flag', 'a+', encoding="utf-8"):
         pass
 
 
 # Scan local files to chose the file part for sale offers.
 def determine_offers_file():
     '''Scan local files to chose the file part for sale offers.'''
-    filename = 'sale_offer{suffix}.csv' \
-        .format(suffix=f"_{globals.file_part}"
-                if globals.file_part > 1 else "")
-    if not os.path.isfile(f'data/{filename}'):
+    filename = f'sale_offer_{config.file_part}.csv' if config.file_part > 1 else 'sale_offer.csv'
+    if not os.path.isfile(f'./data/{filename}'):
         return filename
-    if os.path.getsize(f'data/{filename}') < 40000000.0:
+    if os.path.getsize(f'./data/{filename}') < 40000000.0:
         return filename
-    globals.file_part += 1
+    config.file_part += 1
     return determine_offers_file()
 
 
 # Prepare the expansion cards list file.
 def prepare_expansion_list_file(exp_filename):
     '''Prepare the expansion cards list file.'''
-    exp_file = open('data/' + exp_filename + '.txt', 'a+', encoding="utf-8")
-    exp_file.close()
+    with open('./data/' + exp_filename + '.txt', 'a+', encoding="utf-8"):
+        pass
 
 
 # Save a single date to the date dataframe in .csv file.
@@ -458,7 +445,7 @@ def save_date(date_ID, day, month, year, weekday):
     log_daily('Date ID:       ' + str(date_ID) + '\n')
 
     # Writing
-    with open('data/date.csv', 'a', encoding="utf-8") as date_csv:
+    with open('./data/date.csv', 'a', encoding="utf-8") as date_csv:
         date_csv.write(str(date_ID) + ';')
         date_csv.write(str(day) + ';')
         date_csv.write(str(month) + ';')

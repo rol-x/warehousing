@@ -29,4 +29,4 @@ if __name__ == '__main__':
             main()
     except Exception as exception:
         log(exception)
-        raise SystemExit
+        raise SystemExit from exception

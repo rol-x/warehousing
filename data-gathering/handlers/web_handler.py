@@ -1,7 +1,7 @@
 from random import normalvariate, random
 from time import sleep, time
 
-import globals
+import config
 from bs4 import BeautifulSoup
 from entity.seller import add_seller
 from selenium import common, webdriver
@@ -18,7 +18,7 @@ def connect_webdriver():
     options = Options()
     options.headless = True
     try:
-        driver = webdriver.Remote("http://" + globals.webdriver_hostname
+        driver = webdriver.Remote("http://" + config.webdriver_hostname
                                   + ":4444/wd/hub", options=options)
         log('Webdriver connection ready\n')
         return driver
@@ -26,19 +26,19 @@ def connect_webdriver():
         log(exception)
         log('The connection to remote webdriver failed. '
             + 'Check if the container is running.')
-        log('If it is, check the hostname in globals.py '
+        log('If it is, check the hostname in config.py '
             + 'and other connection settings.\n')
         reset_update_flag()
-        raise SystemExit
+        raise SystemExit from exception
 
 
 # Return the Firefox webdriver in headless mode.
 def reconnect(driver):
     '''Return the Firefox webdriver in headless mode.'''
     log('Restarting the webdriver connection')
-    realistic_pause(globals.wait_coef)
+    realistic_pause(config.wait_coef)
     driver.close()
-    realistic_pause(globals.wait_coef)
+    realistic_pause(config.wait_coef)
     driver = connect_webdriver()
     return driver
 
@@ -67,17 +67,17 @@ def add_sellers_from_set(driver, sellers):
         if seller_name not in seller_df['seller_name'].values:
 
             # Try to get seller data from page
-            while tries < globals.max_tries:
-                realistic_pause(0.8*globals.wait_coef)
-                driver.get(globals.users_url + seller_name)
+            while tries < config.max_tries:
+                realistic_pause(0.8*config.wait_coef)
+                driver.get(config.users_url + seller_name)
                 seller_soup = BeautifulSoup(driver.page_source, 'html.parser')
                 seller_ok = add_seller(seller_soup)
                 if seller_ok:
-                    tries = globals.max_tries
+                    tries = config.max_tries
                     new_sellers += 1
                 else:
                     tries += 1
-                    realistic_pause(globals.wait_coef)
+                    realistic_pause(config.wait_coef)
             tries = 0
 
     # Log task finished
@@ -91,8 +91,8 @@ def get_card_names(driver, expansion_name):
     '''Return a list of all cards found in the expansion cards list.'''
     # Load the number of cards stored in a local file
     exp_filename = urlify(expansion_name)
-    exp_file = open('data/' + exp_filename + '.txt', 'r', encoding="utf-8")
-    saved_cards = exp_file.read().split('\n')[:-1]
+    with open('./data/' + exp_filename + '.txt', 'r', encoding="utf-8") as exp_file:
+        saved_cards = exp_file.read().split('\n')[:-1]
     exp_file.close()
     log("Task - Getting all card names from current expansion")
 
@@ -100,7 +100,7 @@ def get_card_names(driver, expansion_name):
     page_no = 1
     while True:
         # Separate divs that have card links and names
-        driver.get(globals.base_url + expansion_name + '?site=' + str(page_no))
+        driver.get(config.base_url + expansion_name + '?site=' + str(page_no))
         log_url(driver.current_url)
         list_soup = BeautifulSoup(driver.page_source, 'html.parser')
         card_elements = list_soup.findAll("div", {"class": "col-10 col-md-8 "
@@ -128,13 +128,13 @@ def get_card_names(driver, expansion_name):
 
         # Advance to the next page
         page_no += 1
-        realistic_pause(0.3*globals.wait_coef)
+        realistic_pause(0.3*config.wait_coef)
 
     # Save the complete cards list to a file
-    exp_file = open('data/' + exp_filename + '.txt', 'w', encoding="utf-8")
-    for card_name in all_cards:
-        exp_file.write(card_name + '\n')
-    exp_file.close()
+    with open('./data/' + exp_filename + '.txt', 'w', encoding="utf-8") as exp_file:
+        for card_name in all_cards:
+            exp_file.write(card_name + '\n')
+        exp_file.close()
 
     # Return the complete cards list
     log(f"Done - All card names from {expansion_name} saved\n")
@@ -146,7 +146,7 @@ def click_load_more_button(driver):
     '''Deplete the Load More button to have a complete list of card sellers.'''
     elapsed_t = 0.0
     start_t = time()
-    realistic_pause(0.6*globals.wait_coef)
+    realistic_pause(0.6*config.wait_coef)
     while True:
         try:
             # Locate the button element
@@ -159,11 +159,11 @@ def click_load_more_button(driver):
 
             # Click the button and wait
             driver.execute_script("arguments[0].click();", load_more_button)
-            realistic_pause(0.25*globals.wait_coef)
+            realistic_pause(0.25*config.wait_coef)
 
             # Check for timeout
             elapsed_t = time() - start_t
-            if elapsed_t > globals.button_timeout:
+            if elapsed_t > config.button_timeout:
                 return False
 
         # When there is no button
@@ -178,7 +178,7 @@ def click_load_more_button(driver):
         except common.exceptions.ErrorInResponseException:
             return False
         except common.exceptions.InvalidSessionIdException:
-            realistic_pause(globals.wait_coef)
+            realistic_pause(config.wait_coef)
             return False
         except common.exceptions.WebDriverException:
             return False

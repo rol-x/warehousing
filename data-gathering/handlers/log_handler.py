@@ -1,7 +1,7 @@
 """Scrape the card market website to get all the neccessary data."""
 from datetime import datetime
 
-import globals
+import config
 
 
 # Log the current url to the console and log file.
@@ -14,7 +14,7 @@ def log_url(url):
 def log(msg):
     '''Log a message to a local file and the console.'''
     msg = str(msg)
-    with open('logs/data-gathering/' + globals.log_filename,
+    with open('./logs/data-gathering/' + config.log_filename,
               'a+', encoding="utf-8") as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         logfile.write(timestamp + ": " + msg + "\n")
@@ -25,7 +25,7 @@ def log(msg):
 def log_daily(msg):
     '''Log a message to the daily run file and the console.'''
     msg = str(msg)
-    with open('logs/data-gathering/' + globals.daily_logname,
+    with open('./logs/data-gathering/' + config.daily_logname,
               'a+', encoding="utf-8") as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         logfile.write(timestamp + ": " + msg + "\n")

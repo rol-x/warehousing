@@ -1,8 +1,8 @@
 """Scrape the card market website to get all the neccessary data."""
 import time
 
-import globals
-import handlers.data_handler as data_handler
+import config
+from handlers import data_handler
 from entity.card import add_card, get_card_ID, is_card_saved
 from entity.card_stats import add_card_stats, are_card_stats_saved_today
 from entity.sale_offer import add_offers
@@ -16,17 +16,18 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
 # TODO: Change singular to plural in entities use, not in model
 # TODO: Research refreshing connection to standalone webdriver
 # TODO: Research waiting for elements in Selenium framework
-# TODO: Distill packages from functions in handlers and entity folders
+# TODO: Distill packages from functions in handlers and entity folders jijin ji asc as
 
 
 # Main function
-def main(driver):
+def main():
     # Setup
-    data_handler.prepare_files()
+    data_handler.prepare_file()
     data_handler.schedule_run()
     data_handler.prepare_single_log_file()
     data_handler.set_update_flag()
-    data_handler.prepare_expansion_list_file(globals.expansion_name)
+    data_handler.prepare_expansion_list_file(config.EXPANSION_NAME)
+    driver = connect_webdriver()
 
     # Validate the local data (pre-acquisition)
     removed = data_handler.validate_local_data()
@@ -34,22 +35,22 @@ def main(driver):
 
     # Get card names and open each card's URL
     progress = 0
-    card_list = get_card_names(driver, globals.expansion_name)
+    card_list = get_card_names(driver, config.EXPANSION_NAME)
     for card_name in card_list:
         progress += 1
-        if progress < globals.start_from:
+        if progress < config.START_FROM:
             continue
         log_progress(card_name, progress, len(card_list))
 
         # Compose the card page url from the card's name
-        card_url = globals.base_url + globals.expansion_name + '/'
+        card_url = config.BASE_URL + config.EXPANSION_NAME + '/'
         card_url += urlify(card_name)
 
         # Try to load the page 3 times
         tries = 0
-        while tries < globals.max_tries:
+        while tries < config.MAX_TRIES:
             # Open the card page and extend the view maximally
-            realistic_pause(globals.wait_coef)
+            realistic_pause(config.WAIT_COEF)
             driver.get(card_url)
             log_url(driver.current_url)
             log("                Expanding page...\n")
@@ -59,17 +60,16 @@ def main(driver):
                 card_soup = create_soup(driver.page_source)
                 if is_valid_card_page(card_soup):
                     break
-                else:
-                    log('Card page invalid')
-                    driver = reconnect(driver)
-                    log('Waiting and reconnecting...  (15 sec cooldown)')
-                    realistic_pause(15.0)
+                log('Card page invalid')
+                driver = reconnect(driver)
+                log('Waiting and reconnecting...  (15 sec cooldown)')
+                realistic_pause(15.0)
             else:
                 log('Expanding the offers list timed out')
                 driver = reconnect(driver)
                 log('Waiting and reconnecting...  (15 sec cooldown)')
                 realistic_pause(15.0)
-                globals.wait_coef *= 1.1
+                config.WAIT_COEF *= 1.1
             tries += 1
 
         # Save the card if not saved already
@@ -111,11 +111,10 @@ def main(driver):
 # Main function
 if __name__ == '__main__':
     time.sleep(10)
-    driver = connect_webdriver()
     try:
         while True:
-            main(driver)
+            main()
     except Exception as exception:
         data_handler.reset_update_flag()
         log_daily(exception)
-        raise SystemExit
+        raise SystemExit from exception

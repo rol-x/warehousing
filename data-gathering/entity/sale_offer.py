@@ -1,5 +1,4 @@
-import globals
-import numpy as np
+import config
 import pandas as pd
 from entity.card import get_card_ID
 from entity.seller import get_seller_ID
@@ -25,19 +24,15 @@ def add_offers(card_page):
                                           + "align-items-center"})
     seller_names = []
     for seller_info in sellers_info:
-        seller_name = seller_info.find("span", {"class": "d-flex "
+        seller_names.append(seller_info.find("span", {"class": "d-flex "
                                                 + "has-content-centered "
-                                                + "mr-1"})
-        seller_names.append(seller_name)
+                                                + "mr-1"}))
 
     prices = table.findAll("span", {"class": "font-weight-bold color-primary "
                                     + "small text-right text-nowrap"})
     amounts = table.findAll("span", {"class":
                             "item-count small text-right"})
     attributes = table.findAll("div", {"class": "product-attributes col"})
-
-    # Get the card ID (dependent on card_name and this_date_ID)
-    card_ID = get_card_ID(card_name)
 
     # Ensure the table has proper content
     if not (len(prices) / 2) == len(amounts) \
@@ -49,18 +44,16 @@ def add_offers(card_page):
     offers_dict = {"seller_ID": [], "price": [], "card_ID": [],
                    "card_condition": [], "language": [], "is_foiled": [],
                    "amount": [], "date_ID": []}
-    for i in range(len(seller_names)):
-        offer_attrs = []
+    for i in enumerate(seller_names):
+        card_attrs = []
         price = float(str(prices[2*i].string)[:-2].replace(".", "")
                       .replace(",", "."))
-        amount = int(amounts[i].string)
-        seller_name = seller_names[i].string
 
         # Get card attributes
         for attr in attributes[i].findAll("span"):
             if attr is not None:
                 try:
-                    offer_attrs.append(attr["data-original-title"])
+                    card_attrs.append(attr["data-original-title"])
                 except KeyError:
                     continue
             is_foiled = False
@@ -71,51 +64,43 @@ def add_offers(card_page):
                     is_foiled = True
 
         # Interpret the attributes
-        if len(offer_attrs) >= 2:
-            condition = offer_attrs[0]
-            card_lang = offer_attrs[1]
-        else:
-            condition = ''
-            card_lang = ''
+        if len(card_attrs) < 2:
+            card_attrs = ['', '']
             log("Incomplete card attributes!")
 
         # Load the entry into the dictionary
-        seller_ID = get_seller_ID(seller_name)
-        offers_dict['seller_ID'].append(seller_ID)
+        offers_dict['seller_ID'].append(get_seller_ID(seller_names[i].string))
         offers_dict['price'].append(price)
-        offers_dict['card_ID'].append(card_ID)
-        offers_dict['card_condition'].append(condition)
-        offers_dict['language'].append(card_lang)
+        offers_dict['card_ID'].append(get_card_ID(card_name))
+        offers_dict['card_condition'].append(card_attrs[0])
+        offers_dict['language'].append(card_attrs[1])
         offers_dict['is_foiled'].append(is_foiled)
-        offers_dict['amount'].append(amount)
-        offers_dict['date_ID'].append(globals.this_date_ID)
+        offers_dict['amount'].append(int(amounts[i].string))
+        offers_dict['date_ID'].append(config.THIS_DATE_ID)
 
-        for key in offers_dict.keys():
-            if len(offers_dict[key]) == 0:
+        for key, value in offers_dict.items():
+            if len(value) == 0:
                 log("Faulty offer set! No entrys for key: " + key)
                 return
 
-    update_offers(offers_dict)
+    update_sale_offers(offers_dict)
 
 
-# Take new offers and rewrite the dataframe with them today.
-def update_offers(offers_dict):
-    '''Take new offers and rewrite the dataframe with them today.'''
+# Take the gathered data and adjoin it to the local files
+def update_sale_offers(offers_dict):
 
     # Load and drop today's sales data for this card
-    all = load_df('sale_offer')
+    saved = load_df('sale_offer')
     scraped = pd.DataFrame(offers_dict)
-    this_card_today = all[(all['card_ID'] == scraped['card_ID'].values[0])
-                          & (all['date_ID'] == globals.this_date_ID)]
-    all.drop(this_card_today.index, inplace=True)
+    this_card_today = saved[(saved['card_ID'] == scraped['card_ID'].values[0])
+                          & (saved['date_ID'] == config.THIS_DATE_ID)]
+    saved.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
-    fresh = pd.concat([all, scraped]).reset_index(drop=True).drop_duplicates()
-    filename = 'sale_offer{suffix}.csv' \
-        .format(suffix=f"_{globals.file_part}"
-                if globals.file_part > 1 else "")
-    fresh.to_csv(f'data/{filename}', ';', index=False)
+    fresh = pd.concat([saved, scraped]).reset_index(drop=True).drop_duplicates()
+    filename = f'sale_offer_{config.FILE_PART}.csv' if config.FILE_PART > 1 else 'sale_offer.csv'
+    fresh.to_csv(f'./data/{filename}', ';', index=False)
 
     # Log task finished
-    log(f"Done - {len(fresh) - len(all)} sale offers saved  (before: "
+    log(f"Done - {len(fresh) - len(saved)} sale offers saved  (before: "
         + f"{len(this_card_today)}, total: {len(fresh)})\n\n")

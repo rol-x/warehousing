@@ -21,13 +21,6 @@ def add_card(card_soup):
     expansion_name = card_info[1].find('span')['data-original-title']
     rarity = card_info[0].find('span')['data-original-title']
 
-    save_card(card_ID, card_name, expansion_name, rarity)
-
-
-# Save a single card to the card dataframe in .csv file.
-def save_card(card_ID, card_name, expansion_name, rarity):
-    '''Save a single card to the card dataframe in .csv file.'''
-
     # Logging
     log('== Add card ==')
     log('Card ID:       ' + str(card_ID))
@@ -36,7 +29,7 @@ def save_card(card_ID, card_name, expansion_name, rarity):
     log('Expansion:     ' + str(expansion_name) + '\n')
 
     # Writing to the file
-    with open('data/card.csv', 'a', encoding="utf-8") as card_csv:
+    with open('./data/card.csv', 'a', encoding="utf-8") as card_csv:
         card_csv.write(str(card_ID) + ';')
         card_csv.write(card_name + ';')
         card_csv.write(expansion_name + ';')

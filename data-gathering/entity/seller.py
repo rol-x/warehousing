@@ -54,27 +54,19 @@ def add_seller(seller_soup):
     if address == country:
         address = ''
 
-    save_seller(seller_ID, seller_name, s_type, member_since, country, address)
-
-    return True
-
-
-# Save a single seller row to the seller dataframe in .csv file.
-def save_seller(seller_ID, seller_name, s_type,
-                member_since, country, address):
-    '''Save a single seller row to the seller dataframe in .csv file.'''
-
     # Logging
     log(f"Seller added:  {seller_name} [{seller_ID}]")
 
     # Writing
-    with open('data/seller.csv', 'a', encoding="utf-8") as seller_csv:
+    with open('./data/seller.csv', 'a', encoding="utf-8") as seller_csv:
         seller_csv.write(str(seller_ID) + ';')
         seller_csv.write(seller_name + ';')
         seller_csv.write(s_type + ';')
         seller_csv.write(member_since + ';')
         seller_csv.write(country + ';')
         seller_csv.write(address + '\n')
+
+    return True
 
 
 # Return a seller ID given its name.
