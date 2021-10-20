@@ -91,7 +91,8 @@ def get_card_names(driver, expansion_name):
     '''Return a list of all cards found in the expansion cards list.'''
     # Load the number of cards stored in a local file
     exp_filename = urlify(expansion_name)
-    with open('./data/' + exp_filename + '.txt', 'r', encoding="utf-8") as exp_file:
+    with open('./data/' + exp_filename + '.txt', 'r',
+              encoding="utf-8") as exp_file:
         saved_cards = exp_file.read().split('\n')[:-1]
     exp_file.close()
     log("Task - Getting all card names from current expansion")
@@ -131,7 +132,8 @@ def get_card_names(driver, expansion_name):
         realistic_pause(0.3*config.WAIT_COEF)
 
     # Save the complete cards list to a file
-    with open('./data/' + exp_filename + '.txt', 'w', encoding="utf-8") as exp_file:
+    with open('./data/' + exp_filename + '.txt', 'w',
+              encoding="utf-8") as exp_file:
         for card_name in all_cards:
             exp_file.write(card_name + '\n')
         exp_file.close()

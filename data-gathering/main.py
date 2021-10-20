@@ -110,6 +110,7 @@ def main():
 
 # Main function
 if __name__ == '__main__':
+    log_daily("Started: data-gathering")
     time.sleep(10)
     try:
         while True:

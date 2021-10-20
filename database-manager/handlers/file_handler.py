@@ -8,7 +8,8 @@ from handlers.log_handler import log
 
 # Detect changes in data directory based on calculated checksums
 def register_change():
-    with open("./flags/data-checksum.sha1", "r", encoding="utf-8") as hash_file:
+    with open("./flags/data-checksum.sha1", "r",
+              encoding="utf-8") as hash_file:
         last_hash = hash_file.readline()
     this_hash = generate_data_hash()
     change_registered = False
@@ -27,7 +28,8 @@ def register_change():
         timeout = False
         start = time.time()
         while True:
-            with open("./flags/update-flag", "r", encoding="utf-8") as update_flag:
+            with open("./flags/update-flag", "r",
+                      encoding="utf-8") as update_flag:
                 if update_flag.readline() == '1':
 
                     # Exit on timeout after 4 hours
@@ -69,7 +71,8 @@ def generate_data_hash():
 
 # Save given data hash to an external file
 def save_hash(checksum):
-    with open('./flags/data-checksum.sha1', 'w+', encoding="utf-8") as hash_file:
+    with open('./flags/data-checksum.sha1', 'w+',
+              encoding="utf-8") as hash_file:
         hash_file.write(checksum)
 
 
@@ -88,12 +91,12 @@ def reset_update_flag():
     log("Update flag set to 0")
 
 
-
 # Get checksums of data files that has been validated
 def get_checksums():
     try:
-        with open('./flags/validated-checksums.sha1', 'r', encoding="utf-8") as checksums_file:
-            checksums = [line.strip('\n') for line in checksums_file.readlines()]
+        with open('./flags/validated-checksums.sha1', 'r',
+                  encoding="utf-8") as hashes:
+            checksums = [line.strip('\n') for line in hashes.readlines()]
     except FileNotFoundError:
         log("No checksums file found.")
         checksums = []
