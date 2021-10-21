@@ -41,15 +41,18 @@ services:
       - ./data:/data
       - ./logs:/logs
       - ./flags:/flags
+    ports:
+      - "3308:3306"
     restart: always
 
   mysql_database:
     container_name: mysql_database
     image: mysql/mysql-server
     environment:
+      MYSQL_DATABASE: gathering
       MYSQL_USER: database-manager
-      MYSQL_PASSWORD: P@ssword
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: h4Rd_p4sSW0rD
+      MYSQL_ROOT_PASSWORD: h4Rd_p4sSW0rD
     ports:
       - "3307:3306"
     restart: always
