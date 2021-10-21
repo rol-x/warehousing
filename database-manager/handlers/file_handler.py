@@ -32,7 +32,7 @@ def setup_database_checksum():
 # Ensure at least one proper data-gathering run is completed
 def ensure_complete_dataset():
     if not os.path.getsize('/flags/validated-checksums.sha1'):
-        log("No validated checksums yet. Waiting for "
+        log(" - No validated checksums yet. Waiting for "
             + "data-gathering to complete the first run.")
     while not os.path.getsize('./flags/validated-checksums.sha1'):
         time.sleep(15)
@@ -44,14 +44,22 @@ def wait_for_new_data():
     # Ensure at least one proper data-gathering run is completed
     ensure_complete_dataset()
 
-    # Check for changes in data directory
-    while calculate_data_checksum('./data') == read_database_checksum():
-        log(" - Newest data already in database. Waiting 30 minutes.")
-        time.sleep(30 * 60)
+    # Wait until new verified dataset is present
+    while True:
 
-    # Some change in files was detected, ensure it's a proper dataset
-    while calculate_data_checksum('./data') not in read_validated_checksums():
-        log("   - New data found, but is not complete. Waiting 5 minutes.")
+        # Check if there are differences between database and local files
+        if calculate_data_checksum('./data') == read_database_checksum():
+            log(" - Newest data already in database. Waiting 30 minutes.")
+            time.sleep(30 * 60)
+            continue
+
+        # Check if ready, validated dataset is waiting for us to register
+        if calculate_data_checksum('./data') in read_validated_checksums():
+            log(" - Verified new data available for database update.")
+            break
+
+        # Some change in files was detected, ensure it's a proper dataset
+        log(" - New data found, but is not complete. Waiting 5 minutes.")
         time.sleep(5 * 60)
 
 
@@ -59,9 +67,11 @@ def wait_for_new_data():
 def isolate_data():
     config.NEW_CHECKSUM = calculate_data_checksum('./data')
     if os.path.exists('./.data'):
-        os.remove('./.data')
+        rmtree('./.data')
     copytree('./data', './.data')
+    temp_checksum = calculate_data_checksum('./.data')
     log("Data isolated.")
+    log("Checksum: %s" % temp_checksum)
 
 
 # Remove created temporary directory for data files
