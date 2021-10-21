@@ -1,0 +1,55 @@
+20:10:30: = Creation of this file = 
+20:10:39: Webdriver connection ready
+
+20:10:39: Local data validated (removed 0 records)
+
+20:10:39: Task - Getting all card names from current expansion
+20:10:40: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=1
+20:10:42: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=2
+20:10:44: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=3
+20:10:46: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=4
+20:10:48: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=5
+20:10:50: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=6
+20:10:53: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=7
+20:10:55: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=8
+20:10:57: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=9
+20:10:59: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=10
+20:11:01: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=11
+20:11:03: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=12
+20:11:04: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=13
+20:11:06: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=14
+20:11:08: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond?site=15
+20:11:08: Last page reached
+20:11:08: Done - All card names from Battlebond saved
+
+20:11:08:  == Skyshroud Claim ==    (1/264  0.38%)
+20:11:12: URL change  ->  https://www.cardmarket.com/en/Magic/Products/Singles/Battlebond/Skyshroud-Claim
+20:11:12:                 Expanding page...
+
+20:11:18: == Add card ==
+20:11:18: Card ID:       1
+20:11:18: Card:          Skyshroud Claim
+20:11:18: Rarity:        Common
+20:11:18: Expansion:     Battlebond
+
+20:11:18: == Add card stats ==
+20:11:18: Card ID:       1
+20:11:18: Price from:    0.15
+20:11:18: 30-day avg:    0.94
+20:11:18: 7-day avg:     0.87
+20:11:18: 1-day avg:     0.63
+20:11:18: Amount:        1087
+20:11:18: Date ID:       1
+
+20:11:18:  = Sellers = 
+20:11:18: Task - Updating sellers
+20:11:21: Seller added:  Matt-Amoscas [1]
+20:11:24: Seller added:  martial-alters [2]
+20:11:27: Seller added:  MaxiM87 [3]
+20:11:30: Seller added:  JJ-Finkleton [4]
+20:11:33: Seller added:  Goshar [5]
+20:11:37: Seller added:  RFD94 [6]
+20:11:41: Seller added:  TimeaB [7]
+20:11:44: Seller added:  MagicTradeHouseNo1 [8]
+20:11:49: Seller added:  CardCastle [9]
+20:11:53: Seller added:  MagicEmporium [10]
