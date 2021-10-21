@@ -24,23 +24,23 @@ def main():
     # Copy data directory to temporary location to prevent mid-update changes
     file_handler.isolate_data()
 
-    # Test query
-    cursor = db_handler.connect_to_database()
-    cursor.execute("SHOW DATABASES")
-    for row in cursor:
-        log(row)
+    # Connect to MySQL server and set the connection as a global variable
+    db_handler.connect_to_database()
 
-    # Something
+    # Ensure proper database and tables exist
+    db_handler.setup_database()
+
+    # Take the new data and load the differences into the database
     db_handler.run_update()
 
     # Close the connection to the database
-    cursor.close()
+    db_handler.close_connection()
+
+    # Update the database files checksum stored locally
+    file_handler.save_database_checksum()
 
     # Remove temporary database data files
     file_handler.clean_up()
-
-    # Update the database files checksum stored locally
-    file_handler.save_database_checksum(config.NEW_CHECKSUM)
 
 
 # Main function
