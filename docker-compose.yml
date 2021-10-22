@@ -36,6 +36,7 @@ services:
     depends_on:
       - data-gathering
       - mysql_database
+      - caching_service
     command: python -u ./main.py
     volumes:
       - ./data:/data
@@ -55,4 +56,11 @@ services:
       MYSQL_ROOT_PASSWORD: h4Rd_p4sSW0rD
     ports:
       - "3307:3306"
+    restart: always
+
+  caching_service:
+    container_name: caching_service
+    image: memcached
+    ports:
+      - "11211:11211"
     restart: always
