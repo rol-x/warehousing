@@ -2,7 +2,7 @@ import config
 import mysql.connector
 import time
 
-from handlers.log_handler import log
+from services.logs_service import log
 
 
 def connect_to_database():
@@ -37,7 +37,7 @@ def run_queries(queries, silent=True):
 def setup_database():
     run_query("SHOW DATABASES")
     run_queries(["USE gathering",
-                 "CREATE TABLE IF NOT EXIST card( \
+                 "CREATE TABLE IF NOT EXISTS card( \
                             id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, \
                             name VARCHAR(50), \
                             expansion_name VARCHAR(20), \
