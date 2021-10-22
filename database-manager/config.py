@@ -8,3 +8,4 @@ NEW_CHECKSUM = ''
 DATABASE = None
 
 # Fixed variables
+NAME = 'database-manager'

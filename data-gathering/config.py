@@ -19,3 +19,4 @@ CONTAINER_DELAY = 10
 # Fixed variables
 BASE_URL = 'https://www.cardmarket.com/en/Magic/Products/Singles/'
 USERS_URL = 'https://www.cardmarket.com/en/Magic/Users/'
+NAME = 'data-gathering'
