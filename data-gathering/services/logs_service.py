@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 
-# TODO: Isolate config from this service
 import config
 
 

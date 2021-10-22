@@ -15,8 +15,8 @@ def setup_flags():
 
 
 # Return calculated checksum based on the contents of data directory
-def calculate_data_checksum():
-    return str(dirhash('./data', 'sha1'))
+def calculate_checksum(directory_path):
+    return str(dirhash(directory_path, 'sha1'))
 
 
 # Create the checksums file for storing validated datasets.

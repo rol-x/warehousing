@@ -9,7 +9,7 @@ from selenium.webdriver.firefox.options import Options
 from urllib3.exceptions import MaxRetryError
 
 from handlers.data_handler import load_df
-from handlers.log_handler import log, log_url
+from services.logs_service import log, log_url
 
 
 # Return the Firefox webdriver in headless mode.
@@ -65,6 +65,7 @@ def add_sellers_from_set(driver, sellers):
         # Check if the record already exists
         if seller_name not in seller_df['seller_name'].values:
 
+            # TODO: Selenium wait here
             # Try to get seller data from page
             while tries < config.MAX_TRIES:
                 realistic_pause(0.8*config.WAIT_COEF)

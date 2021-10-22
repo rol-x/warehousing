@@ -7,7 +7,7 @@ import config
 import pandas as pd
 from checksumdir import dirhash
 
-from handlers.log_handler import log, log_daily
+from services.logs_service import log, log_daily
 
 
 # Check the time and files status to run the code once a day.
@@ -86,6 +86,8 @@ def is_first_run():
 # Return whether the data saved for specified date is complete.
 def is_data_complete(date_ID):
     '''Return whether the data saved for specified date is complete.'''
+
+    return True
 
     # Load the data
     with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \

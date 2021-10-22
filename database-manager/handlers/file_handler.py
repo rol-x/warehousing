@@ -4,10 +4,10 @@ from shutil import copytree, rmtree
 
 import config
 import pandas as pd
-from checksumdir import dirhash
 
 from services.logs_service import log
-from services.flags_service import flags
+from services.flags_service import calculate_checksum, get_database_checksum, \
+                                   get_validated_checksums
 
 
 # Ensure at least one proper data-gathering run is completed
@@ -29,14 +29,14 @@ def wait_for_new_data():
     while True:
 
         # Check if there are differences between database and local files
-        if calculate_data_checksum('./data') == flags.get_database_checksum():
+        if calculate_checksum('./data') == get_database_checksum():
             log(" - Newest data already in database. Waiting 30 minutes.")
             time.sleep(30 * 60)
             continue
 
         # Check if ready, validated dataset is waiting for us to register
-        if calculate_data_checksum('./data') \
-                in flags.get_validated_checksums():
+        if calculate_checksum('./data') \
+                in get_validated_checksums():
             log(" - Verified new data available for database update.")
             break
 
@@ -47,23 +47,18 @@ def wait_for_new_data():
 
 # Copy data directory, save the checksum as global variable
 def isolate_data():
-    config.NEW_CHECKSUM = calculate_data_checksum('./data')
+    config.NEW_CHECKSUM = calculate_checksum('./data')
     if os.path.exists('./.data'):
         rmtree('./.data')
     copytree('./data', './.data')
     log("Data isolated.")
-    log("Checksum: %s" % calculate_data_checksum('./.data'))
+    log("Checksum: %s" % calculate_checksum('./.data'))
 
 
 # Remove created temporary directory for data files
 def clean_up():
     rmtree('./.data')
     log("Cleaned up.")
-
-
-# Return calculated checksum based on the contents of data directory
-def calculate_data_checksum(directory_path):
-    return str(dirhash(directory_path, 'sha1'))
 
 
 # Try to load a .csv file content into a dataframe.

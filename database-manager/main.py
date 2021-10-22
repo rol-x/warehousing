@@ -1,8 +1,9 @@
 import time
 
 import config
+import services.flags_service as flags
 from handlers import db_handler, file_handler
-from handlers.log_handler import log, setup_logging
+from services.logs_service import log, setup_logs
 
 # TODO: Write simple database connection, create empty tables if there are none
 # TODO: Check local data against database contents & decide how much to update
@@ -13,10 +14,10 @@ from handlers.log_handler import log, setup_logging
 # Main function
 def main():
     # Set the current run log filename
-    setup_logging()
+    setup_logs()
 
     # Create the file for database files checksum
-    file_handler.setup_database_checksum()
+    flags.create_database_checksum_file()
 
     # Wait until change in files is detected and any updates are finished
     file_handler.wait_for_new_data()
@@ -37,7 +38,7 @@ def main():
     db_handler.close_connection()
 
     # Update the database files checksum stored locally
-    file_handler.save_database_checksum()
+    flags.save_database_checksum(config.NEW_CHECKSUM)
 
     # Remove temporary database data files
     file_handler.clean_up()
