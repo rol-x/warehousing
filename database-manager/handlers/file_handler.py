@@ -6,27 +6,8 @@ import config
 import pandas as pd
 from checksumdir import dirhash
 
-from handlers.log_handler import log
-
-
-# Return the current database files checksum.
-def save_database_checksum():
-
-    # Note new complete validated data ready to be updated
-    log("     - Database update validation received.")
-    log("     - Old database checksum: " + read_database_checksum())
-    log("     - Current database checksum: " + config.NEW_CHECKSUM)
-    log("     - Saving the checksum to local file.")
-
-    with open('./flags/database-checksum.sha1', 'w',
-              encoding='utf-8') as checksum_file:
-        checksum_file.write(config.NEW_CHECKSUM)
-
-
-# Return the current database files checksum.
-def setup_database_checksum():
-    with open('./flags/database-checksum.sha1', 'a+', encoding='utf-8'):
-        pass
+from services.logs_service import log
+from services.flags_service import flags
 
 
 # Ensure at least one proper data-gathering run is completed
@@ -48,13 +29,14 @@ def wait_for_new_data():
     while True:
 
         # Check if there are differences between database and local files
-        if calculate_data_checksum('./data') == read_database_checksum():
+        if calculate_data_checksum('./data') == flags.get_database_checksum():
             log(" - Newest data already in database. Waiting 30 minutes.")
             time.sleep(30 * 60)
             continue
 
         # Check if ready, validated dataset is waiting for us to register
-        if calculate_data_checksum('./data') in read_validated_checksums():
+        if calculate_data_checksum('./data') \
+                in flags.get_validated_checksums():
             log(" - Verified new data available for database update.")
             break
 
@@ -69,31 +51,14 @@ def isolate_data():
     if os.path.exists('./.data'):
         rmtree('./.data')
     copytree('./data', './.data')
-    temp_checksum = calculate_data_checksum('./.data')
     log("Data isolated.")
-    log("Checksum: %s" % temp_checksum)
+    log("Checksum: %s" % calculate_data_checksum('./.data'))
 
 
 # Remove created temporary directory for data files
 def clean_up():
     rmtree('./.data')
     log("Cleaned up.")
-
-
-# Get checksums of data files that has been validated
-def read_validated_checksums():
-    with open('./flags/validated-checksums.sha1', 'r',
-              encoding="utf-8") as checksums_file:
-        checksums = [line.strip('\n') for line in checksums_file.readlines()]
-    return checksums
-
-
-# Return saved checksum of the dataset currently stored in the database
-def read_database_checksum():
-    with open('./flags/database-checksum.sha1', 'r',
-              encoding='utf-8') as checksum_file:
-        checksum = checksum_file.readline().strip('\n')
-    return checksum
 
 
 # Return calculated checksum based on the contents of data directory

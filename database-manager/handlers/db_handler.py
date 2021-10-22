@@ -35,13 +35,9 @@ def run_queries(queries, silent=True):
 
 
 def setup_database():
-    # GRANT ALL PRIVILEGES ON gathering.*
-    # TO 'database-manager'@'mysql_database'
-    # FLUSH PRIVILEGES
-
     run_query("SHOW DATABASES")
     run_queries(["USE gathering",
-                 "CREATE TABLE IF NOT EXIST card ( \
+                 "CREATE TABLE IF NOT EXIST card( \
                             id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, \
                             name VARCHAR(50), \
                             expansion_name VARCHAR(20), \
