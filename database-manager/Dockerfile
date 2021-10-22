@@ -5,6 +5,7 @@ COPY . .
 RUN pip install pandas
 RUN pip install checksumdir
 RUN pip install mysql-connector-python
+RUN pip install pymemcache
 
 CMD [ "python", "-u", "./main.py" ]
 
