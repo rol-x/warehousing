@@ -3,7 +3,7 @@ import time
 import config
 import services.flags_service as flags
 from handlers import db_handler, file_handler
-from services.logs_service import log, setup_logs
+from services.logs_service import log_daily, setup_logs
 
 # TODO: Write simple database connection, create empty tables if there are none
 # TODO: Check local data against database contents & decide how much to update
@@ -39,7 +39,7 @@ def main():
 
     # Update the database files checksum stored locally
     flags.save_database_checksum(config.NEW_CHECKSUM)
-    log("New database checksum saved: %s" % config.NEW_CHECKSUM)
+    log_daily("New database checksum saved: %s" % config.NEW_CHECKSUM)
 
     # Remove temporary database data files
     file_handler.clean_up()
@@ -53,5 +53,5 @@ if __name__ == '__main__':
         while True:
             main()
     except Exception as exception:
-        log(exception)
+        log_daily(exception)
         raise SystemExit from exception
