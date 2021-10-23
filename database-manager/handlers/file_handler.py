@@ -8,6 +8,9 @@ from handlers.log_handler import log
 
 # Detect changes in data directory based on calculated checksums
 def register_change():
+    if get_checksums() == 0:
+        log("Waiting 15 minutes for first dataset.")
+        time.sleep(15 * 60)
     last_hash = get_checksums()[-1]
     this_hash = generate_data_hash()
     change_registered = False
