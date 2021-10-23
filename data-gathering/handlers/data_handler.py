@@ -87,8 +87,6 @@ def is_first_run():
 def is_data_complete(date_ID):
     '''Return whether the data saved for specified date is complete.'''
 
-    return True
-
     # Load the data
     with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \
             as exp_file:
