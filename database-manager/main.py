@@ -39,6 +39,7 @@ def main():
 
     # Update the database files checksum stored locally
     flags.save_database_checksum(config.NEW_CHECKSUM)
+    log("New database checksum saved: %s" % config.NEW_CHECKSUM)
 
     # Remove temporary database data files
     file_handler.clean_up()
