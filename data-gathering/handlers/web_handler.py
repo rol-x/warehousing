@@ -31,14 +31,11 @@ def connect_webdriver():
         raise SystemExit from exception
 
 
-# Return the Firefox webdriver in headless mode.
-def reconnect(driver):
-    '''Return the Firefox webdriver in headless mode.'''
-    logr('Restarting the webdriver connection')
-    realistic_pause(config.WAIT_COEF)
-    driver.close()
-    realistic_pause(config.WAIT_COEF)
-    driver = connect_webdriver()
+# Cooldown the Firefox webdriver.
+def cooldown(driver):
+    '''Cooldown the Firefox webdriver.'''
+    logr('Cooling the webdriver connection down')
+    realistic_pause(10*config.WAIT_COEF)
     return driver
 
 

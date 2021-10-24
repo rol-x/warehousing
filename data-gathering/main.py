@@ -11,7 +11,7 @@ from services.logs_service import logr, log, log_progress, log_url
 from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
                                   connect_webdriver, create_soup,
                                   get_card_names, is_valid_card_page,
-                                  realistic_pause, reconnect, urlify)
+                                  realistic_pause, cooldown, urlify)
 
 # TODO: Change singular to plural in entities use, not in model
 # TODO: Research refreshing connection to standalone webdriver
@@ -62,12 +62,12 @@ def main():
                 if is_valid_card_page(card_soup):
                     break
                 logr('Card page invalid')
-                driver = reconnect(driver)
+                driver = cooldown(driver)
                 logr('Waiting and reconnecting...  (15 sec cooldown)')
                 realistic_pause(15.0)
             else:
                 logr('Expanding the offers list timed out')
-                driver = reconnect(driver)
+                driver = cooldown(driver)
                 logr('Waiting and reconnecting...  (15 sec cooldown)')
                 realistic_pause(15.0)
                 config.WAIT_COEF *= 1.1
