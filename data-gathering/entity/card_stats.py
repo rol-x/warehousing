@@ -1,6 +1,6 @@
 import config
 from handlers.data_handler import load_df
-from handlers.log_handler import log
+from services.logs_service import logr
 
 
 # Extract information about card statistics from provided soup.
@@ -10,7 +10,7 @@ def add_card_stats(card_soup, card_ID):
     # Get rows from the card information table
     card_info = card_soup.findAll("dd", {"class": "col-6 col-xl-7"})
     if len(card_info) == 0:
-        log('No card info found on current page')
+        logr('No card info found on current page')
         return
 
     # Get the attributes
@@ -21,14 +21,14 @@ def add_card_stats(card_soup, card_ID):
     available_items = card_info[-6].string
 
     # Logging
-    log('== Add card stats ==')
-    log('Card ID:       ' + str(card_ID))
-    log('Price from:    ' + str(price_from))
-    log('30-day avg:    ' + str(avg_30_price))
-    log('7-day avg:     ' + str(avg_7_price))
-    log('1-day avg:     ' + str(avg_1_price))
-    log('Amount:        ' + str(available_items))
-    log('Date ID:       ' + str(config.THIS_DATE_ID) + '\n')
+    logr('== Add card stats ==')
+    logr('Card ID:       ' + str(card_ID))
+    logr('Price from:    ' + str(price_from))
+    logr('30-day avg:    ' + str(avg_30_price))
+    logr('7-day avg:     ' + str(avg_7_price))
+    logr('1-day avg:     ' + str(avg_1_price))
+    logr('Amount:        ' + str(available_items))
+    logr('Date ID:       ' + str(config.THIS_DATE_ID) + '\n')
 
     # Writing to local file
     with open('./data/card_stats.csv', 'a', encoding="utf-8") as card_csv:

@@ -1,5 +1,5 @@
 from handlers.data_handler import load_df
-from handlers.log_handler import log
+from services.logs_service import logr
 
 
 # Extract information about a seller from provided soup.
@@ -55,7 +55,7 @@ def add_seller(seller_soup):
         address = ''
 
     # Logging
-    log(f"Seller added:  {seller_name} [{seller_ID}]")
+    logr(f"Seller added:  {seller_name} [{seller_ID}]")
 
     # Writing
     with open('./data/seller.csv', 'a', encoding="utf-8") as seller_csv:

@@ -1,9 +1,10 @@
 import config
 import pandas as pd
+from handlers.data_handler import load_df
+from services.logs_service import logr
+
 from entity.card import get_card_ID
 from entity.seller import get_seller_ID
-from handlers.data_handler import load_df
-from handlers.log_handler import log
 
 
 # Extract information about the offers from provided card soup.
@@ -13,8 +14,8 @@ def add_offers(card_page):
                                    + "article-table "
                                    + "table-striped"})
     if table is None:
-        log("No offers found on page!")
-        log(f'Page title:  {card_page.find("title")}')
+        logr("No offers found on page!")
+        logr(f'Page title:  {card_page.find("title")}')
         return
 
     # Get static and list info from the page
@@ -37,7 +38,7 @@ def add_offers(card_page):
     # Ensure the table has proper content
     if not (len(prices) / 2) == len(amounts) \
             == len(seller_names) == len(attributes):
-        log('The columns don\'t match in size!\n')
+        logr('The columns don\'t match in size!\n')
         return
 
     # Acquire the data row by row
@@ -66,7 +67,7 @@ def add_offers(card_page):
         # Interpret the attributes
         if len(card_attrs) < 2:
             card_attrs = ['', '']
-            log("Incomplete card attributes!")
+            logr("Incomplete card attributes!")
 
         # Load the entry into the dictionary
         offers_dict['seller_ID'].append(get_seller_ID(seller_name.string))
@@ -80,7 +81,7 @@ def add_offers(card_page):
 
         for key, value in offers_dict.items():
             if len(value) == 0:
-                log("Faulty offer set! No entrys for key: " + key)
+                logr("Faulty offer set! No entrys for key: " + key)
                 return
 
     update_sale_offers(offers_dict)
@@ -103,5 +104,5 @@ def update_sale_offers(offers_dict):
     data.to_csv(f'./data/{filename}', ';', index=False)
 
     # Log task finished
-    log(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
-        + f"{len(this_card_today)}, total: {len(data)})\n\n")
+    logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
+         + f"{len(this_card_today)}, total: {len(data)})\n\n")

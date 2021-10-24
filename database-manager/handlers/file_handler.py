@@ -1,106 +1,86 @@
+import os
 import time
+from shutil import copytree, rmtree
 
+import config
 import pandas as pd
-from checksumdir import dirhash
 
-from handlers.log_handler import log
+from services.logs_service import log
+from services.flags_service import calculate_checksum, get_database_checksum, \
+                                   get_validated_checksums
+
+
+# Ensure at least one proper data-gathering run is completed
+def ensure_complete_dataset():
+    if not os.path.getsize('/flags/validated-checksums.sha1'):
+        log(" - No validated checksums yet. Waiting for "
+            + "data-gathering to complete the first run.")
+    while not os.path.getsize('./flags/validated-checksums.sha1'):
+        time.sleep(15)
 
 
 # Detect changes in data directory based on calculated checksums
-def register_change():
-    if get_checksums() == 0:
-        log("Waiting 15 minutes for first dataset.")
-        time.sleep(15 * 60)
-    last_hash = get_checksums()[-1]
-    this_hash = generate_data_hash()
-    change_registered = False
+def wait_for_new_data():
 
-    # Timeout after update over four (4) hours
-    while not change_registered:
+    # Ensure at least one proper data-gathering run is completed
+    ensure_complete_dataset()
 
-        # Every thirty (15) minutes check whether the two hashes differ
-        while this_hash == last_hash:
-            log("Checksums checked - no changes detected. Waiting 15 minutes.")
-            time.sleep(15 * 60)
-            this_hash = generate_data_hash()
-        log(" - Change in data files detected.")
+    # Wait until new verified dataset is present
+    while True:
 
-        # Every sixty (60) seconds check whether the update flag is active
-        timeout = False
-        start = time.time()
+        # Check if there are differences between database and local files
+        if calculate_checksum('./data') == get_database_checksum():
+            log(" - Newest data already in database. Waiting 30 minutes.")
+            time.sleep(30 * 60)
+            continue
 
-        # Wait for update to be over
-        while True:
-            with open("./flags/update-flag", "r",
-                      encoding="utf-8") as update_flag:
+        # Check if ready, validated dataset is waiting for us to register
+        if calculate_checksum('./data') \
+                in get_validated_checksums():
+            log(" - Verified new data available for database update.")
+            break
 
-                # Update over signalized by data-gathering
-                if update_flag.readline() == '0':
-                    break
-
-            # Timeout after 4 hours
-            if time.time() - start > 4 * 60 * 60:
-                log("Waiting for the update end timed out. Waiting 12 hours.")
-                time.sleep(12 * 60 * 60)
-                timeout = True
-                break
-
-            # Wait before continuing
-            log(" - Update detected. Waiting 60 seconds.")
-            time.sleep(60)
-
-        # On exit, if the update ended properly, register a change
-        if not timeout:
-            log("   - No update detected. Registering a change.")
-            this_hash = generate_data_hash()
-
-            # Data found as validated in checksums - exit the scheduler loop
-            if this_hash in get_checksums():
-                log("   - Dataset checksum found in validated checksums.")
-                change_registered = True
-                break
-
-            # When the data is downloaded, but not checked for completeness
-            log("   - Waiting for data to be validated. Waiting 60 seconds.")
-            time.sleep(60)
-
-    # On finished update or data migration the files are static
-    log("     - Changes ready to commence.")
-    log("     - Old hash: " + last_hash)
-    log("     - New hash: " + this_hash)
-    log("     - Proceeding to update.")
+        # Some change in files was detected, ensure it's a proper dataset
+        log(" - New data found, but is not complete. Waiting 5 minutes.")
+        time.sleep(5 * 60)
 
 
-# Return generated hash based on the contents of data directory
-def generate_data_hash():
-    return str(dirhash('./data', 'sha1'))
+# Copy data directory, save the checksum as global variable
+def isolate_data():
+    config.NEW_CHECKSUM = calculate_checksum('./data')
+    if os.path.exists('./.data'):
+        rmtree('./.data')
+    copytree('./data', './.data')
+    log("Data isolated.")
+    log("Checksum: %s" % calculate_checksum('./.data'))
 
 
-# Set up the file with information about ongoing update.
-def set_update_flag():
-    '''Set up the file with information about ongoing update.'''
-    with open('./flags/update-flag', 'w', encoding="utf-8") as update_flag:
-        update_flag.write('1')
-    log("Update flag set to 1")
+# Remove created temporary directory for data files
+def clean_up():
+    rmtree('./.data')
+    log("Cleaned up.")
 
 
-# Update the flag about the end of the update
-def reset_update_flag():
-    with open('./flags/update-flag', 'w', encoding="utf-8") as update_flag:
-        update_flag.write('0')
-    log("Update flag set to 0")
-
-
-# Get checksums of data files that has been validated
-def get_checksums():
+# Try to load a .csv file content into a dataframe.
+def load_df(entity_name):
+    '''Try to return a dataframe from the respective .csv file.'''
+    if entity_name == 'sale_offer' and config.FILE_PART > 1:
+        entity_name += f'_{config.FILE_PART}'
     try:
-        with open('./flags/validated-checksums.sha1', 'r',
-                  encoding="utf-8") as hashes:
-            checksums = [line.strip('\n') for line in hashes.readlines()]
-    except FileNotFoundError:
-        log("No checksums file found.")
-        checksums = []
-    return checksums
+        df = pd.read_csv('./data/' + entity_name + '.csv', sep=';')
+    except pd.errors.EmptyDataError as empty_err:
+        log(f'Please prepare the headers and data in {entity_name}.csv!\n')
+        log(str(empty_err))
+        return None
+    except pd.errors.ParserError as parser_err:
+        log(f'Parser error while loading {entity_name}.csv\n')
+        log(str(parser_err))
+        return secure_load_df(entity_name)
+    except Exception as e:
+        log(f'Exception occured while loading {entity_name}.csv\n')
+        log(str(e))
+        return None
+    return df
 
 
 # Try to securely load a dataframe from a .csv file.
@@ -112,6 +92,5 @@ def secure_load_df(entity_name):
     except pd.errors.ParserError as parser_err:
         log(parser_err)
         log("Importing data from csv failed - aborting.\n")
-        reset_update_flag()
         raise SystemExit from parser_err
     return df
