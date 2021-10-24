@@ -9,7 +9,7 @@ from selenium.webdriver.firefox.options import Options
 from urllib3.exceptions import MaxRetryError
 
 from handlers.data_handler import load_df
-from services.logs_service import log, log_url
+from services.logs_service import logr, log_url
 
 
 # Return the Firefox webdriver in headless mode.
@@ -20,21 +20,21 @@ def connect_webdriver():
     try:
         driver = webdriver.Remote("http://" + config.WEBDRIVER_HOSTNAME
                                   + ":4444/wd/hub", options=options)
-        log('Webdriver connection ready\n')
+        logr('Webdriver connection ready\n')
         return driver
     except MaxRetryError as exception:
-        log(exception)
-        log('The connection to remote webdriver failed. '
-            + 'Check if the container is running.')
-        log('If it is, check the hostname in config.py '
-            + 'and other connection settings.\n')
+        logr(exception)
+        logr('The connection to remote webdriver failed. '
+             + 'Check if the container is running.')
+        logr('If it is, check the hostname in config.py '
+             + 'and other connection settings.\n')
         raise SystemExit from exception
 
 
 # Return the Firefox webdriver in headless mode.
 def reconnect(driver):
     '''Return the Firefox webdriver in headless mode.'''
-    log('Restarting the webdriver connection')
+    logr('Restarting the webdriver connection')
     realistic_pause(config.WAIT_COEF)
     driver.close()
     realistic_pause(config.WAIT_COEF)
@@ -82,8 +82,8 @@ def add_sellers_from_set(driver, sellers):
 
     # Log task finished
     total_sellers = sellers_before + new_sellers
-    log(f"Done - {new_sellers} new sellers saved  (out of: "
-        + f"{read_sellers}, total: {total_sellers})\n")
+    logr(f"Done - {new_sellers} new sellers saved  (out of: "
+         + f"{read_sellers}, total: {total_sellers})\n")
 
 
 # Return a list of all cards found in the expansion cards list.
@@ -94,7 +94,7 @@ def get_card_names(driver, expansion_name):
     with open('./data/' + exp_filename + '.txt', 'r',
               encoding="utf-8") as exp_file:
         saved_cards = [line.strip('\n') for line in exp_file.readlines()]
-    log("Task - Getting all card names from current expansion")
+    logr("Task - Getting all card names from current expansion")
 
     all_cards = []
     page_no = 1
@@ -110,12 +110,12 @@ def get_card_names(driver, expansion_name):
 
         # Check if there are cards on the page
         if len(card_elements) == 0:
-            log("Last page reached")
+            logr("Last page reached")
             break
 
         # Check if there is a saved complete list of cards from this expansion
         if get_card_hits(list_soup) == len(saved_cards):
-            log(f"Done - All card names from {expansion_name} saved\n")
+            logr(f"Done - All card names from {expansion_name} saved\n")
             return saved_cards
 
         for card in card_elements:
@@ -137,7 +137,7 @@ def get_card_names(driver, expansion_name):
             exp_file.write(card_name + '\n')
 
     # Return the complete cards list
-    log(f"Done - All card names from {expansion_name} saved\n")
+    logr(f"Done - All card names from {expansion_name} saved\n")
     return all_cards
 
 

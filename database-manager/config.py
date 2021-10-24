@@ -3,8 +3,8 @@
 # Variables connected to this single run of the code
 DATABASE = None
 NEW_CHECKSUM = ''
-LOG_FILENAME = 'other.log'
-DAILY_LOGNAME = 'other_daily.log'
+MAIN_LOGNAME = 'other_main.log'
+RUN_LOGNAME = 'other_run.log'
 
 # Fixed variables
 NAME = 'database-manager'

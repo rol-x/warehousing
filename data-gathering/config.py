@@ -11,8 +11,8 @@ MAX_TRIES = 3
 # Variables connected to this single run of the code
 FILE_PART = 1
 THIS_DATE_ID = 0
-LOG_FILENAME = 'other.log'
-DAILY_LOGNAME = 'other_daily.log'
+MAIN_LOGNAME = 'other_main.log'
+RUN_LOGNAME = 'other_run.log'
 
 # Fixed variables
 NAME = 'data-gathering'

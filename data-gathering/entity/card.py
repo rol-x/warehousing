@@ -1,5 +1,5 @@
 from handlers.data_handler import load_df
-from services.logs_service import log
+from services.logs_service import logr
 
 
 # Extract information about a card from provided soup.
@@ -12,7 +12,7 @@ def add_card(card_soup):
     # Get rows from the card information table
     card_info = card_soup.findAll("dd", {"class": "col-6 col-xl-7"})
     if len(card_info) == 0:
-        log('No card info found on current page')
+        logr('No card info found on current page')
         return
 
     # Get the attributes
@@ -22,11 +22,11 @@ def add_card(card_soup):
     rarity = card_info[0].find('span')['data-original-title']
 
     # Logging
-    log('== Add card ==')
-    log('Card ID:       ' + str(card_ID))
-    log('Card:          ' + str(card_name))
-    log('Rarity:        ' + str(rarity))
-    log('Expansion:     ' + str(expansion_name) + '\n')
+    logr('== Add card ==')
+    logr('Card ID:       ' + str(card_ID))
+    logr('Card:          ' + str(card_name))
+    logr('Rarity:        ' + str(rarity))
+    logr('Expansion:     ' + str(expansion_name) + '\n')
 
     # Writing to the file
     with open('./data/card.csv', 'a', encoding="utf-8") as card_csv:

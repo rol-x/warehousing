@@ -17,21 +17,21 @@ def setup_logs():
         os.mkdir(f'./logs/{config.NAME}')
 
 
-# Prepare the daily log file.
-def setup_daily_logfile():
-    '''Prepare the daily log file.'''
-    config.DAILY_LOGNAME = datetime.now().strftime("%d%m%Y") + ".log"
-    log_daily(f"Service {config.NAME} is running." + "\n")
+# Prepare the main log file.
+def setup_main_logfile():
+    '''Prepare the main log file.'''
+    config.MAIN_LOGNAME = datetime.now().strftime("%d%m%Y") + ".log"
+    log(f"Service {config.NAME} is running." + "\n")
 
 
 # Prepare the local log files for single run.
 def setup_run_logfile():
     '''Prepare the local log files for single run.'''
-    config.LOG_FILENAME = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
-    with open(f"./logs/{config.NAME}/{config.LOG_FILENAME}", "a+",
+    config.RUN_LOGNAME = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
+    with open(f"./logs/{config.NAME}/{config.RUN_LOGNAME}", "a+",
               encoding="utf-8"):
         pass
-    if os.path.getsize(f"./logs/{config.NAME}/{config.LOG_FILENAME}"):
+    if os.path.getsize(f"./logs/{config.NAME}/{config.RUN_LOGNAME}"):
         log(" = Separate code execution = \n")
     else:
         log(" = Creation of this file = \n")
@@ -41,7 +41,7 @@ def setup_run_logfile():
 def log(msg):
     '''Log a message to a local file and the console.'''
     msg = str(msg)
-    with open(f"./logs/{config.NAME}/{config.LOG_FILENAME}", 'a+',
+    with open(f"./logs/{config.NAME}/{config.RUN_LOGNAME}", 'a+',
               encoding="utf-8") as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         logfile.write(timestamp + ": " + msg + "\n")
@@ -54,11 +54,11 @@ def log_url(url):
     log("URL change  ->  " + url)
 
 
-# Log a message to the daily run file and the console.
-def log_daily(msg):
-    '''Log a message to the daily run file and the console.'''
+# Log a message to the main run file and the console.
+def log(msg):
+    '''Log a message to the main run file and the console.'''
     msg = str(msg)
-    with open('./logs/data-gathering/' + config.DAILY_LOGNAME,
+    with open(f'./logs/{config.NAME}/{config.MAIN_LOGNAME}',
               'a+', encoding="utf-8") as logfile:
         timestamp = datetime.now().strftime("%H:%M:%S")
         logfile.write(timestamp + ": " + msg + "\n")
