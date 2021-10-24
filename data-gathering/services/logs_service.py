@@ -20,7 +20,6 @@ def setup_logs():
 def setup_main_logfile():
     '''Prepare the main log file.'''
     config.MAIN_LOGNAME = datetime.now().strftime("%d%m%Y") + ".log"
-    log(f"Service {config.NAME} is running." + "\n")
 
 
 # Prepare the local log files for single run.
