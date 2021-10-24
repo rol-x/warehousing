@@ -4,7 +4,6 @@ services:
 
   data_gathering:
     container_name: data_gathering
-    shm_size: 2gb
     build:
       context: ./data-gathering
       dockerfile: Dockerfile
