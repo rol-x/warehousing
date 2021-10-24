@@ -21,6 +21,13 @@ services:
       - "4441:4441"
     restart: always
 
+  firefox_webdriver:
+    container_name: firefox_webdriver
+    image: selenium/standalone-firefox
+    ports:
+      - "4444:4444"
+    restart: always
+
   database_manager:
     container_name: database_manager
     build:
@@ -28,16 +35,32 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - data-gathering
+      - mysql_database
+      - caching_service
     command: python -u ./main.py
     volumes:
       - ./data:/data
       - ./logs:/logs
       - ./flags:/flags
+    ports:
+      - "3308:3306"
     restart: always
 
-  firefox_webdriver:
-    container_name: firefox_webdriver
-    image: selenium/standalone-firefox
+  mysql_database:
+    container_name: mysql_database
+    image: mysql/mysql-server
+    environment:
+      MYSQL_DATABASE: gathering
+      MYSQL_USER: database-manager
+      MYSQL_PASSWORD: h4Rd_p4sSW0rD
+      MYSQL_ROOT_PASSWORD: h4Rd_p4sSW0rD
     ports:
-      - "4444:4444"
+      - "3307:3306"
+    restart: always
+
+  caching_service:
+    container_name: caching_service
+    image: memcached
+    ports:
+      - "11211:11211"
     restart: always
