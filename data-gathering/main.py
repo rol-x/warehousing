@@ -43,34 +43,39 @@ def main():
         log_progress(card_name, progress, len(card_list))
 
         # Compose the card page url from the card's name
-        card_url = config.BASE_URL + config.EXPANSION_NAME + '/'
-        card_url += urlify(card_name)
+        card_url = config.BASE_URL + config.EXPANSION_NAME + '/' \
+            + urlify(card_name)
 
         # TODO: Selenium wait here
         # Try to load the page 3 times
         tries = 0
         while tries < config.MAX_TRIES:
+
             # Open the card page and extend the view maximally
             realistic_pause(config.WAIT_COEF)
             driver.get(card_url)
             log_url(driver.current_url)
             logr("                Expanding page...\n")
             is_page_expanded = click_load_more_button(driver)
-            if is_page_expanded:
-                # Validate and save the parsed page content for later use
-                card_soup = create_soup(driver.page_source)
-                if is_valid_card_page(card_soup):
-                    break
-                logr('Card page invalid')
-                driver = cooldown(driver)
-                logr('Waiting and reconnecting...  (15 sec cooldown)')
-                realistic_pause(15.0)
-            else:
+
+            # Check whether all Load more buttons were pressed
+            if not is_page_expanded:
                 logr('Expanding the offers list timed out')
-                driver = cooldown(driver)
-                logr('Waiting and reconnecting...  (15 sec cooldown)')
-                realistic_pause(15.0)
+                cooldown()
                 config.WAIT_COEF *= 1.1
+                tries += 1
+                continue
+
+            # Create a soup from the website source code
+            card_soup = create_soup(driver.page_source)
+
+            # If the card page is valid, save it
+            if is_valid_card_page(card_soup):
+                break
+
+            # Otherwise try again
+            logr('Card page invalid')
+            cooldown()
             tries += 1
 
         # Save the card if not saved already
