@@ -32,11 +32,10 @@ def connect_webdriver():
 
 
 # Cooldown the Firefox webdriver.
-def cooldown(driver):
+def cooldown():
     '''Cooldown the Firefox webdriver.'''
     logr('Cooling the webdriver connection down')
     realistic_pause(10*config.WAIT_COEF)
-    return driver
 
 
 # Use the BeautifulSoup module to parse the page content into soup.
