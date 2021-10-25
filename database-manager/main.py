@@ -35,8 +35,23 @@ def main():
     # Ensure proper database and tables exist
     db_handler.setup_database()
 
+    # Test the setup
+    # db_handler.test()
+
+    new_data = file_handler.load_isolated_data()
+    db_content = db_handler.get_database_content()
+    db_data = file_handler.load_database_data(db_content)
+    deltas = file_handler.calculate_deltas(db_data, new_data)
+
     # Take the new data and load the differences into the database
-    db_handler.run_update()
+    db_handler.run_update(deltas)
+
+    db_handler.run_fetch_query("SELECT * FROM date")
+    db_handler.run_fetch_query("SELECT * FROM card")
+    db_handler.run_fetch_query("SELECT * FROM card_stats")
+    db_handler.run_fetch_query("SELECT * FROM seller")
+    db_handler.run_fetch_query("SELECT * FROM sale_offer")
+    time.sleep(60)
 
     # Close the connection to the database
     db_handler.close_connection()
