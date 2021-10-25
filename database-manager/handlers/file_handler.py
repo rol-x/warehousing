@@ -41,8 +41,8 @@ def wait_for_new_data():
             break
 
         # Some change in files was detected, ensure it's a proper dataset
-        log(" - New data found, but is not complete. Waiting 5 minutes.")
-        time.sleep(5 * 60)
+        log(" - New data found, but is not complete. Waiting 10 minutes.")
+        time.sleep(10 * 60)
 
 
 # Copy data directory, save the checksum as global variable
@@ -61,36 +61,64 @@ def clean_up():
     log("Cleaned up.")
 
 
-# Try to load a .csv file content into a dataframe.
-def load_df(entity_name):
-    '''Try to return a dataframe from the respective .csv file.'''
-    if entity_name == 'sale_offer' and config.FILE_PART > 1:
-        entity_name += f'_{config.FILE_PART}'
-    try:
-        df = pd.read_csv('./data/' + entity_name + '.csv', sep=';')
-    except pd.errors.EmptyDataError as empty_err:
-        log(f'Please prepare the headers and data in {entity_name}.csv!\n')
-        log(str(empty_err))
-        return None
-    except pd.errors.ParserError as parser_err:
-        log(f'Parser error while loading {entity_name}.csv\n')
-        log(str(parser_err))
-        return secure_load_df(entity_name)
-    except Exception as e:
-        log(f'Exception occured while loading {entity_name}.csv\n')
-        log(str(e))
-        return None
-    return df
+# Load and return all the data in dataframes
+def load_isolated_data():
+    date = pd.read_csv(
+        './.data/date.csv', sep=';', encoding="utf-8")
+    card = pd.read_csv(
+        './.data/card.csv', sep=';', encoding="utf-8")
+    card_stats = pd.read_csv(
+        './.data/card_stats.csv', sep=';', encoding="utf-8")
+    seller = pd.read_csv(
+        './.data/seller.csv', sep=';', encoding="utf-8")
+    sale_offers = []
+    sale_offers.append(pd.read_csv(
+            './.data/sale_offer.csv', sep=';', encoding="utf-8"))
+
+    file_part = 2
+    while os.path.exists(f'./.data/sale_offer_{file_part}.csv'):
+        sale_offers.append(pd.read_csv(
+            f'./.data/sale_offer_{file_part}.csv', sep=';', encoding="utf-8"))
+        file_part += 1
+    sale_offer = pd.concat(sale_offers)
+
+    return {"date": date, "card": card, "card_stats": card_stats,
+            "seller": seller, "sale_offer": sale_offer}
 
 
-# Try to securely load a dataframe from a .csv file.
-def secure_load_df(entity_name):
-    '''Try to securely load a dataframe from a .csv file.'''
-    try:
-        df = pd.read_csv('./data' + entity_name + '.csv',
-                         sep=';', error_bad_lines=False)
-    except pd.errors.ParserError as parser_err:
-        log(parser_err)
-        log("Importing data from csv failed - aborting.\n")
-        raise SystemExit from parser_err
-    return df
+def load_database_data(db_content):
+    date_db = db_content.get('date')
+    card_db = db_content.get('card')
+    card_stats_db = db_content.get('card_stats')
+    seller_db = db_content.get('seller')
+    sale_offer_db = db_content.get('sale_offer')
+
+    date = pd.DataFrame(
+        date_db.get('values'), columns=date_db.get('columns'))
+    card = pd.DataFrame(
+        card_db.get('values'), columns=card_db.get('columns'))
+    card_stats = pd.DataFrame(
+        card_stats_db.get('values'), columns=card_stats_db.get('columns'))
+    seller = pd.DataFrame(
+        seller_db.get('values'), columns=seller_db.get('columns'))
+    sale_offer = pd.DataFrame(
+        sale_offer_db.get('values'), columns=sale_offer_db.get('columns'))
+
+    return {"date": date, "card": card, "card_stats": card_stats,
+            "seller": seller, "sale_offer": sale_offer}
+
+
+def calculate_deltas(old_data, new_data):
+
+    date_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
+        .drop_duplicates(keep=False).to_dict(orient='index')
+    card_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
+        .drop_duplicates(keep=False).to_dict(orient='index')
+    card_stats_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
+        .drop_duplicates(keep=False).to_dict(orient='index')
+    seller_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
+        .drop_duplicates(keep=False).to_dict(orient='index')
+    sale_offer_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
+        .drop_duplicates(keep=False).to_dict(orient='index')
+    return {"date": date_d, "card": card_d, "card_stats": card_stats_d,
+            "seller": seller_d, "sale_offer": sale_offer_d}
