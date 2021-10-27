@@ -12,6 +12,31 @@ from services.logs_service import log, setup_logs, setup_main_logfile
 # TODO: Complete main logging and run logging
 
 
+def load_database_data(new_dates):
+
+    # Read the date, card and seller data from the database
+    date = file_handler.transform_database_data(
+        db_handler.get_table_content('date'))
+    card = file_handler.transform_database_data(
+        db_handler.get_table_content('card'))
+    seller = file_handler.transform_database_data(
+        db_handler.get_table_content('seller'))
+
+    # Determine which dates are new to the database
+    update_dates = file_handler.compare_dates(date, new_dates)
+    log("Update dates: ")
+    log(update_dates)
+
+    # Load the relevant slices from the database
+    card_stats_slice = file_handler.transform_database_data(
+        db_handler.get_table_content_since_date('card_stats', update_dates))
+    sale_offer_slice = file_handler.transform_database_data(
+        db_handler.get_table_content_since_date('sale_offer', update_dates))
+
+    return {"date": date, "card": card, "seller": seller,
+            "card_stats": card_stats_slice, "sale_offer": sale_offer_slice}
+
+
 # Main function
 def main():
     # Set the current run log filename
@@ -36,29 +61,37 @@ def main():
     db_handler.setup_database()
 
     # Test the setup
-    # db_handler.test()
+    db_handler.insert_test_data()
 
+    # Read the local data from the files
     new_data = file_handler.load_isolated_data()
-    db_content = db_handler.get_database_content()
-    db_data = file_handler.load_database_data(db_content)
-    deltas = file_handler.calculate_deltas(db_data, new_data)
 
-    # Take the new data and load the differences into the database
-    db_handler.run_update(deltas)
+    # Read the database data from a relevant date_id onwards
+    old_data = load_database_data(new_data['date'])
 
-    db_handler.run_fetch_query("SELECT * FROM date")
-    db_handler.run_fetch_query("SELECT * FROM card")
-    db_handler.run_fetch_query("SELECT * FROM card_stats")
-    db_handler.run_fetch_query("SELECT * FROM seller")
-    db_handler.run_fetch_query("SELECT * FROM sale_offer")
-    time.sleep(60)
+    # Iterate over every table
+    for entity in new_data.keys:
+
+        # Get the relevant differences between datasets
+        to_be_deleted, to_be_inserted = \
+            file_handler.calculate_deltas(old_data.get(entity),
+                                          new_data.get(entity))
+
+    # Find and drop the rows to delete by inspecting the index of TBD rows
+    for row in to_be_deleted:
+        db_handler.remove_row(entity, row[0])
+
+    # Insert all the missing data
+    for row in to_be_inserted:
+        db_handler.insert_row(entity, row[1:])
+
+    time.sleep(20)
 
     # Close the connection to the database
     db_handler.close_connection()
 
     # Update the database files checksum stored locally
     flags.save_database_checksum(config.NEW_CHECKSUM)
-    log("New database checksum saved: %s" % config.NEW_CHECKSUM)
 
     # Remove temporary database data files
     file_handler.clean_up()
