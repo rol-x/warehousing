@@ -82,43 +82,53 @@ def load_isolated_data():
         file_part += 1
     sale_offer = pd.concat(sale_offers)
 
-    return {"date": date, "card": card, "card_stats": card_stats,
-            "seller": seller, "sale_offer": sale_offer}
-
-
-def load_database_data(db_content):
-    date_db = db_content.get('date')
-    card_db = db_content.get('card')
-    card_stats_db = db_content.get('card_stats')
-    seller_db = db_content.get('seller')
-    sale_offer_db = db_content.get('sale_offer')
-
-    date = pd.DataFrame(
-        date_db.get('values'), columns=date_db.get('columns'))
-    card = pd.DataFrame(
-        card_db.get('values'), columns=card_db.get('columns'))
-    card_stats = pd.DataFrame(
-        card_stats_db.get('values'), columns=card_stats_db.get('columns'))
-    seller = pd.DataFrame(
-        seller_db.get('values'), columns=seller_db.get('columns'))
-    sale_offer = pd.DataFrame(
-        sale_offer_db.get('values'), columns=sale_offer_db.get('columns'))
+    date = date.rename(columns={'date_ID': 'date_id',
+                                'day_of_week': 'weekday'})
+    card = card.rename(columns={'card_ID': 'card_id',
+                                'card_name': 'name'})
+    card_stats = card_stats.rename(columns={'date_ID': 'date_id',
+                                            'card_ID': 'card_id',
+                                            '30_avg_price': 'monthly_avg',
+                                            '7_avg_price': 'weekly_avg',
+                                            '1_avg_price': 'daily_avg'})
+    seller = seller.rename(columns={'seller_ID': 'seller_id',
+                                    'seller_name': 'name'})
+    sale_offer = sale_offer.rename(columns={'date_ID': 'date_id',
+                                            'card_ID': 'card_id',
+                                            'seller_ID': 'seller_id'})
 
     return {"date": date, "card": card, "card_stats": card_stats,
             "seller": seller, "sale_offer": sale_offer}
+
+
+def transform_database_data(table_content):
+    return pd.DataFrame(
+        table_content.get('values'), columns=table_content.get('columns'))
+
+
+# Return those date_ids from the new dataset which are not in the old one.
+def compare_dates(old_dates, new_dates):
+    old = set([tuple(row) for row in old_dates.values])
+    new = set([tuple(row) for row in new_dates.values])
+    return [row[1] for row in new if new not in old]
 
 
 def calculate_deltas(old_data, new_data):
 
-    date_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
-        .drop_duplicates(keep=False).to_dict(orient='index')
-    card_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
-        .drop_duplicates(keep=False).to_dict(orient='index')
-    card_stats_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
-        .drop_duplicates(keep=False).to_dict(orient='index')
-    seller_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
-        .drop_duplicates(keep=False).to_dict(orient='index')
-    sale_offer_d = pd.concat([old_data.get('date'), new_data.get('date')]) \
-        .drop_duplicates(keep=False).to_dict(orient='index')
-    return {"date": date_d, "card": card_d, "card_stats": card_stats_d,
-            "seller": seller_d, "sale_offer": sale_offer_d}
+    # Take the new data and load the differences into the database,
+    old_data_rows = set([tuple(row) for row in old_data.values])
+    new_data_rows = set([tuple(row) for row in new_data.values])
+    to_be_inserted = [row for row in new_data_rows if row not in old_data_rows]
+    to_be_deleted = [row for row in old_data_rows if row not in new_data_rows]
+
+    log("Old data:")
+    log(old_data_rows)
+    log("New data:")
+    log(new_data_rows)
+    log("TBI:")
+    log(to_be_inserted)
+    log("TBD:")
+    log(to_be_deleted)
+    time.sleep(10)
+
+    return to_be_deleted, to_be_inserted
