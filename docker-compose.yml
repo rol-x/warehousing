@@ -53,6 +53,8 @@ services:
       MYSQL_USER: database-manager
       MYSQL_PASSWORD: h4Rd_p4sSW0rD
       MYSQL_ROOT_PASSWORD: h4Rd_p4sSW0rD
+    volumes:
+      - ./.mysql:/var/lib/mysql
     ports:
       - "3307:3306"
     restart: always
