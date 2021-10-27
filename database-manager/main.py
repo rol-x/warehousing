@@ -61,7 +61,7 @@ def main():
     db_handler.setup_database()
 
     # Test the setup
-    db_handler.insert_test_data()
+    # db_handler.insert_test_data()
 
     # Read the local data from the files
     new_data = file_handler.load_isolated_data()
@@ -70,22 +70,25 @@ def main():
     old_data = load_database_data(new_data['date'])
 
     # Iterate over every table
-    for entity in new_data.keys:
+    for entity in new_data.keys():
 
         # Get the relevant differences between datasets
         to_be_deleted, to_be_inserted = \
             file_handler.calculate_deltas(old_data.get(entity),
                                           new_data.get(entity))
 
-    # Find and drop the rows to delete by inspecting the index of TBD rows
-    for row in to_be_deleted:
-        db_handler.remove_row(entity, row[0])
+        # Find and drop the rows to delete by inspecting the index of TBD rows
+        for row in to_be_deleted:
+            db_handler.remove_row(entity, row[0])
 
-    # Insert all the missing data
-    for row in to_be_inserted:
-        db_handler.insert_row(entity, row[1:])
+        # Insert all the missing data
+        for row in to_be_inserted:
+            db_handler.insert_row(entity, row[1:])
 
-    time.sleep(20)
+        log(f"Data in {entity} updated.")
+        count = db_handler.run_fetch_query(f"SELECT * FROM {entity} LIMIT 5")
+        log(count.values())
+        time.sleep(4)
 
     # Close the connection to the database
     db_handler.close_connection()

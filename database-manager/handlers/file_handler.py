@@ -121,14 +121,9 @@ def calculate_deltas(old_data, new_data):
     to_be_inserted = [row for row in new_data_rows if row not in old_data_rows]
     to_be_deleted = [row for row in old_data_rows if row not in new_data_rows]
 
-    log("Old data:")
-    log(old_data_rows)
-    log("New data:")
-    log(new_data_rows)
-    log("TBI:")
-    log(to_be_inserted)
-    log("TBD:")
+    log(f"TBI:  {len(to_be_inserted)}")
+    log(f"TBD:  {len(to_be_deleted)}")
     log(to_be_deleted)
-    time.sleep(10)
+    time.sleep(0.5)
 
     return to_be_deleted, to_be_inserted
