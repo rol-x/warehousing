@@ -28,11 +28,6 @@ def run_fetch_query(query, silent=False):
         if not silent:
             for row in values:
                 log(row)
-        # log("Logging cursor values from query " + query)
-        # log(str(columns))
-        # time.sleep(0.5)
-        # log(str(values))
-        # time.sleep(3)
     return {"columns": columns, "values": values}
 
 
@@ -41,6 +36,23 @@ def run_query(query, silent=True):
         log(f"Executing query: {query}")
     with config.DATABASE.cursor(buffered=True) as cursor:
         cursor.execute(query)
+
+
+def run_insert_query(entity, values):
+    query = f"INSERT INTO {entity.name} ({entity.headers}) \
+              VALUES ({entity.args})"
+    with config.DATABASE.cursor() as cursor:
+        cursor.executemany(query, values)
+        config.DATABASE.commit()
+        log(f"{cursor.rowcount} was inserted.")
+
+
+def run_delete_query(entity, values):
+    query = f"DELETE FROM {entity.name} a WHERE a.id = %s"
+    with config.DATABASE.cursor() as cursor:
+        cursor.executemany(query, values)
+        config.DATABASE.commit()
+        log(f"{cursor.rowcount} was deleted.")
 
 
 # Setup empty database to be ready for data.

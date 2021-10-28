@@ -2,6 +2,11 @@ import time
 
 import config
 import services.flags_service as flags
+from entity import card as Card
+from entity import card_stats as CardStats
+from entity import date as Date
+from entity import sale_offer as SaleOffer
+from entity import seller as Seller
 from handlers import db_handler, file_handler
 from services.logs_service import log, setup_logs, setup_main_logfile
 
@@ -65,30 +70,60 @@ def main():
 
     # Read the local data from the files
     new_data = file_handler.load_isolated_data()
+    Date.new_data = new_data['date']
+    Card.new_data = new_data['card']
+    Seller.new_data = new_data['seller']
+    CardStats.new_data = new_data['card_stats']
+    SaleOffer.new_data = new_data['sale_offer']
 
     # Read the database data from a relevant date_id onwards
     old_data = load_database_data(new_data['date'])
+    Date.old_data = old_data['date']
+    Card.old_data = old_data['card']
+    Seller.old_data = old_data['seller']
+    CardStats.old_data = old_data['card_stats']
+    SaleOffer.old_data = old_data['sale_offer']
+
+    # Prepare the data for database insertion
+    Date.prepare_data()
+    Card.prepare_data()
+    Seller.prepare_data()
+    CardStats.prepare_data()
+    SaleOffer.prepare_data()
+
+    tables = [Date, Card, Seller, CardStats, SaleOffer]
 
     # Iterate over every table
-    for entity in new_data.keys():
+    for entity in tables:
+        log("Currently in table: %s" % entity.name)
 
         # Get the relevant differences between datasets
         to_be_deleted, to_be_inserted = \
-            file_handler.calculate_deltas(old_data.get(entity),
-                                          new_data.get(entity))
+            file_handler.calculate_deltas(entity.old_data, entity.new_data)
 
-        # Find and drop the rows to delete by inspecting the index of TBD rows
+        # Save indices of rows to delete from the database
+        tbd_values = []
         for row in to_be_deleted:
-            db_handler.remove_row(entity, row[0])
+            tbd_values.append(tuple(row[0]))
 
-        # Insert all the missing data
+        # Save the data that needs to be inserted to the table
+        tbi_values = []
         for row in to_be_inserted:
-            db_handler.insert_row(entity, row[1:])
+            tbi_values.append(tuple(row[1:]))
 
-        log(f"Data in {entity} updated.")
-        count = db_handler.run_fetch_query(f"SELECT * FROM {entity} LIMIT 5")
+        if tbd_values:
+            db_handler.run_delete_query(entity, tbd_values)
+        if tbi_values:
+            db_handler.run_insert_query(entity, tbi_values)
+
+        log(f"Data in {entity.name} table updated.")
+
+        r = db_handler.run_fetch_query(f"SELECT * FROM {entity.name} LIMIT 5")
+        count = db_handler.run_fetch_query(f"SELECT COUNT(*) \
+                                             FROM {entity.name} LIMIT 5")
         log(count.values())
-        time.sleep(4)
+        log(r.values())
+        time.sleep(6)
 
     # Close the connection to the database
     db_handler.close_connection()
