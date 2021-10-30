@@ -11,13 +11,15 @@ old_data = None
 
 
 def prepare_data():
-    log("Preparing data inside %s module" % name)
     if new_data is None:
         raise Exception("No data after loading")
-    log(new_data.columns)
-    for col in new_data.columns:
-        log(type(new_data[col]))
-    log("----- ^ N E W ^ -------- v O L D v -----")
-    log(old_data.columns)
-    for col in old_data.columns:
-        log(type(old_data[col]))
+    log(" === [SALE OFFER] New data === ")
+    log(new_data.describe())
+    log(new_data.info())
+    log(new_data.head())
+    log(new_data.tail())
+    log(" === [SALE OFFER] Old data === ")
+    log(old_data.describe())
+    log(old_data.info())
+    log(old_data.head())
+    log(old_data.tail())

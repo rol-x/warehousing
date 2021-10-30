@@ -106,6 +106,7 @@ def transform_database_data(table_content):
         table_content.get('values'), columns=table_content.get('columns'))
 
 
+# TODO: Redo this, so that it works as intended.
 # Return those date_ids from the new dataset which are not in the old one.
 def compare_dates(old_dates, new_dates):
     old = set([tuple(row) for row in old_dates.values])
@@ -113,6 +114,7 @@ def compare_dates(old_dates, new_dates):
     return [row[1] for row in new if new not in old]
 
 
+# TODO: Redo this, so that it works as intended. Check for id compliance.
 def calculate_deltas(old_data, new_data):
 
     # Take the new data and load the differences into the database,
