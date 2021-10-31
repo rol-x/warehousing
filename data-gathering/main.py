@@ -84,7 +84,7 @@ def main():
 
         # Save the card market statistics if not saved today
         card_ID = get_card_ID(card_name)
-        if not are_card_stats_saved_today(card_ID):
+        if not are_card_stats_saved_today(card_ID) or config.FORCE_UPDATE:
             add_card_stats(card_soup, card_ID)
         else:
             logr(' = Card stats = ')
@@ -122,4 +122,5 @@ if __name__ == '__main__':
             main()
     except Exception as exception:
         log(exception)
+        time.sleep(15 * 60)
         raise SystemExit from exception
