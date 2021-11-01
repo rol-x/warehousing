@@ -1,13 +1,10 @@
 """Manage the local files with data stored in .csv format."""
-import os
 import time
-from datetime import datetime
 
 import config
 import pandas as pd
-from checksumdir import dirhash
-
-from services.logs_service import logr, log
+import services.flags_service as flags
+from services.logs_service import log, logr
 
 
 # Check the time and files status to run the code once a day.
@@ -16,8 +13,9 @@ def schedule_the_run():
 
     # Load the data and compare against today
     date = load_df('date')
-    now = datetime.now()
     row_id = date.index[-1]
+    today = time.strftime("%d/%m/%Y",
+                          time.localtime(time.time())).split("/")
 
     # Run immediately if it's the first run
     if is_first_run():
@@ -30,10 +28,10 @@ def schedule_the_run():
         config.FORCE_UPDATE = False
         return
 
-    # If such record for today already exists
-    while date.loc[row_id, 'day'] == now.day and \
-        date.loc[row_id, 'month'] == now.month and \
-            date.loc[row_id, 'year'] == now.year:
+    # If today's date is already saved in date.csv
+    while date.loc[row_id, 'day'] == int(today[0]) and \
+        date.loc[row_id, 'month'] == int(today[1]) and \
+            date.loc[row_id, 'year'] == int(today[2]):
 
         # Log and check whether another run is needed
         log(" - Relevant data discovered. Checking for completeness.")
@@ -43,11 +41,12 @@ def schedule_the_run():
             log("   - Gathered data is incomplete. Proceeding to run.")
             break
 
-        # Save this complete dataset as validated in checksum form
-        if not is_data_checksum_saved():
+        # If not, save this complete dataset as validated in a checksum form
+        if not flags.is_data_checksum_saved():
             log("   - Data validation completed successfully.")
-            log("   - Saving checksum: " + calculate_data_checksum())
-            save_checksum(calculate_data_checksum())
+            log("   - Saving checksum: " + flags.calculate_data_checksum())
+            flags.save_checksum(flags.calculate_data_checksum())
+
         # Or note that it's already validated and continue waiting
         else:
             log("   - Dataset already validated. All needed data saved.")
@@ -59,7 +58,8 @@ def schedule_the_run():
         # Reload the data after waiting
         date = load_df('date')
         row_id = date.index[-1]
-        now = datetime.now()
+        today = time.strftime("%d/%m/%Y",
+                              time.localtime(time.time())).split("/")
 
 
 # Check whether all the datasets in local files are empty
@@ -104,21 +104,26 @@ def is_data_complete(date_ID):
             or len(card_list) == 0:
         return False
 
-    # TODO: Add faulty data.csv file exceptions
+    # Card. Check whether the number of saved cards is correct.
+    if len(card.index) != len(card_list):
+        log("The number of cards in expansion %s is incorrect"
+            % config.EXPANSION_NAME)
+        log(f"Expected: {len(card_list)}    got: " + str(len(card.index)))
+        return False
 
-    # Check whether the number of card stats is correct
+    # Card stats. Check whether the number of saved card stats is correct.
     if len(card_stats[card_stats['date_ID'] == date_ID]) != len(card_list):
         log(f"The number of cards for date ID [{date_ID}] is incorrect")
         log(f"Expected: {len(card_list)}    got: "
             + str(len(card_stats[card_stats['date_ID'] == date_ID])))
         return False
 
-    # Find any new sellers from sale_offer csv
+    # Sale offer. Find any new sellers from sale_offer csv.
     before = sale_offer[sale_offer['date_ID'] < date_ID]
     sellers_today = sale_offer['seller_ID'].unique()
     sellers_before = before['seller_ID'].unique()
 
-    # Check if there isn't more sellers yesterday than today
+    # Check if there was more sellers yesterday than today.
     if len(sellers_before) > len(sellers_today):
         log("The number of sellers for date ID ["
             + date_ID + "] is incorrect")
@@ -126,54 +131,21 @@ def is_data_complete(date_ID):
             + f"got: {len(sellers_today)}")
         return False
 
-    # Check if all sellers from offers are in the sellers file
+    # Seller. Check if all sellers from offers are in the sellers file.
     for seller_ID in sellers_today:
         if seller_ID not in seller['seller_ID'].values:
             log("Seller from sale offer not saved in sellers")
             return False
 
     # TODO: Check sale_offer for outlier changes (crudely)
+    daily = sale_offer.groupby('date_ID').count()
+    daily.pct_change()
 
     return True
 
 
-# Create the checksums file for storing validated datasets.
-def create_checksums_file():
-    '''Create the checksums file for storing validated datasets.'''
-    with open('./flags/validated-checksums.sha1', 'a+', encoding="utf-8"):
-        pass
-
-
-# Return whether the data in the files has already been validated.
-def is_data_checksum_saved():
-    '''Return whether the data in the files has already been validated.'''
-    if calculate_data_checksum() in get_validated_checksums():
-        return True
-    return False
-
-
-# Get checksums of data files that has been validated
-def get_validated_checksums():
-    with open('./flags/validated-checksums.sha1', 'r',
-              encoding="utf-8") as checksum_file:
-        checksums = [line.strip('\n') for line in checksum_file.readlines()]
-    return checksums
-
-
-# Return calculated checksum based on the contents of data directory
-def calculate_data_checksum():
-    return str(dirhash('./data', 'sha1'))
-
-
-# Save given data chceksum to an external file
-def save_checksum(checksum):
-    with open('./flags/validated-checksums.sha1', 'a+',
-              encoding="utf-8") as checksums_file:
-        checksums_file.write(checksum + "\n")
-
-
-# Load and validate local files, returning the number of removed rows.
-def validate_local_data():
+# Load and clean local files, returning the number of removed rows.
+def clean_local_data():
     '''Load and validate local files, returning the number of removed rows.'''
 
     # Count the rows dropped
@@ -185,7 +157,6 @@ def validate_local_data():
     rows_dropped += drop_duplicate_rows(date)
     rows_dropped += drop_negative_index(date, 'date_ID')
     rows_dropped += drop_identical_records(date, 'date_ID')
-    reset_id(date, 'date_ID')
 
     # Validate cards
     card = load_df('card')
@@ -193,7 +164,6 @@ def validate_local_data():
     rows_dropped += drop_duplicate_rows(card)
     rows_dropped += drop_negative_index(card, 'card_ID')
     rows_dropped += drop_identical_records(card, 'card_ID')
-    reset_id(card, 'card_ID')
 
     # Validate card stats
     card_stats = load_df('card_stats')
@@ -207,7 +177,6 @@ def validate_local_data():
     rows_dropped += drop_duplicate_rows(seller)
     rows_dropped += drop_identical_records(seller, 'seller_ID')
     rows_dropped += drop_negative_index(seller, 'seller_ID')
-    reset_id(seller, 'seller_ID')
 
     # Validate sale offers
     sale_offer = load_df('sale_offer')
@@ -274,20 +243,10 @@ def drop_identical_records(df, id_col):
     return 0
 
 
-# Sort the data by ID and reset the date index.
-def reset_id(df, id_col):
-    '''Sort the data by ID and reset the date index.'''
-    df.sort_values(by=id_col, ascending=True, inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    df[id_col] = list(map(lambda x: x + 1, df.index))
-
-
 # Save the dataframe replacing the existing file.
 def save_data(df, filename):
     '''Save the dataframe replacing the existing file.'''
-    if filename == 'sale_offer' and config.FILE_PART > 1:
-        filename += f'_{config.FILE_PART}'
-    df.to_csv(f"data/{filename}.csv", sep=';', index=False)
+    df.to_pickle(f"./data/{filename}.csv", sep=';', index=False)
 
 
 # Try to load a .csv file content into a dataframe.
@@ -332,30 +291,6 @@ def get_size(entity_name):
     return len(entity_df.index)
 
 
-# Prepare the main log file.
-def prepare_main_log_file():
-    '''Prepare the main log file.'''
-    config.MAIN_LOGNAME = datetime.now().strftime("%d%m%Y") + ".log"
-    with open('./logs/data-gathering/' + config.MAIN_LOGNAME,
-              "a+", encoding="utf-8") as main_logfile:
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        main_logfile.write("\n" + timestamp
-                           + ": Service data-gathering is running.\n")
-
-
-# Prepare the local log files for single run.
-def prepare_single_log_file():
-    '''Prepare the local log files for single run.'''
-    config.RUN_LOGNAME = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
-    with open('./logs/data-gathering/' + config.RUN_LOGNAME,
-              "a+", encoding="utf-8") as logfile:
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        if os.path.getsize('./logs/data-gathering/' + config.RUN_LOGNAME):
-            logfile.write(timestamp + ": = Separate code execution = \n")
-        else:
-            logfile.write(timestamp + ": = Creation of this file = \n")
-
-
 # Get the current date ID.
 def generate_date_ID():
     '''Get the current date ID.'''
@@ -364,12 +299,13 @@ def generate_date_ID():
     date_df = load_df('date')
 
     # Prepare the attributes
-    now = datetime.now()
-    date = now.strftime("%d/%m/%Y").split("/")
+    now = time.time()
+    date = time.strftime("%d/%m/%Y", time.localtime(now)).split("/")
     day = int(date[0])
     month = int(date[1])
     year = int(date[2])
-    weekday = now.weekday() + 1
+    weekday = int(time.strftime("%w", time.localtime(now)))
+    weekday = weekday if weekday > 0 else 7
     date_ID = len(date_df.index) + 1
 
     # Check for the same datetime record
@@ -384,89 +320,6 @@ def generate_date_ID():
         # Save the date locally
         config.THIS_DATE_ID = date_ID
         save_date(date_ID, day, month, year, weekday)
-
-
-# Prepare the local data and log files.
-def prepare_files():
-    '''Prepare the local data and log files.'''
-    # Create main logs directory
-    if not os.path.exists('./logs'):
-        os.mkdir('./logs')
-
-    # Create service logs directory
-    if not os.path.exists('./logs/data-gathering'):
-        os.mkdir('./logs/data-gathering')
-
-    # Prepare a main log file
-    prepare_main_log_file()
-
-    # Create data directory
-    if not os.path.exists('./data'):
-        os.mkdir('./data')
-
-    # Create sellers file
-    with open('./data/seller.csv', 'a+', encoding="utf-8") as seller_csv:
-        if not os.path.getsize('./data/seller.csv'):
-            seller_csv.write('seller_ID;seller_name;seller_type'
-                             + ';member_since;country;address\n')
-
-    # Create cards file
-    with open('./data/card.csv', 'a+', encoding="utf-8") as card_csv:
-        if not os.path.getsize('./data/card.csv'):
-            card_csv.write('card_ID;card_name;expansion_name;rarity\n')
-
-    # Create card stats file
-    with open('./data/card_stats.csv', 'a+',
-              encoding="utf-8") as card_stats_csv:
-        if not os.path.getsize('./data/card_stats.csv'):
-            card_stats_csv.write('card_ID;price_from;30_avg_price;7_avg_price;'
-                                 + '1_avg_price;available_items;date_ID\n')
-
-    # Create date file
-    with open('./data/date.csv', 'a+', encoding="utf-8") as date_csv:
-        if not os.path.getsize('./data/date.csv'):
-            date_csv.write('date_ID;day;month;year;day_of_week\n')
-
-    # Create sale offers file
-    filename = determine_offers_file()
-    with open(f'./data/{filename}', 'a+', encoding="utf-8") as sale_offer_csv:
-        if not os.path.getsize(f'./data/{filename}'):
-            sale_offer_csv.write('seller_ID;price;card_ID;card_condition;'
-                                 + 'language;is_foiled;amount;date_ID\n')
-
-    # Create expansion card names list file
-    with open(f'./data/{config.EXPANSION_NAME}.txt', 'a+', encoding="utf-8"):
-        pass
-
-    # Set global date ID and new date if needed
-    generate_date_ID()
-
-    # Create flags directory
-    if not os.path.exists('./flags'):
-        os.mkdir('./flags')
-
-    # Create a file for storing checksums of validated datasets
-    create_checksums_file()
-
-
-# Scan local files to chose the file part for sale offers.
-def determine_offers_file():
-    '''Scan local files to chose the file part for sale offers.'''
-    filename = 'sale_offer.csv' if config.FILE_PART == 1 \
-        else f'sale_offer_{config.FILE_PART}.csv'
-    if not os.path.isfile(f'./data/{filename}'):
-        return filename
-    if os.path.getsize(f'./data/{filename}') < 40000000.0:
-        return filename
-    config.FILE_PART += 1
-    return determine_offers_file()
-
-
-# Prepare the expansion cards list file.
-def prepare_expansion_list_file(exp_filename):
-    '''Prepare the expansion cards list file.'''
-    with open('./data/' + exp_filename + '.txt', 'a+', encoding="utf-8"):
-        pass
 
 
 # Save a single date to the date dataframe in .csv file.
@@ -487,3 +340,303 @@ def save_date(date_ID, day, month, year, weekday):
         date_csv.write(str(month) + ';')
         date_csv.write(str(year) + ';')
         date_csv.write(str(weekday) + '\n')
+
+
+# Extract information about card statistics from provided soup.
+def add_card_stats(card_soup, card_ID):
+    '''Extract information about card statistics from provided soup.'''
+
+    # Get rows from the card information table
+    card_info = card_soup.findAll("dd", {"class": "col-6 col-xl-7"})
+    if len(card_info) == 0:
+        logr('No card info found on current page')
+        return
+
+    # Get the attributes
+    avg_1_price = card_info[-1].string.string[:-2].replace(',', '.')
+    avg_7_price = card_info[-2].string.string[:-2].replace(',', '.')
+    avg_30_price = card_info[-3].string.string[:-2].replace(',', '.')
+    price_from = card_info[-5].string[:-2].replace(',', '.')
+    available_items = card_info[-6].string
+
+    # Logging
+    logr('== Add card stats ==')
+    logr('Card ID:       ' + str(card_ID))
+    logr('Price from:    ' + str(price_from))
+    logr('30-day avg:    ' + str(avg_30_price))
+    logr('7-day avg:     ' + str(avg_7_price))
+    logr('1-day avg:     ' + str(avg_1_price))
+    logr('Amount:        ' + str(available_items))
+    logr('Date ID:       ' + str(config.THIS_DATE_ID) + '\n')
+
+    # Writing to local file
+    with open('./data/card_stats.csv', 'a', encoding="utf-8") as card_csv:
+        card_csv.write(str(card_ID) + ';')
+        card_csv.write(str(price_from) + ';')
+        card_csv.write(str(avg_30_price) + ';')
+        card_csv.write(str(avg_7_price) + ';')
+        card_csv.write(str(avg_1_price) + ';')
+        card_csv.write(str(available_items) + ';')
+        card_csv.write(str(config.THIS_DATE_ID) + '\n')
+
+
+# Return whether stats given by card ID were saved that day.
+def are_card_stats_saved_today(card_ID):
+    '''Return whether stats given by card ID were saved that day.'''
+    card_stats_df = load_df('card_stats')
+    sm = card_stats_df[(card_stats_df['card_ID'] == card_ID) &
+                       (card_stats_df['date_ID'] == config.THIS_DATE_ID)]
+
+    if len(sm) > 0:
+        return True
+    return False
+
+
+# Extract information about a card from provided soup.
+def add_card(card_soup):
+    '''Extract information about a card from provided soup.'''
+
+    # Load the card and date dataframes
+    card_df = load_df('card')
+
+    # Get rows from the card information table
+    card_info = card_soup.findAll("dd", {"class": "col-6 col-xl-7"})
+    if len(card_info) == 0:
+        logr('No card info found on current page')
+        return
+
+    # Get the attributes
+    card_ID = len(card_df.index) + 1
+    card_name = str(card_soup.find("h1")).split('<')[1][3:]
+    expansion_name = card_info[1].find('span')['data-original-title']
+    rarity = card_info[0].find('span')['data-original-title']
+
+    # Logging
+    logr('== Add card ==')
+    logr('Card ID:       ' + str(card_ID))
+    logr('Card:          ' + str(card_name))
+    logr('Rarity:        ' + str(rarity))
+    logr('Expansion:     ' + str(expansion_name) + '\n')
+
+    # Writing to the file
+    with open('./data/card.csv', 'a', encoding="utf-8") as card_csv:
+        card_csv.write(str(card_ID) + ';')
+        card_csv.write(card_name + ';')
+        card_csv.write(expansion_name + ';')
+        card_csv.write(rarity + '\n')
+
+
+# Return a session-valid card ID given its name.
+def get_card_ID(card_name):
+    '''Return a session-valid card ID given its name.'''
+    card_df = load_df('card')
+    this_card = card_df[(card_df['card_name'] == card_name)]
+
+    if len(this_card) == 0:
+        return -1
+
+    return int(this_card['card_ID'].values[0])
+
+
+# Return whether a card with the same name is already saved.
+def is_card_saved(card_name):
+    '''Return whether a card with the same name is already saved.'''
+    card_df = load_df('card')
+    if card_name in card_df['card_name'].values:
+        return True
+    return False
+
+
+# Extract information about the offers from provided card soup.
+def add_offers(card_page):
+    '''Extract information about the offers from provided card soup.'''
+    table = card_page.find("div", {"class": "table "
+                                   + "article-table "
+                                   + "table-striped"})
+    if table is None:
+        logr("No offers found on page!")
+        logr(f'Page title:  {card_page.find("title")}')
+        return
+
+    # Get static and list info from the page
+    card_name = (str(card_page.find("div", {"class": "flex-grow-1"}))
+                 .split(">")[2]).split("<")[0]
+    sellers_info = table.findAll("span", {"class": "seller-info d-flex "
+                                          + "align-items-center"})
+    seller_names = []
+    for seller_info in sellers_info:
+        seller_names.append(seller_info.find("span", {"class": "d-flex "
+                                             + "has-content-centered "
+                                             + "mr-1"}))
+
+    prices = table.findAll("span", {"class": "font-weight-bold color-primary "
+                                    + "small text-right text-nowrap"})
+    amounts = table.findAll("span", {"class":
+                            "item-count small text-right"})
+    attributes = table.findAll("div", {"class": "product-attributes col"})
+
+    # Ensure the table has proper content
+    if not (len(prices) / 2) == len(amounts) \
+            == len(seller_names) == len(attributes):
+        logr('The columns don\'t match in size!\n')
+        return
+
+    # Acquire the data row by row
+    offers_dict = {"seller_ID": [], "price": [], "card_ID": [],
+                   "card_condition": [], "language": [], "is_foiled": [],
+                   "amount": [], "date_ID": []}
+    for i, seller_name in enumerate(seller_names):
+        card_attrs = []
+        price = float(str(prices[2*i].string)[:-2].replace(".", "")
+                      .replace(",", "."))
+
+        # Get card attributes
+        for attr in attributes[i].findAll("span"):
+            if attr is not None:
+                try:
+                    card_attrs.append(attr["data-original-title"])
+                except KeyError:
+                    continue
+            is_foiled = False
+            foil = attributes[i].find("span", {"class":
+                                               "icon st_SpecialIcon mr-1"})
+            if foil is not None:
+                if foil["data-original-title"] == 'Foil':
+                    is_foiled = True
+
+        # Interpret the attributes
+        if len(card_attrs) < 2:
+            card_attrs = ['', '']
+            logr("Incomplete card attributes!")
+
+        # Load the entry into the dictionary
+        offers_dict['seller_ID'].append(get_seller_ID(seller_name.string))
+        offers_dict['price'].append(price)
+        offers_dict['card_ID'].append(get_card_ID(card_name))
+        offers_dict['card_condition'].append(card_attrs[0])
+        offers_dict['language'].append(card_attrs[1])
+        offers_dict['is_foiled'].append(is_foiled)
+        offers_dict['amount'].append(int(amounts[i].string))
+        offers_dict['date_ID'].append(config.THIS_DATE_ID)
+
+        for key, value in offers_dict.items():
+            if len(value) == 0:
+                logr("Faulty offer set! No entrys for key: " + key)
+                return
+
+    update_sale_offers(offers_dict)
+
+
+# Take the gathered data and adjoin it to the local files
+def update_sale_offers(offers_dict):
+
+    # Load and drop today's sales data for this card
+    saved = load_df('sale_offer')
+    scraped = pd.DataFrame(offers_dict)
+    this_card_today = saved[(saved['card_ID'] == scraped['card_ID'].values[0])
+                            & (saved['date_ID'] == config.THIS_DATE_ID)]
+    saved.drop(this_card_today.index, inplace=True)
+
+    # Concatenate the remaining and new offers and save to file
+    data = pd.concat([saved, scraped]).reset_index(drop=True).drop_duplicates()
+    filename = f'sale_offer_{config.FILE_PART}.csv' if config.FILE_PART > 1 \
+        else 'sale_offer.csv'
+    data.to_csv(f'./data/{filename}', ';', index=False)
+
+    # Log task finished
+    logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
+         + f"{len(this_card_today)}, total: {len(data)})\n\n")
+
+
+# Extract information about a seller from provided soup.
+def add_seller(seller_soup):
+    '''Extract information about a seller from provided soup.'''
+
+    # Get rows from the seller information table on page
+    seller_name = seller_soup.find("h1")
+
+    # User not loaded correctly
+    if seller_name is None:
+        return False
+
+    # Seller name
+    seller_name = str(seller_name.string)
+
+    # Seller ID
+    seller_df = load_df('seller')
+    seller_ID = len(seller_df.index) + 1
+
+    # Type
+    s_type = seller_soup.find("span",
+                              {"class":
+                               "ml-2 personalInfo-bold"}).string
+
+    # Member since
+    member_since = seller_soup.find("span",
+                                    {"class": "ml-1 "
+                                     + "personalInfo-light "
+                                     + "d-none "
+                                     + "d-md-block"}).string.split(' ')[-1]
+
+    # Country
+    country = seller_soup.find("div",
+                               {"class":
+                                "col-12 col-md-6"}) \
+        .find("span")["data-original-title"]
+
+    # Address
+    address_div = seller_soup.findAll("div", {"class": "d-flex "
+                                              + "align-items-center "
+                                              + "justify-content-start "
+                                              + "flex-wrap "
+                                              + "personalInfo "
+                                              + "col-8 "
+                                              + "col-md-9"})[-1] \
+        .findAll("p")
+    address = ''
+    for line in address_div:
+        address = address + line.string + ', '
+    address = address.strip(', ')
+    if address == country:
+        address = ''
+
+    # Logging
+    logr(f"Seller added:  {seller_name} [{seller_ID}]")
+
+    # Writing
+    with open('./data/seller.csv', 'a', encoding="utf-8") as seller_csv:
+        seller_csv.write(str(seller_ID) + ';')
+        seller_csv.write(seller_name + ';')
+        seller_csv.write(s_type + ';')
+        seller_csv.write(member_since + ';')
+        seller_csv.write(country + ';')
+        seller_csv.write(address + '\n')
+
+    return True
+
+
+# Return a seller ID given its name.
+def get_seller_ID(seller_name):
+    '''Return a seller ID given its name.'''
+    seller_df = load_df('seller')
+    if seller_df is None:
+        return -1
+
+    this_seller = seller_df[(seller_df['seller_name'] == seller_name)]
+
+    if len(this_seller) == 0:
+        return -1
+
+    return int(this_seller['seller_ID'].values[0])
+
+
+# Return a set of all sellers found in a card page.
+def get_seller_names(card_soup):
+    '''Return a set of all sellers found in a card page.'''
+    names = set(map(lambda x: str(x.find("a").string
+                                  if x.find("a") is not None
+                                  else ""),
+                    card_soup.findAll("span", {"class": "d-flex "
+                                      + "has-content-centered " + "mr-1"})))
+    names.remove('')
+    return names

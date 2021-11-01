@@ -2,16 +2,14 @@
 import time
 
 import config
-from entity.card import add_card, get_card_ID, is_card_saved
-from entity.card_stats import add_card_stats, are_card_stats_saved_today
-from entity.sale_offer import add_offers
-from entity.seller import get_seller_names
-from handlers import data_handler
-from services.logs_service import logr, log, log_progress, log_url
+import services.flags_service as flags
+from handlers import data_handler as data
+from handlers import files_handler as files
 from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
-                                  connect_webdriver, create_soup,
+                                  connect_webdriver, cooldown, create_soup,
                                   get_card_names, is_valid_card_page,
-                                  realistic_pause, cooldown, urlify)
+                                  realistic_pause, urlify)
+from services.logs_service import log, log_progress, log_url, logr
 
 # TODO: Change singular to plural in entities use, not in model
 # TODO: Research refreshing connection to standalone webdriver
@@ -23,14 +21,18 @@ from handlers.web_handler import (add_sellers_from_set, click_load_more_button,
 # Main function
 def main():
     # Setup
-    data_handler.prepare_files()
-    data_handler.schedule_the_run()
-    data_handler.prepare_single_log_file()
-    data_handler.prepare_expansion_list_file(config.EXPANSION_NAME)
+    files.prepare_files()
+    flags.setup_flags()
+    data.generate_date_ID()
+    data.schedule_the_run()
+
+    # Setup for data gathering run
+    files.prepare_single_log_file()
+    files.prepare_expansion_list_file(config.EXPANSION_NAME)
     driver = connect_webdriver()
 
     # Validate the local data (pre-acquisition)
-    removed = data_handler.validate_local_data()
+    removed = data.clean_local_data()
     logr(f"Local data validated (removed {removed} records)\n")
 
     # Get card names and open each card's URL
@@ -79,13 +81,13 @@ def main():
             tries += 1
 
         # Save the card if not saved already
-        if not is_card_saved(card_name):
-            add_card(card_soup)
+        if not data.is_card_saved(card_name):
+            data.add_card(card_soup)
 
         # Save the card market statistics if not saved today
-        card_ID = get_card_ID(card_name)
-        if not are_card_stats_saved_today(card_ID) or config.FORCE_UPDATE:
-            add_card_stats(card_soup, card_ID)
+        card_ID = data.get_card_ID(card_name)
+        if not data.are_card_stats_saved_today(card_ID) or config.FORCE_UPDATE:
+            data.add_card_stats(card_soup, card_ID)
         else:
             logr(' = Card stats = ')
             logr(f"Card ID:  {card_ID}")

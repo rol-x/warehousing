@@ -36,7 +36,7 @@ def setup_run_logfile():
 
 
 # Log a message to a local file and the console.
-def log(msg):
+def logr(msg):
     '''Log a message to a local file and the console.'''
     msg = str(msg)
     with open(f"./logs/{config.NAME}/{config.RUN_LOGNAME}", 'a+',

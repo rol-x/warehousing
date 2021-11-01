@@ -61,6 +61,25 @@ def clean_up():
     log("Cleaned up.")
 
 
+# Return one specified dataframe
+def load(entity):
+    try:
+        df = pd.read_csv(f'./data/{entity}.csv', sep=';', encoding="utf-8")
+        if entity == 'sale_offer':
+            sale_offers = []
+            file_part = 2
+            while os.path.exists(f'./data/sale_offer_{file_part}.csv'):
+                sale_offers.append(pd.read_csv(f'sale_offer_{file_part}.csv',
+                                   sep=';', encoding="utf-8"))
+                file_part += 1
+            df = pd.concat(sale_offers)
+    except Exception as exception:
+        print(exception)
+        df = None
+    finally:
+        return df
+
+
 # Load and return all the data in dataframes
 def load_isolated_data():
     date = pd.read_csv(
