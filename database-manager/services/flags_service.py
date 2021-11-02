@@ -1,6 +1,8 @@
 import os
 
+import config
 from checksumdir import dirhash
+from services.logs_service import log
 
 
 # Create flags directory and validated checksums file.
@@ -52,6 +54,7 @@ def save_database_checksum(checksum):
     with open('./flags/database-checksum.sha1', 'w',
               encoding='utf-8') as checksum_file:
         checksum_file.write(checksum)
+    log("New database checksum saved: %s" % config.NEW_CHECKSUM)
 
 
 # Return saved checksum of the dataset currently stored in the database
