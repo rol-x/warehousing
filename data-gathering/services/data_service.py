@@ -62,8 +62,6 @@ def setup_data():
             empty.to_csv(f'./data/{entity}.csv',
                          sep=';', encoding='utf-8', index=False)
 
-    log("Data directory ready.")
-
 
 # Copy the dataframes from csv to pickle format for faster I/O.
 def pickle_data():

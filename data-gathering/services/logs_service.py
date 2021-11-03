@@ -17,7 +17,6 @@ def setup_logs():
 
     # Prepare the main log filename
     config.MAIN_LOGNAME = tm.strftime("%d%m%Y", tm.localtime()) + ".log"
-    log("Logs directory ready.")
 
 
 # Prepare the log file for a single run.
