@@ -6,8 +6,6 @@ __pycache__/
 .vscode
 .vscode/settings.json
 geckodriver.log
-.pickles/
-*.pkl
 .mysql/
 .data/
 .old/
