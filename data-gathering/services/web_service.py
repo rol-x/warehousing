@@ -1,12 +1,15 @@
 import time as tm
-from random import normalvariate, random
 
 import config
 from bs4 import BeautifulSoup
 from selenium import common, webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from urllib3.exceptions import MaxRetryError
 
+# Web service shouldn't do that
 from services.data_service import add_seller, load
 from services.logs_service import log_url, logr
 
@@ -31,13 +34,6 @@ def connect_webdriver():
         raise SystemExit from exception
 
 
-# Cooldown the Firefox webdriver.
-def cooldown(multiplier=10.0):
-    '''Cooldown the Firefox webdriver.'''
-    logr('Cooling the webdriver connection down')
-    realistic_pause(multiplier*config.WAIT_COEF)
-
-
 # Use the BeautifulSoup module to parse the page content into soup.
 def create_soup(page_source):
     '''Use the BeautifulSoup module to parse the page content into soup.'''
@@ -45,6 +41,7 @@ def create_soup(page_source):
     return soup
 
 
+# TODO: Remove load from here, move the loop out to main
 # Add every new seller from a set of seller names.
 def iterate_over_sellers(driver, sellers):
     '''Add every new seller from a set of seller names.'''
@@ -53,28 +50,22 @@ def iterate_over_sellers(driver, sellers):
     read_sellers = len(sellers)
 
     # Define loop-control variables and iterate over every seller
+    driver.implicitly_wait(1.5)
     new_sellers = 0
-    tries = 0
-    seller_ok = False
     to_add = [name for name in sellers if name not in seller_df['name'].values]
     for seller_name in to_add:
 
-        # TODO: Selenium wait here
         # Try to get seller data from page
-        while tries < 3:
-            realistic_pause(0.8*config.WAIT_COEF)
+        for try_num in range(3):
             driver.get(config.USERS_URL + seller_name)
             seller_soup = create_soup(driver.page_source)
-            seller_ok = add_seller(seller_soup)
-            if seller_ok:
+            if add_seller(seller_soup):
                 new_sellers += 1
                 break
-            else:
-                tries += 1
-                realistic_pause(config.WAIT_COEF)
-        tries = 0
+            tm.sleep(3 ** (try_num + 1))
 
     # Log task finished
+    driver.implicitly_wait(0.5)
     total_sellers = sellers_before + new_sellers
     logr(f"Done - {new_sellers} new sellers saved  (out of: "
          + f"{read_sellers}, total: {total_sellers})\n")
@@ -122,7 +113,6 @@ def get_card_names(driver, expansion_name):
 
         # Advance to the next page
         page_no += 1
-        realistic_pause(0.3*config.WAIT_COEF)
 
     # Save the complete cards list to a file
     with open('./data/' + exp_filename + '.txt', 'w',
@@ -138,30 +128,22 @@ def get_card_names(driver, expansion_name):
 # Deplete the Load More button to have a complete list of card sellers.
 def click_load_more_button(driver):
     '''Deplete the Load More button to have a complete list of card sellers.'''
-    elapsed_t = 0.0
-    start_t = tm.time()
-    realistic_pause(0.6*config.WAIT_COEF)
+    driver.implicitly_wait(0)
+    BUTTON = '//button[@id="loadMoreButton"]'
+    SPINNER = '//div[@class="spinner"]'
     while True:
         try:
-            # Locate the button element
-            load_more_button = driver \
-                .find_element_by_xpath('//button[@id="loadMoreButton"]')
+            WebDriverWait(driver, timeout=3, poll_frequency=0.25) \
+                .until(EC.invisibility_of_element_located((By.XPATH, SPINNER)))
 
-            # Confirm the button is not an empty object
-            if load_more_button.text == "":
-                return True
+            button = WebDriverWait(driver, timeout=3, poll_frequency=0.25) \
+                .until(EC.element_to_be_clickable((By.XPATH, BUTTON)))
+            if button.text == "SHOW MORE RESULTS":
+                button.click()
 
-            # Click the button and wait
-            driver.execute_script("arguments[0].click();", load_more_button)
-            realistic_pause(0.25*config.WAIT_COEF)
-
-            # Check for timeout
-            elapsed_t = tm.time() - start_t
-            if elapsed_t > config.BUTTON_TIMEOUT:
-                return False
-
-        # When there is no button
-        except common.exceptions.NoSuchElementException:
+        # When there is no more to load
+        except common.exceptions.TimeoutException:
+            driver.implicitly_wait(0)
             return True
 
         # Other related errors
@@ -171,11 +153,9 @@ def click_load_more_button(driver):
             return False
         except common.exceptions.ErrorInResponseException:
             return False
-        except common.exceptions.InvalidSessionIdException:
-            realistic_pause(config.WAIT_COEF)
-            return False
-        except common.exceptions.WebDriverException:
-            return False
+        except Exception as exception:
+            logr(exception)
+            raise SystemExit from exception
 
 
 # Return the given string in url-compatible form, like 'Spell-Snare'.
@@ -202,14 +182,6 @@ def is_valid_card_page(card_soup):
     if len(card_info) > 0 and table is not None:
         return True
     return False
-
-
-# Wait about mean_val seconds before proceeding to the rest of the code.
-def realistic_pause(mean_val):
-    '''Wait ~mean_val seconds before proceeding to the rest of the code.'''
-    std_val = mean_val * random() * 0.3 + 0.1
-    sleep_time = abs(normalvariate(mean_val, std_val)) + 0.2
-    tm.sleep(sleep_time)
 
 
 # Return the number of cards in the search results.

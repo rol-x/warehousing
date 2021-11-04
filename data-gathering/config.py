@@ -1,14 +1,11 @@
 """Store and initialize global configuration of the program."""
 
 # Variables for user custom program configuration
-START_FROM = 1
-FORCE_UPDATE = False
+START_FROM = 264
+FORCE_UPDATE = True
 EXPANSION_NAME = 'Battlebond'
-BUTTON_TIMEOUT = 120.0
-WAIT_COEF = 3
 
-# Variables connected to this single run of the code
-FILE_PART = 1
+# Variables connected to a single run of code
 THIS_DATE_ID = 0
 MAIN_LOGNAME = 'other_main.log'
 RUN_LOGNAME = 'other_run.log'

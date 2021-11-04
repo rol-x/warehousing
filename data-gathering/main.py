@@ -1,4 +1,5 @@
 """Scrape the card market website to get all the neccessary data."""
+import os
 import time as tm
 
 import config
@@ -9,10 +10,7 @@ from services import web_service as web
 from services.logs_service import log, logr
 
 # TODO: Change singular to plural in entities use, not in model
-# TODO: Research refreshing connection to standalone webdriver
-# TODO: Research waiting for elements in Selenium framework
-# TODO: Distill packages from functions in handlers and entity folders
-# TODO: Complete main logging and run logging
+# TODO: Look into add_offers potentially speeding up. Maybe to_hdf?
 
 
 # Main function
@@ -30,13 +28,14 @@ def main():
     # Create run log file and connect the webdriver
     logs.setup_run_logfile()
     driver = web.connect_webdriver()
+    driver.implicitly_wait(0.5)
 
     # Transform the data from .csv to pickle format for faster changes
     data.pickle_data()
 
-    # Clean the local data (pre-acquisition)
-    removed = data.clean_local_data()
-    logr(f"Local data validated (removed {removed} records)\n")
+    # Clean the local pickle data (pre-acquisition)
+    removed = data.clean_pickles()
+    logr(f"Local pickle data validated (removed {removed} records)\n")
 
     # Get card names and open each card's URL
     progress = 0
@@ -51,24 +50,19 @@ def main():
         card_url = config.BASE_URL + config.EXPANSION_NAME + '/' \
             + web.urlify(card_name)
 
-        # TODO: Selenium wait here
         # Try to load the page 3 times
-        tries = 0
-        while tries < 3:
+        for try_num in range(3):
 
             # Open the card page and extend the view maximally
-            web.realistic_pause(config.WAIT_COEF)
             driver.get(card_url)
             logs.log_url(driver.current_url)
             logr("                Expanding page...\n")
-            is_page_expanded = web.click_load_more_button(driver)
 
-            # Check whether all Load more buttons were pressed
-            if not is_page_expanded:
-                logr('Expanding the offers list timed out')
-                web.cooldown()
-                config.WAIT_COEF *= 1.1
-                tries += 1
+            # If clicking the load more button returned False, wait and repeat
+            if not web.click_load_more_button(driver):
+                logr(f"Expanding the page timed out. Waiting to cool down.")
+                driver.implicitly_wait(1.5)
+                tm.sleep(30 * 2 ** try_num)
                 continue
 
             # Create a soup from the website source code
@@ -79,9 +73,8 @@ def main():
                 break
 
             # Otherwise try again
-            logr('Card page invalid')
-            web.cooldown()
-            tries += 1
+            logr('Card page invalid. Retrying...')
+            tm.sleep(3 ** (try_num + 1))
 
         # Save the card if not saved already
         if not data.is_card_saved(card_name):
@@ -109,16 +102,12 @@ def main():
         logr("Task - Updating sale offers")
         data.add_offers(card_soup)
 
-        # If the program fails, always start after the last saved card
-        config.START_FROM += 1
-
     # Log program task completion
-    config.START_FROM = 1
     logr("All cards, sellers and sale offers acquired")
 
-    # Clean the local data (post-acquisition)
-    removed = data.clean_local_data()
-    logr(f"Local data validated (removed {removed} records)\n")
+    # Clean the pickle data (post-acquisition)
+    removed = data.clean_pickles()
+    logr(f"Pickle data validated (removed {removed} records)\n")
 
     # Transform the data back from pickle to .csv format
     data.unpickle_data()
@@ -134,7 +123,10 @@ if __name__ == '__main__':
             main()
     except Exception as exception:
         log(exception)
-        data.unpickle_data()
-        log(" - Data unpickled. Container will restart in 30 minutes.")
+        if os.path.exists('./.pickles'):
+            data.unpickle_data()
+            log(" - Data unpickled. Container will restart in 30 minutes.")
+        else:
+            log(" - Container will restart in 30 minutes.")
         tm.sleep(30 * 60)
         raise SystemExit from exception

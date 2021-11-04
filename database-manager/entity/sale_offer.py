@@ -1,7 +1,7 @@
 from services.logs_service import log
 
 name = 'sale_offer'
-headers = "seller_id, price, card_id, card_condition, \
+headers = "id, price, card_id, card_condition, \
             language, is_foiled, amount, date_id"
 args = "%s, %s, %s, %s, %s, %s, %s, %s"
 static = False

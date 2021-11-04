@@ -1,8 +1,8 @@
 """Manage the local files with data stored in .csv format."""
 import os
-import time as tm
-import sys
 import shutil
+import sys
+import time as tm
 
 import config
 import pandas as pd
@@ -78,6 +78,11 @@ def pickle_data():
     # Ensure the files exist and are ready for writing
     for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
         df = pd.read_csv(f'./data/{entity}.csv', sep=';', encoding="utf-8")
+
+        # Optimize performance by slicing only the relevant data
+        if entity == 'sale_offer':
+            df = df[df['date_id'] == config.THIS_DATE_ID]
+
         df.to_pickle(f'./.pickles/{entity}.pkl')
 
 
@@ -87,10 +92,30 @@ def unpickle_data():
     for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
         df = load(entity)
         if df is not None:
+
+            # Merge new sale offers with previous ones
+            if entity == 'sale_offer':
+                df = merge_sale_offers(df)
+
             df.to_csv(f'./data/{entity}.csv',
                       sep=';', encoding='utf-8', index=False)
     if os.path.exists('./.pickles'):
         shutil.rmtree('./.pickles')
+
+
+def merge_sale_offers(new_offers):
+    # Load the original csv data and make room for updated version
+    old = pd.read_csv(f'./data/sale_offer.csv', sep=';', encoding="utf-8")
+    added_card_ids = list(new_offers['card_id'].unique())
+    tb_dropped = old[old['card_id'].isin(added_card_ids)
+                     & old['date_id'] == config.THIS_DATE_ID].index
+    old = old.drop(tb_dropped)
+
+    # Merge new offers with previous ones and refresh the index and id
+    old = pd.concat([old, new_offers]).reset_index(drop=True)
+    old.index += 1
+    old["id"] = old.index
+    return old
 
 
 # Get the current date ID and save the date if necessary.
@@ -113,7 +138,7 @@ def add_date():
 
     # Today's date is already saved
     if(len(same_date) > 0):
-        config.THIS_DATE_ID = date.loc[same_date, "id"]
+        config.THIS_DATE_ID = date.loc[same_date, "id"].item()
         log(f"Date ID [{config.THIS_DATE_ID}] already added.")
 
     # Else, update the local data
@@ -169,10 +194,11 @@ def schedule_the_run():
             break
 
         # If not, save this complete dataset as validated in a checksum form
-        if not flags.is_data_checksum_saved():
+        checksum = flags.calculate_data_checksum("./data")
+        if checksum not in flags.get_validated_checksums():
             log("   - Data validation completed successfully.")
-            log("   - Saving checksum: " + flags.calculate_data_checksum())
-            flags.save_checksum(flags.calculate_data_checksum())
+            log("   - Saving checksum: " + checksum)
+            flags.save_validated_checksum(checksum)
 
         # Or note that it's already validated and continue waiting
         else:
@@ -259,7 +285,7 @@ def is_data_complete(date_id):
 
     # Seller. Check if all sellers from offers are in the sellers file.
     for seller_id in sellers_today:
-        if seller_id not in seller['seller_id'].values:
+        if seller_id not in seller['id'].values:
             log("Seller from sale offer not saved in sellers")
             return False
 
@@ -271,7 +297,7 @@ def is_data_complete(date_id):
 
 
 # Load and clean local files, returning the number of removed rows.
-def clean_local_data():
+def clean_pickles():
     '''Load and validate local files, returning the number of removed rows.'''
 
     # Count the rows dropped
@@ -400,6 +426,10 @@ def add_seller(seller_soup):
 
     # User not loaded correctly
     if seller_name is None:
+        return False
+
+    if seller_name.string == '':
+        logr("Gotcha!")
         return False
 
     # Seller name
@@ -570,16 +600,13 @@ def add_offers(card_page):
     # Load and drop today's sales data for this card
     saved = load('sale_offer')
     scraped = pd.DataFrame(offers_dict)
-    this_card_today = saved[(saved['card_id'] == scraped['card_id'].values[0])
-                            & (saved['date_id'] == config.THIS_DATE_ID)]
+    this_card_today = saved[(saved['card_id'] == scraped['card_id'].values[0])]
     saved.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
-    data = pd.concat([saved, scraped])
-    # drop_duplicate_rows(data)
-    data.reset_index(drop=True, inplace=True)
+    data = pd.concat([saved, scraped]).reset_index(drop=True)
     data.index += 1
-    data["id"] = list(data.index)
+    data["id"] = data.index
     data.to_pickle('./.pickles/sale_offer.pkl')
 
     # Log task finished
@@ -596,7 +623,7 @@ def get_card_id(card_name):
     if len(this_card) == 0:
         return -1
 
-    return int(this_card['id'].values[0])
+    return int(this_card['id'].item())
 
 
 # Return whether a card with the same name is already saved.
@@ -620,7 +647,7 @@ def get_seller_id(seller_name):
     if len(this_seller) == 0:
         return -1
 
-    return int(this_seller['id'].values[0])
+    return int(this_seller['id'].item())
 
 
 # Return a set of all sellers found in a card page.
