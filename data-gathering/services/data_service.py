@@ -32,7 +32,7 @@ def load_csv(entity):
 def load(entity):
     '''Try to return a dataframe from the respective .pkl file.'''
     try:
-        return pd.read_pickle(f'./.pickles/{entity}.pkl')
+        return pd.read_pickle(f'./pickles/{entity}.pkl')
     except pd.errors.EmptyDataError as empty_err:
         logr(f'No data in {entity}.pkl\n')
         logr(empty_err)
@@ -69,9 +69,13 @@ def pickle_data():
     '''Copy the dataframes from csv to pickle format for faster I/O.'''
 
     # Create fresh pickles directory
-    if os.path.exists('./.pickles'):
-        shutil.rmtree('./.pickles')
-    os.mkdir('./.pickles')
+    if os.path.exists('./pickles'):
+        log("Trying to remove pickles")
+        shutil.rmtree('./pickles')
+        log("Removed")
+    log("Trying to create pickles")
+    os.mkdir('./pickles')
+    log("Created")
 
     # Set higher recursion limit for pickling
     sys.setrecursionlimit(10000)
@@ -80,12 +84,15 @@ def pickle_data():
     for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
         df = pd.read_csv(f'./data/{entity}.csv', compression='gzip',
                          sep=';', encoding="utf-8")
-
+        df_size = len(df.index)
+        log(f"Loaded {entity}: {df_size} rows")
         # Optimize performance by slicing only the relevant data
         if entity == 'sale_offer':
             df = df[df['date_id'] == config.THIS_DATE_ID]
+            pct = 100.0 * (df_size - len(df.index)) / df_size
+            log(f"{len(df.index)} rows selected ({round(pct, 2)}% reduced)")
 
-        df.to_pickle(f'./.pickles/{entity}.pkl')
+        df.to_pickle(f'./pickles/{entity}.pkl')
 
 
 # Convert the data from pickles to csv format.
@@ -101,8 +108,8 @@ def unpickle_data():
 
             df.to_csv(f'./data/{entity}.csv', compression='gzip',
                       sep=';', encoding='utf-8', index=False)
-    if os.path.exists('./.pickles'):
-        shutil.rmtree('./.pickles')
+    if os.path.exists('./pickles'):
+        shutil.rmtree('./pickles')
 
 
 def merge_sale_offers(new_offers):
@@ -111,7 +118,7 @@ def merge_sale_offers(new_offers):
                       sep=';', encoding="utf-8")
     added_card_ids = list(new_offers['card_id'].unique())
     tb_dropped = old[old['card_id'].isin(added_card_ids)
-                     & old['date_id'] == config.THIS_DATE_ID].index
+                     & (old['date_id'] == config.THIS_DATE_ID)].index
     old = old.drop(tb_dropped)
 
     # Merge new offers with previous ones and refresh the index and id
@@ -168,32 +175,25 @@ def add_date():
 def schedule_the_run():
     '''Check the time and files status to run the code once a day.'''
 
-    # Load the data and compare against today
-    date = load_csv('date')
-    date_id = date.index[-1]
-    day, month, year = tm.strftime("%d/%m/%Y", tm.localtime()).split("/")
-
-    # Run immediately if it's the first run
-    if is_first_run():
-        log(" - Fresh start detected. Proceeding to run.")
-        return
-
     # Run the code always if the option is set
     if config.FORCE_UPDATE:
         log(" - Force update flag active. Proceeding to run.")
         config.FORCE_UPDATE = False
         return
 
+    # Run immediately if it's the first run
+    if is_first_run():
+        log(" - Fresh start detected. Proceeding to run.")
+        return
+
     # If today's date is already saved in date.pkl
-    while date.loc[date_id, 'day'] == int(day) and \
-        date.loc[date_id, 'month'] == int(month) and \
-            date.loc[date_id, 'year'] == int(year):
+    while True:
 
         # Log and check whether another run is needed
         log(" - Relevant data discovered. Checking for completeness.")
 
         # If yes, break out of the wait loop
-        if not is_data_complete(date_id):
+        if not is_data_complete(config.THIS_DATE_ID):
             log("   - Gathered data is incomplete. Proceeding to run.")
             break
 
@@ -211,11 +211,6 @@ def schedule_the_run():
         # If the data doesn't need to be gathered, wait 1 hour
         log(" - Job is done. Waiting for 1 hour.")
         tm.sleep(60 * 60)
-
-        # Reload the data after waiting
-        date = load_csv('date')
-        date_id = date.index[-1]
-        day, month, year = tm.strftime("%d/%m/%Y", tm.localtime()).split("/")
 
 
 # Check whether all the datasets in local files are empty
@@ -269,7 +264,7 @@ def is_data_complete(date_id):
 
     # Card stats. Check whether the number of saved card stats is correct.
     if len(card_stats[card_stats['date_id'] == date_id]) != len(card_list):
-        log(f"The number of cards for date ID [{date_id}] is incorrect")
+        log(f"The number of card stats for date ID [{date_id}] is incorrect")
         log(f"Expected: {len(card_list)}    got: "
             + str(len(card_stats[card_stats['date_id'] == date_id])))
         return False
@@ -305,77 +300,78 @@ def clean_pickles():
     '''Load and validate local files, returning the number of removed rows.'''
 
     # Count the rows dropped
-    removed = 0
+    rows = 0
 
     # TODO: Check for wrong types
 
     # Validate dates
-    date = pd.DataFrame(load('date'))
-    date, removed = drop_rows_with_nans(date, removed)
-    date, removed = drop_duplicate_rows(date, removed)
+    date = load('date')
+    rows += len(date.index)
+    date = drop_rows_with_nans(date)
+    date = drop_duplicate_rows(date)
+    rows -= len(date.index)
 
     # Validate cards
     card = load('card')
-    card, removed = drop_rows_with_nans(card, removed)
-    card, removed = drop_duplicate_rows(card, removed)
+    rows += len(card.index)
+    card = drop_rows_with_nans(card)
+    card = drop_duplicate_rows(card)
+    rows -= len(card.index)
 
     # Validate card stats
     card_stats = load('card_stats')
-    card_stats, removed = drop_rows_with_nans(card_stats, removed)
-    card_stats, removed = drop_duplicate_rows(card_stats, removed)
-    card_stats, removed = drop_negative_index(card_stats, 'card_id', removed)
-    card_stats, removed = drop_negative_index(card_stats, 'date_id', removed)
+    rows += len(card_stats.index)
+    card_stats = drop_rows_with_nans(card_stats)
+    card_stats = drop_duplicate_rows(card_stats)
+    card_stats = drop_negative_index(card_stats, 'card_id')
+    card_stats = drop_negative_index(card_stats, 'date_id')
+    rows -= len(card_stats.index)
 
     # Validate sellers
     seller = load('seller')
-    seller, removed = drop_duplicate_rows(seller, removed)
+    rows += len(seller.index)
+    seller = drop_duplicate_rows(seller)
+    rows -= len(seller.index)
 
     # Validate sale offers
     sale_offer = load('sale_offer')
-    sale_offer, removed = drop_rows_with_nans(sale_offer, removed)
-    sale_offer, removed = drop_duplicate_rows(sale_offer, removed)
-    sale_offer, removed = drop_negative_index(sale_offer, 'seller_id', removed)
-    sale_offer, removed = drop_negative_index(sale_offer, 'card_id', removed)
-    sale_offer, removed = drop_negative_index(sale_offer, 'date_id', removed)
+    rows += len(sale_offer.index)
+    sale_offer = drop_rows_with_nans(sale_offer)
+    sale_offer = drop_duplicate_rows(sale_offer)
+    sale_offer = drop_negative_index(sale_offer, 'seller_id')
+    sale_offer = drop_negative_index(sale_offer, 'card_id')
+    sale_offer = drop_negative_index(sale_offer, 'date_id')
+    rows -= len(sale_offer.index)
 
     # Save the validated data
-    date.to_pickle('./.pickles/date.pkl')
-    card.to_pickle('./.pickles/card.pkl')
-    seller.to_pickle('./.pickles/seller.pkl')
-    card_stats.to_pickle('./.pickles/card_stats.pkl')
-    sale_offer.to_pickle('./.pickles/sale_offer.pkl')
+    date.to_pickle('./pickles/date.pkl')
+    card.to_pickle('./pickles/card.pkl')
+    seller.to_pickle('./pickles/seller.pkl')
+    card_stats.to_pickle('./pickles/card_stats.pkl')
+    sale_offer.to_pickle('./pickles/sale_offer.pkl')
 
     # Return the number of rows dropped
-    return removed
+    return rows
 
 
 # Drop rows with NaNs.
-def drop_rows_with_nans(df, total_count):
+def drop_rows_with_nans(df):
     '''Drop rows with NaNs.'''
-    tb_dropped = len(df.index) - len(df.dropna().index)
-    if tb_dropped > 0:
-        df = df.dropna().reset_index(drop=True)
-    return (df, total_count + tb_dropped)
+    return df.dropna().reset_index(drop=True)
 
 
 # Drop rows with negative indices.
-def drop_negative_index(df, id_col, total_count):
+def drop_negative_index(df, id_col):
     '''Drop rows with negative indices.'''
     tb_saved = df[df[id_col] > 0]
-    tb_dropped = len(df.index) - len(tb_saved.index)
-    if tb_dropped > 0:
-        df = df.loc[tb_saved.index].reset_index(drop=True)
-    return (df, total_count + tb_dropped)
+    return df.loc[tb_saved.index].reset_index(drop=True)
 
 
 # Drop duplicate rows.
-def drop_duplicate_rows(df, total_count):
+def drop_duplicate_rows(df):
     '''Drop duplicate rows.'''
     tb_saved = df.drop("id", axis=1).drop_duplicates()
-    tb_dropped = len(df.index) - len(tb_saved.index)
-    if tb_dropped > 0:
-        df = df.loc[tb_saved.index].reset_index(drop=True)
-    return (df, total_count + tb_dropped)
+    return df.loc[tb_saved.index].reset_index(drop=True)
 
 
 # Extract information about a card from provided soup.
@@ -402,7 +398,7 @@ def add_card(card_soup):
                         "rarity": rarity}, ignore_index=True)
     card.reset_index(drop=True, inplace=True)
     card.index += 1
-    card.to_pickle("./.pickles/card.pkl")
+    card.to_pickle("./pickles/card.pkl")
 
     # Logging
     logr('== Added card ==')
@@ -465,7 +461,7 @@ def add_seller(seller_soup):
                             "address": address}, ignore_index=True)
     seller.reset_index(drop=True, inplace=True)
     seller.index += 1
-    seller.to_pickle('./.pickles/seller.pkl')
+    seller.to_pickle('./pickles/seller.pkl')
 
     # Logging
     logr(f"Seller added:  {seller_name} [{len(seller.index) + 1}]")
@@ -503,7 +499,7 @@ def add_card_stats(card_soup, card_id):
                                    ignore_index=True)
     card_stats.reset_index(drop=True, inplace=True)
     card_stats.index += 1
-    card_stats.to_pickle('./.pickles/card_stats.pkl')
+    card_stats.to_pickle('./pickles/card_stats.pkl')
 
     # Logging
     logr('== Added card stats ==')
@@ -602,7 +598,7 @@ def add_offers(card_page):
     data = pd.concat([saved, scraped]).reset_index(drop=True)
     data.index += 1
     data["id"] = data.index
-    data.to_pickle('./.pickles/sale_offer.pkl')
+    data.to_pickle('./pickles/sale_offer.pkl')
 
     # Log task finished
     logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "

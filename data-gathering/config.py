@@ -1,8 +1,8 @@
 """Store and initialize global configuration of the program."""
 
 # Variables for user custom program configuration
-START_FROM = 263
-FORCE_UPDATE = True
+START_FROM = 1
+FORCE_UPDATE = False
 EXPANSION_NAME = 'Battlebond'
 
 # Variables connected to a single run of code

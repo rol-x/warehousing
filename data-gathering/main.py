@@ -10,7 +10,8 @@ from services import web_service as web
 from services.logs_service import log, logr
 
 # TODO: Change singular to plural in entities use, not in model
-# TODO: Look into add_offers potentially speeding up. Maybe to_hdf?
+# TODO: Convert sale_offer mid-way for faster pickling?
+# TODO: Look into seller adding and page expanding
 
 
 # Main function
@@ -123,7 +124,7 @@ if __name__ == '__main__':
             main()
     except Exception as exception:
         log(exception)
-        if os.path.exists('./.pickles'):
+        if os.path.exists('./pickles'):
             data.unpickle_data()
             log(" - Data unpickled. Container will restart in 30 minutes.")
         else:
