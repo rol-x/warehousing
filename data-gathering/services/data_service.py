@@ -15,7 +15,8 @@ from services.logs_service import log, logr
 def load_csv(entity):
     '''Try to return a dataframe from the respective .csv file.'''
     try:
-        return pd.read_csv(f'./data/{entity}.csv', sep=';', encoding="utf-8")
+        return pd.read_csv(f'./data/{entity}.csv',
+                           compression='gzip', sep=';', encoding="utf-8")
     except pd.errors.EmptyDataError as empty_err:
         logr(f'No data in {entity}.csv\n')
         logr(empty_err)
@@ -59,7 +60,7 @@ def setup_data():
     for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
         if not os.path.exists(f'./data/{entity}.csv'):
             empty = pd.DataFrame(columns=config.HEADERS.get(entity))
-            empty.to_csv(f'./data/{entity}.csv',
+            empty.to_csv(f'./data/{entity}.csv', compression='gzip',
                          sep=';', encoding='utf-8', index=False)
 
 
@@ -77,7 +78,8 @@ def pickle_data():
 
     # Ensure the files exist and are ready for writing
     for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
-        df = pd.read_csv(f'./data/{entity}.csv', sep=';', encoding="utf-8")
+        df = pd.read_csv(f'./data/{entity}.csv', compression='gzip',
+                         sep=';', encoding="utf-8")
 
         # Optimize performance by slicing only the relevant data
         if entity == 'sale_offer':
@@ -97,7 +99,7 @@ def unpickle_data():
             if entity == 'sale_offer':
                 df = merge_sale_offers(df)
 
-            df.to_csv(f'./data/{entity}.csv',
+            df.to_csv(f'./data/{entity}.csv', compression='gzip',
                       sep=';', encoding='utf-8', index=False)
     if os.path.exists('./.pickles'):
         shutil.rmtree('./.pickles')
@@ -105,7 +107,8 @@ def unpickle_data():
 
 def merge_sale_offers(new_offers):
     # Load the original csv data and make room for updated version
-    old = pd.read_csv(f'./data/sale_offer.csv', sep=';', encoding="utf-8")
+    old = pd.read_csv(f'./data/sale_offer.csv', compression='gzip',
+                      sep=';', encoding="utf-8")
     added_card_ids = list(new_offers['card_id'].unique())
     tb_dropped = old[old['card_id'].isin(added_card_ids)
                      & old['date_id'] == config.THIS_DATE_ID].index
@@ -150,7 +153,8 @@ def add_date():
                             "weekday": int(weekday)}, ignore_index=True)
         date.reset_index(drop=True, inplace=True)
         date.index += 1
-        date.to_csv("./data/date.csv", sep=';', encoding="utf-8", index=False)
+        date.to_csv("./data/date.csv", compression='gzip',
+                    sep=';', encoding="utf-8", index=False)
         config.THIS_DATE_ID = list(date.index)[-1]
 
         log('== Added date ==')
@@ -194,7 +198,7 @@ def schedule_the_run():
             break
 
         # If not, save this complete dataset as validated in a checksum form
-        checksum = flags.calculate_data_checksum("./data")
+        checksum = flags.calculate_checksum("./data")
         if checksum not in flags.get_validated_checksums():
             log("   - Data validation completed successfully.")
             log("   - Saving checksum: " + checksum)
@@ -301,38 +305,38 @@ def clean_pickles():
     '''Load and validate local files, returning the number of removed rows.'''
 
     # Count the rows dropped
-    rows_dropped = 0
+    removed = 0
 
     # TODO: Check for wrong types
 
     # Validate dates
     date = pd.DataFrame(load('date'))
-    rows_dropped += drop_rows_with_nans(date)
-    rows_dropped += drop_duplicate_rows(date)
+    date, removed = drop_rows_with_nans(date, removed)
+    date, removed = drop_duplicate_rows(date, removed)
 
     # Validate cards
     card = load('card')
-    rows_dropped += drop_rows_with_nans(card)
-    rows_dropped += drop_duplicate_rows(card)
+    card, removed = drop_rows_with_nans(card, removed)
+    card, removed = drop_duplicate_rows(card, removed)
 
     # Validate card stats
     card_stats = load('card_stats')
-    rows_dropped += drop_rows_with_nans(card_stats)
-    rows_dropped += drop_duplicate_rows(card_stats)
-    rows_dropped += drop_negative_index(card_stats, 'card_id')
-    rows_dropped += drop_negative_index(card_stats, 'date_id')
+    card_stats, removed = drop_rows_with_nans(card_stats, removed)
+    card_stats, removed = drop_duplicate_rows(card_stats, removed)
+    card_stats, removed = drop_negative_index(card_stats, 'card_id', removed)
+    card_stats, removed = drop_negative_index(card_stats, 'date_id', removed)
 
     # Validate sellers
     seller = load('seller')
-    rows_dropped += drop_duplicate_rows(seller)
+    seller, removed = drop_duplicate_rows(seller, removed)
 
     # Validate sale offers
     sale_offer = load('sale_offer')
-    rows_dropped += drop_rows_with_nans(sale_offer)
-    rows_dropped += drop_duplicate_rows(sale_offer)
-    rows_dropped += drop_negative_index(sale_offer, 'seller_id')
-    rows_dropped += drop_negative_index(sale_offer, 'card_id')
-    rows_dropped += drop_negative_index(sale_offer, 'date_id')
+    sale_offer, removed = drop_rows_with_nans(sale_offer, removed)
+    sale_offer, removed = drop_duplicate_rows(sale_offer, removed)
+    sale_offer, removed = drop_negative_index(sale_offer, 'seller_id', removed)
+    sale_offer, removed = drop_negative_index(sale_offer, 'card_id', removed)
+    sale_offer, removed = drop_negative_index(sale_offer, 'date_id', removed)
 
     # Save the validated data
     date.to_pickle('./.pickles/date.pkl')
@@ -342,45 +346,36 @@ def clean_pickles():
     sale_offer.to_pickle('./.pickles/sale_offer.pkl')
 
     # Return the number of rows dropped
-    return rows_dropped
+    return removed
 
 
 # Drop rows with NaNs.
-def drop_rows_with_nans(df):
+def drop_rows_with_nans(df, total_count):
     '''Drop rows with NaNs.'''
     tb_dropped = len(df.index) - len(df.dropna().index)
     if tb_dropped > 0:
-        df.dropna(inplace=True)
-        df.reset_index(drop=True, inplace=True)
-        df.index += 1
-        return tb_dropped
-    return 0
+        df = df.dropna().reset_index(drop=True)
+    return (df, total_count + tb_dropped)
 
 
 # Drop rows with negative indices.
-def drop_negative_index(df, id_col):
+def drop_negative_index(df, id_col, total_count):
     '''Drop rows with negative indices.'''
     tb_saved = df[df[id_col] > 0]
     tb_dropped = len(df.index) - len(tb_saved.index)
     if tb_dropped > 0:
-        df = df.loc[tb_saved.index]
-        df.reset_index(drop=True, inplace=True)
-        df.index += 1
-        return tb_dropped
-    return 0
+        df = df.loc[tb_saved.index].reset_index(drop=True)
+    return (df, total_count + tb_dropped)
 
 
 # Drop duplicate rows.
-def drop_duplicate_rows(df):
+def drop_duplicate_rows(df, total_count):
     '''Drop duplicate rows.'''
     tb_saved = df.drop("id", axis=1).drop_duplicates()
     tb_dropped = len(df.index) - len(tb_saved.index)
     if tb_dropped > 0:
-        df = df.loc[tb_saved.index]
-        df.reset_index(drop=True, inplace=True)
-        df.index += 1
-        return tb_dropped
-    return 0
+        df = df.loc[tb_saved.index].reset_index(drop=True)
+    return (df, total_count + tb_dropped)
 
 
 # Extract information about a card from provided soup.

@@ -1,5 +1,5 @@
 from services.logs_service import log, logr
-from handlers.file_handler import load
+from services.data_service import load
 
 name = 'card'
 headers = "name, expansion, rarity"
@@ -57,3 +57,7 @@ class Card(object):
 
     def is_card_saved(self):
         return self.name in load('card')['name'].values()
+
+
+def prepare_data():
+    ...

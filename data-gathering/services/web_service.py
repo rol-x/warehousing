@@ -20,9 +20,8 @@ def connect_webdriver():
     options = Options()
     options.headless = True
     try:
-        # driver = webdriver.Remote("http://" + config.WEBDRIVER_HOSTNAME
-        #                           + ":4444/wd/hub", options=options)
-        driver = webdriver.Firefox(options=options)
+        driver = webdriver.Remote("http://" + config.WEBDRIVER_HOSTNAME
+                                  + ":4444/wd/hub", options=options)
         logr('Webdriver connection ready\n')
         return driver
     except MaxRetryError as exception:

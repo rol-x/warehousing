@@ -1,7 +1,7 @@
 """Store and initialize global configuration of the program."""
 
 # Variables for user custom program configuration
-START_FROM = 264
+START_FROM = 263
 FORCE_UPDATE = True
 EXPANSION_NAME = 'Battlebond'
 

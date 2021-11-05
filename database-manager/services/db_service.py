@@ -1,5 +1,4 @@
-from datetime import date
-import time
+import time as tm
 
 import config
 import mysql.connector
@@ -152,14 +151,14 @@ def test():
                      JOIN date d ON so.date_id = d.id \
                      JOIN card_stats cs ON so.card_id = cs.card_id \
                      AND so.date_id = cs.date_id")
-    time.sleep(60)
+    tm.sleep(60)
 
 
-def get_table_content(entity):
+def table_content(entity):
     return run_fetch_query(f"SELECT * FROM {entity}", silent=True)
 
 
-def get_table_content_since_date(entity, date_index):
+def table_content_since(entity, date_index):
     dates = "("
     for date_id in date_index:
         dates += f"{date_id}, "
