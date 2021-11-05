@@ -8,9 +8,10 @@ services:
       context: ./data-gathering
       dockerfile: Dockerfile
     depends_on:
-      - firefox-webdriver
+      - firefox_webdriver
     command: python -u ./main.py
     volumes:
+      - ./pickles:/pickles
       - ./data:/data
       - ./logs:/logs
       - ./flags:/flags
@@ -33,11 +34,12 @@ services:
       context: ./database-manager
       dockerfile: Dockerfile
     depends_on:
-      - data-gathering
+      - data_gathering
       - mysql_database
       - caching_service
     command: python -u ./main.py
     volumes:
+      - ./.data:/.data
       - ./data:/data
       - ./logs:/logs
       - ./flags:/flags
