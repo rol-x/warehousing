@@ -1,6 +1,6 @@
 import os
+import shutil
 import time as tm
-from shutil import copytree, rmtree
 
 import pandas as pd
 
@@ -18,15 +18,19 @@ def ensure_complete_dataset():
 
 # Copy data directory, save the checksum as global variable
 def isolate_data():
-    if os.path.exists('./.data'):
-        rmtree('./.data')
-    copytree('./data', './.data')
+    try:
+        shutil.rmtree('./.data')
+        os.rmdir('./.data')
+    except Exception:
+        ...
+    shutil.copytree('./data', './.data')
     log("Data isolated.")
 
 
 # Remove created temporary directory for data files
 def clean_up():
-    rmtree('./.data')
+    shutil.rmtree('./.data')
+    os.rmdir('./.data')
     log("Cleaned up.")
 
 

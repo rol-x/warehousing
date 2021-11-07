@@ -32,7 +32,7 @@ def load_csv(entity):
 def load(entity):
     '''Try to return a dataframe from the respective .pkl file.'''
     try:
-        return pd.read_pickle(f'./pickles/{entity}.pkl')
+        return pd.read_pickle(f'./.pickles/{entity}.pkl')
     except pd.errors.EmptyDataError as empty_err:
         logr(f'No data in {entity}.pkl\n')
         logr(empty_err)
@@ -69,13 +69,17 @@ def pickle_data():
     '''Copy the dataframes from csv to pickle format for faster I/O.'''
 
     # Create fresh pickles directory
-    if os.path.exists('./pickles'):
-        log("Trying to remove pickles")
-        shutil.rmtree('./pickles')
-        log("Removed")
-    log("Trying to create pickles")
-    os.mkdir('./pickles')
-    log("Created")
+    try:
+        shutil.rmtree('./.pickles', ignore_errors=True)
+        os.rmdir('./.pickles')
+        log("Removed old pickles directory.")
+    except Exception:
+        ...
+    try:
+        os.mkdir('./.pickles')
+        log("Created new pickles directory.")
+    except Exception:
+        ...
 
     # Set higher recursion limit for pickling
     sys.setrecursionlimit(10000)
@@ -92,7 +96,7 @@ def pickle_data():
             pct = 100.0 * (df_size - len(df.index)) / df_size
             log(f"{len(df.index)} rows selected ({round(pct, 2)}% reduced)")
 
-        df.to_pickle(f'./pickles/{entity}.pkl')
+        df.to_pickle(f'./.pickles/{entity}.pkl')
 
 
 # Convert the data from pickles to csv format.
@@ -104,27 +108,34 @@ def unpickle_data():
 
             # Merge new sale offers with previous ones
             if entity == 'sale_offer':
-                df = merge_sale_offers(df)
+                df = replace_sale_offers(df)
 
             df.to_csv(f'./data/{entity}.csv', compression='gzip',
                       sep=';', encoding='utf-8', index=False)
-    if os.path.exists('./pickles'):
-        shutil.rmtree('./pickles')
+    try:
+        shutil.rmtree('./.pickles', ignore_errors=True)
+        os.rmdir('./.pickles')
+        logr("Removed pickles directory.")
+    except Exception:
+        ...
 
 
-def merge_sale_offers(new_offers):
+def replace_sale_offers(new_offers):
     # Load the original csv data and make room for updated version
     old = pd.read_csv(f'./data/sale_offer.csv', compression='gzip',
                       sep=';', encoding="utf-8")
+    log("Read old sale offer data, size: " + str(len(old.index)))
     added_card_ids = list(new_offers['card_id'].unique())
     tb_dropped = old[old['card_id'].isin(added_card_ids)
                      & (old['date_id'] == config.THIS_DATE_ID)].index
     old = old.drop(tb_dropped)
+    log(f"Merging sale offers: -{len(tb_dropped)}, +{len(new_offers)} rows")
 
     # Merge new offers with previous ones and refresh the index and id
     old = pd.concat([old, new_offers]).reset_index(drop=True)
     old.index += 1
     old["id"] = old.index
+    log("Saving new sale offer data, size: " + str(len(old.index)))
     return old
 
 
@@ -344,11 +355,11 @@ def clean_pickles():
     rows -= len(sale_offer.index)
 
     # Save the validated data
-    date.to_pickle('./pickles/date.pkl')
-    card.to_pickle('./pickles/card.pkl')
-    seller.to_pickle('./pickles/seller.pkl')
-    card_stats.to_pickle('./pickles/card_stats.pkl')
-    sale_offer.to_pickle('./pickles/sale_offer.pkl')
+    date.to_pickle('./.pickles/date.pkl')
+    card.to_pickle('./.pickles/card.pkl')
+    seller.to_pickle('./.pickles/seller.pkl')
+    card_stats.to_pickle('./.pickles/card_stats.pkl')
+    sale_offer.to_pickle('./.pickles/sale_offer.pkl')
 
     # Return the number of rows dropped
     return rows
@@ -398,7 +409,7 @@ def add_card(card_soup):
                         "rarity": rarity}, ignore_index=True)
     card.reset_index(drop=True, inplace=True)
     card.index += 1
-    card.to_pickle("./pickles/card.pkl")
+    card.to_pickle("./.pickles/card.pkl")
 
     # Logging
     logr('== Added card ==')
@@ -461,7 +472,7 @@ def add_seller(seller_soup):
                             "address": address}, ignore_index=True)
     seller.reset_index(drop=True, inplace=True)
     seller.index += 1
-    seller.to_pickle('./pickles/seller.pkl')
+    seller.to_pickle('./.pickles/seller.pkl')
 
     # Logging
     logr(f"Seller added:  {seller_name} [{len(seller.index) + 1}]")
@@ -499,7 +510,7 @@ def add_card_stats(card_soup, card_id):
                                    ignore_index=True)
     card_stats.reset_index(drop=True, inplace=True)
     card_stats.index += 1
-    card_stats.to_pickle('./pickles/card_stats.pkl')
+    card_stats.to_pickle('./.pickles/card_stats.pkl')
 
     # Logging
     logr('== Added card stats ==')
@@ -598,7 +609,7 @@ def add_offers(card_page):
     data = pd.concat([saved, scraped]).reset_index(drop=True)
     data.index += 1
     data["id"] = data.index
-    data.to_pickle('./pickles/sale_offer.pkl')
+    data.to_pickle('./.pickles/sale_offer.pkl')
 
     # Log task finished
     logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "

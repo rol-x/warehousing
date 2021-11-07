@@ -11,7 +11,7 @@ services:
       - firefox_webdriver
     command: python -u ./main.py
     volumes:
-      - ./pickles:/pickles
+      - ./.pickles:/.pickles
       - ./data:/data
       - ./logs:/logs
       - ./flags:/flags

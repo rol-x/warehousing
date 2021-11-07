@@ -11,7 +11,8 @@ from services.logs_service import log, logr
 
 # TODO: Change singular to plural in entities use, not in model
 # TODO: Convert sale_offer mid-way for faster pickling?
-# TODO: Look into seller adding and page expanding
+# TODO: Look into seller adding and page expanding.
+# TODO: Cast id columns of card_stats to int.
 
 
 # Main function
@@ -102,6 +103,7 @@ def main():
         logr(" = Offers = ")
         logr("Task - Updating sale offers")
         data.add_offers(card_soup)
+        tm.sleep(0.5)
 
     # Log program task completion
     logr("All cards, sellers and sale offers acquired")
@@ -110,6 +112,7 @@ def main():
     removed = data.clean_pickles()
     logr(f"Pickle data validated (removed {removed} records)\n")
 
+    # TODO: Fix error 16: resource busy
     # Transform the data back from pickle to .csv format
     data.unpickle_data()
     logr(" = Program execution finished = ")
@@ -124,10 +127,10 @@ if __name__ == '__main__':
             main()
     except Exception as exception:
         log(exception)
-        if os.path.exists('./pickles'):
-            data.unpickle_data()
-            log(" - Data unpickled. Container will restart in 30 minutes.")
+        if os.path.exists("./.pickles"):
+            log(" - Unpickling data. Container will restart in 30 minutes.")
         else:
             log(" - Container will restart in 30 minutes.")
+        data.unpickle_data()
         tm.sleep(30 * 60)
         raise SystemExit from exception
