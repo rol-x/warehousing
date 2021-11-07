@@ -1,0 +1,188 @@
+00:09:05: == Added date ==
+00:09:05: Day:           06
+00:09:05: Month:         11
+00:09:05: Year:          2021
+00:09:05: Date ID:       39
+
+00:09:09:  - Relevant data discovered. Checking for completeness.
+00:09:13: The number of card stats for date ID [39] is incorrect
+00:09:13: Expected: 264    got: 0
+00:09:13:    - Gathered data is incomplete. Proceeding to run.
+00:09:17: Loaded date: 39 rows
+00:09:17: Loaded card: 264 rows
+00:09:17: Loaded seller: 7083 rows
+00:09:17: Loaded card_stats: 9955 rows
+00:10:31: Date ID [39] already added.
+00:10:34:  - Relevant data discovered. Checking for completeness.
+00:10:37: The number of card stats for date ID [39] is incorrect
+00:10:37: Expected: 264    got: 0
+00:10:37:    - Gathered data is incomplete. Proceeding to run.
+00:10:41: Loaded date: 39 rows
+00:10:41: Loaded card: 264 rows
+00:10:41: Loaded seller: 7083 rows
+00:10:41: Loaded card_stats: 9955 rows
+00:10:44: Loaded sale_offer: 3337707 rows
+00:10:44: 0 rows selected (100.0% reduced)
+02:30:42: Date ID [39] already added.
+02:30:43:  - Relevant data discovered. Checking for completeness.
+02:30:43: The number of card stats for date ID [39] is incorrect
+02:30:43: Expected: 264    got: 117
+02:30:43:    - Gathered data is incomplete. Proceeding to run.
+02:30:48: Loaded date: 39 rows
+02:30:48: Loaded card: 264 rows
+02:30:48: Loaded seller: 7094 rows
+02:30:48: Loaded card_stats: 10072 rows
+02:30:48: Loaded sale_offer: 37189 rows
+02:30:48: 37189 rows selected (0.0% reduced)
+02:36:10: ''
+02:36:24: Date ID [39] already added.
+02:36:24:  - Relevant data discovered. Checking for completeness.
+02:36:24: The number of card stats for date ID [39] is incorrect
+02:36:24: Expected: 264    got: 139
+02:36:24:    - Gathered data is incomplete. Proceeding to run.
+02:41:24: Message: Could not start a new session. New session request timed out
+Build info: version: '4.0.0', revision: '3a21814679'
+System info: host: '760c276eb2aa', ip: '172.27.0.2', os.name: 'Linux', os.arch: 'amd64', os.version: '5.10.16.3-microsoft-standard-WSL2', java.version: '11.0.11'
+Driver info: driver.version: unknown
+Stacktrace:
+    at org.openqa.selenium.grid.sessionqueue.local.LocalNewSessionQueue.addToQueue (LocalNewSessionQueue.java:199)
+    at org.openqa.selenium.grid.sessionqueue.NewSessionQueue.lambda$new$0 (NewSessionQueue.java:68)
+    at org.openqa.selenium.remote.http.Route$TemplatizedRoute.handle (Route.java:192)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.grid.sessionqueue.NewSessionQueue.execute (NewSessionQueue.java:120)
+    at org.openqa.selenium.remote.tracing.SpanWrappedHttpHandler.execute (SpanWrappedHttpHandler.java:86)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.grid.router.Router.execute (Router.java:91)
+    at org.openqa.selenium.grid.web.EnsureSpecCompliantResponseHeaders.lambda$apply$0 (EnsureSpecCompliantResponseHeaders.java:34)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$NestedRoute.handle (Route.java:270)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.http.Route$CombinedRoute.handle (Route.java:336)
+    at org.openqa.selenium.remote.http.Route.execute (Route.java:68)
+    at org.openqa.selenium.remote.AddWebDriverSpecHeaders.lambda$apply$0 (AddWebDriverSpecHeaders.java:35)
+    at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0 (ErrorFilter.java:44)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.remote.ErrorFilter.lambda$apply$0 (ErrorFilter.java:44)
+    at org.openqa.selenium.remote.http.Filter$1.execute (Filter.java:64)
+    at org.openqa.selenium.netty.server.SeleniumHandler.lambda$channelRead0$0 (SeleniumHandler.java:44)
+    at java.util.concurrent.Executors$RunnableAdapter.call (Executors.java:515)
+    at java.util.concurrent.FutureTask.run (FutureTask.java:264)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker (ThreadPoolExecutor.java:1128)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run (ThreadPoolExecutor.java:628)
+    at java.lang.Thread.run (Thread.java:829)
+02:41:37: Date ID [39] already added.
+02:41:37:  - Relevant data discovered. Checking for completeness.
+02:41:37: The number of card stats for date ID [39] is incorrect
+02:41:37: Expected: 264    got: 139
+02:41:37:    - Gathered data is incomplete. Proceeding to run.
+02:41:47: Loaded date: 39 rows
+02:41:47: Loaded card: 264 rows
+02:41:48: Loaded seller: 7094 rows
+02:41:48: Loaded card_stats: 10094 rows
+02:41:48: Loaded sale_offer: 43223 rows
+02:41:48: 43223 rows selected (0.0% reduced)
+03:08:30: [Errno 16] Device or resource busy: './pickles'
+03:08:43: Date ID [39] already added.
+03:08:43:  - Relevant data discovered. Checking for completeness.
+03:08:43:    - Data validation completed successfully.
+03:08:43:    - Saving checksum: 8e24d9238e80b63374a8538c3b9a1b531585618e
+03:08:43:  - Job is done. Waiting for 1 hour.
+04:08:43:  - Relevant data discovered. Checking for completeness.
+04:08:43:    - Dataset already validated. All needed data saved.
+04:08:43:  - Job is done. Waiting for 1 hour.
+05:08:43:  - Relevant data discovered. Checking for completeness.
+05:08:44:    - Dataset already validated. All needed data saved.
+05:08:44:  - Job is done. Waiting for 1 hour.
+06:08:44:  - Relevant data discovered. Checking for completeness.
+06:08:44:    - Dataset already validated. All needed data saved.
+06:08:44:  - Job is done. Waiting for 1 hour.
+07:08:44:  - Relevant data discovered. Checking for completeness.
+07:08:44:    - Dataset already validated. All needed data saved.
+07:08:44:  - Job is done. Waiting for 1 hour.
+08:08:44:  - Relevant data discovered. Checking for completeness.
+08:08:44:    - Dataset already validated. All needed data saved.
+08:08:44:  - Job is done. Waiting for 1 hour.
+09:08:45:  - Relevant data discovered. Checking for completeness.
+09:08:45:    - Dataset already validated. All needed data saved.
+09:08:45:  - Job is done. Waiting for 1 hour.
+10:08:45:  - Relevant data discovered. Checking for completeness.
+10:08:45:    - Dataset already validated. All needed data saved.
+10:08:45:  - Job is done. Waiting for 1 hour.
+16:57:22: Date ID [39] already added.
+16:57:22:  - Relevant data discovered. Checking for completeness.
+16:57:22:    - Dataset already validated. All needed data saved.
+16:57:22:  - Job is done. Waiting for 1 hour.
+16:59:25: Date ID [39] already added.
+16:59:25:  - Force update flag active. Proceeding to run.
+16:59:30: Loaded date: 39 rows
+16:59:30: Loaded card: 264 rows
+16:59:30: Loaded seller: 7094 rows
+16:59:30: Loaded card_stats: 10219 rows
+16:59:30: Loaded sale_offer: 67279 rows
+16:59:30: 67279 rows selected (0.0% reduced)
+16:59:38: Unpickling the data.
+16:59:41: Unpickling date.
+16:59:41: Pickle loaded.
+16:59:41: Saved as csv.
+16:59:41: Unpickling card.
+16:59:42: Pickle loaded.
+16:59:42: Saved as csv.
+16:59:42: Unpickling seller.
+16:59:42: Pickle loaded.
+16:59:42: Saved as csv.
+16:59:42: Unpickling card_stats.
+16:59:43: Pickle loaded.
+16:59:43: Saved as csv.
+16:59:43: Unpickling sale_offer.
+16:59:44: Pickle loaded.
+16:59:44: Saved as csv.
+16:59:44: [Errno 16] Device or resource busy: './pickles'
+16:59:44: Unpickling the data.
+16:59:47: Unpickling date.
+16:59:47: Pickle loaded.
+16:59:47: Unpickling card.
+16:59:48: Pickle loaded.
+16:59:48: Unpickling seller.
+16:59:48: Pickle loaded.
+16:59:48: Unpickling card_stats.
+16:59:49: Pickle loaded.
+16:59:49: Unpickling sale_offer.
+16:59:49: Pickle loaded.
+17:00:03: Date ID [39] already added.
+17:00:03:  - Force update flag active. Proceeding to run.
+17:07:33: Date ID [39] already added.
+17:07:33:  - Force update flag active. Proceeding to run.
+17:07:38: Removed old pickles directory.
+17:07:38: Loaded date: 39 rows
+17:07:38: Loaded card: 264 rows
+17:07:38: Loaded seller: 7094 rows
+17:07:38: Loaded card_stats: 10219 rows
+17:07:38: Loaded sale_offer: 67279 rows
+17:07:38: 67279 rows selected (0.0% reduced)
+17:07:46: Date ID [39] already added.
+17:07:46:  - Relevant data discovered. Checking for completeness.
+17:07:47:    - Data validation completed successfully.
+17:07:47:    - Saving checksum: 254eb1289948d33214015ebfc8a25eb46e1065b6
+17:07:47:  - Job is done. Waiting for 1 hour.
+19:25:43: Date ID [39] already added.
+19:25:43:  - Force update flag active. Proceeding to run.
+19:25:48: Removed old pickles directory.
+19:25:48: Loaded date: 39 rows
+19:25:48: Loaded card: 264 rows
+19:25:48: Loaded seller: 7094 rows
+19:25:48: Loaded card_stats: 10219 rows
+19:25:48: Loaded sale_offer: 67279 rows
+19:25:48: 67279 rows selected (0.0% reduced)
+19:25:56: Date ID [39] already added.
+19:25:56:  - Relevant data discovered. Checking for completeness.
+19:25:56:    - Data validation completed successfully.
+19:25:56:    - Saving checksum: 739fd7e4e1008924dd90edbf448ee3d33e4c5d4e
+19:25:56:  - Job is done. Waiting for 1 hour.
