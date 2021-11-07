@@ -29,9 +29,12 @@ def isolate_data():
 
 # Remove created temporary directory for data files
 def clean_up():
-    shutil.rmtree('./.data')
-    os.rmdir('./.data')
-    log("Cleaned up.")
+    try:
+        shutil.rmtree('./.data', ignore_errors=True)
+        os.rmdir('./.data')
+        log("Cleaned up.")
+    except Exception:
+        ...
 
 
 # Return one specified dataframe
