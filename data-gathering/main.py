@@ -13,6 +13,7 @@ from services.logs_service import log, logr
 # TODO: Convert sale_offer mid-way for faster pickling?
 # TODO: Look into seller adding and page expanding.
 # TODO: Cast id columns of card_stats to int.
+# TODO: Check out empty seller name fiasco.
 
 
 # Main function

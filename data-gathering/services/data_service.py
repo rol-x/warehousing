@@ -533,15 +533,18 @@ def add_offers(card_page):
         logr(f'Page title:  {card_page.find("title")}')
         return
 
+    start = tm.time()
+    last = start
+    scraped = pd.DataFrame(columns=config.HEADERS.get("sale_offer"))
+
     # Get static and list info from the page
     card_name = (str(card_page.find("div", {"class": "flex-grow-1"}))
                  .split(">")[2]).split("<")[0]
     sellers_info = table.findAll("span", {"class": "seller-info d-flex "
                                           + "align-items-center"})
-    seller_names = []
-    for seller_info in sellers_info:
-        seller_names.append(seller_info.find("span", {"class": "d-flex "
-                                             + "has-content-centered mr-1"}))
+    seller_names = [info.find(
+                    "span", {"class": "d-flex has-content-centered mr-1"})
+                    for info in sellers_info]
 
     prices = table.findAll("span", {"class": "font-weight-bold color-primary "
                                     + "small text-right text-nowrap"})
@@ -554,66 +557,72 @@ def add_offers(card_page):
         logr("The columns don't match in size!\n")
         return
 
-    # Acquire the data row by row
-    offers_dict = {"id": [], "seller_id": [], "price": [], "card_id": [],
-                   "card_condition": [], "card_language": [], "is_foiled": [],
-                   "amount": [], "date_id": []}
-    for i, seller_name in enumerate(seller_names):
-        card_attrs = []
-        price = float(str(prices[2*i].string)[:-2].replace(".", "")
-                      .replace(",", "."))
+    log("Partially acquired attributes: %s" % round(tm.time() - last, 3))
+    last = tm.time()
 
-        # Get card attributes
-        for attr in attributes[i].findAll("span"):
-            if attr is not None:
-                try:
-                    card_attrs.append(attr["data-original-title"])
-                except KeyError:
-                    continue
-            is_foiled = False
-            foil = attributes[i].find("span", {"class":
-                                               "icon st_SpecialIcon mr-1"})
-            if foil is not None:
-                if foil["data-original-title"] == 'Foil':
-                    is_foiled = True
+    cond_lang = [x.findAll("span") for x in attributes
+                 if x.findAll("span") is not None]
 
-        # Interpret the attributes
-        if len(card_attrs) < 2:
-            card_attrs = ['', '']
-            logr("Incomplete card attributes!")
+    foils = [x.find("span", {"class": "icon st_SpecialIcon mr-1"})
+             for x in attributes if
+             x.find("span", {"class": "icon st_SpecialIcon mr-1"})
+             is not None]
 
-        # Load the entry into the dictionary
-        offers_dict['id'].append(None)
-        offers_dict['seller_id'].append(get_seller_id(seller_name.string))
-        offers_dict['price'].append(price)
-        offers_dict['card_id'].append(get_card_id(card_name))
-        offers_dict['card_condition'].append(card_attrs[0])
-        offers_dict['card_language'].append(card_attrs[1])
-        offers_dict['is_foiled'].append(is_foiled)
-        offers_dict['amount'].append(int(amounts[i].string))
-        offers_dict['date_id'].append(config.THIS_DATE_ID)
+    log("Attributes and foils: %s" % round(tm.time() - last, 3))
+    last = tm.time()
 
-        # Check for faulty data
-        for key, value in offers_dict.items():
-            if len(value) == 0:
-                logr("Faulty offer set! No entrys for key: " + key)
-                return
+    card_condition = [x[0]["data-original-title"] for x in cond_lang
+                      if x[0] is not None]
+    card_language = [x[1]["data-original-title"] for x in cond_lang if
+                     x[1] is not None]
+    is_foiled = [True if x["data-original-title"] == 'Foil'
+                 else False for x in foils]
+
+    log("Unpacking: %s" % round(tm.time() - last, 3))
+    last = tm.time()
+
+    scraped['id'] = None
+    scraped['seller_id'] = [get_seller_id(x.string) for x in seller_names]
+    scraped['price'] = [float(str(prices[2*i].string)[:-2]
+                        .replace(".", "").replace(",", "."))
+                        for i in range(len(seller_names))]
+    scraped['card_id'] = get_card_id(card_name)
+    scraped['card_condition'] = card_condition
+    scraped['card_language'] = card_language
+    scraped['is_foiled'] = is_foiled
+    scraped['amount'] = [int(amount.string) for amount in amounts]
+    scraped['date_id'] = config.THIS_DATE_ID
+
+    log("Dataframe ready: %s" % round(tm.time() - last, 3))
+    last = tm.time()
 
     # Load and drop today's sales data for this card
     saved = load('sale_offer')
-    scraped = pd.DataFrame(offers_dict)
+
+    log("Dataframe pickle loaded: %s" % round(tm.time() - last, 3))
+    last = tm.time()
+
     this_card_today = saved[(saved['card_id'] == scraped['card_id'].values[0])]
+
+    log("Card data sliced: %s" % round(tm.time() - last, 3))
+    last = tm.time()
+
     saved.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
-    data = pd.concat([saved, scraped]).reset_index(drop=True)
-    data.index += 1
-    data["id"] = data.index
+    data = pd.concat([saved, scraped])
+
+    log("Offers ready: %s" % round(tm.time() - last, 3))
+    last = tm.time()
+
     data.to_pickle('./.pickles/sale_offer.pkl')
+
+    log("Data pickled: %s" % round(tm.time() - last, 3))
 
     # Log task finished
     logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
          + f"{len(this_card_today)}, total: {len(data)})\n\n")
+    log(f"Total time: %s" % round(tm.time() - start, 3))
 
 
 # Return a session-valid card ID given its name.

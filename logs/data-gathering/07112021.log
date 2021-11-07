@@ -1,0 +1,518 @@
+13:06:56: == Added date ==
+13:06:56: Day:           07
+13:06:56: Month:         11
+13:06:56: Year:          2021
+13:06:56: Date ID:       40
+
+13:06:59:  - Relevant data discovered. Checking for completeness.
+13:07:03: The number of card stats for date ID [40] is incorrect
+13:07:03: Expected: 264    got: 0
+13:07:03:    - Gathered data is incomplete. Proceeding to run.
+13:07:09: Loaded date: 40 rows
+13:07:09: Loaded card: 264 rows
+13:07:09: Loaded seller: 7094 rows
+13:07:09: Loaded card_stats: 10219 rows
+13:07:13: Loaded sale_offer: 3404986 rows
+13:07:13: 0 rows selected (100.0% reduced)
+14:08:20: Message: Unable to route (POST) /session/d11f78f3-9420-4b4a-a424-b6433861ba6f/url
+
+14:08:21:  - Unpickling data. Container will restart in 30 minutes.
+14:08:27: Read old sale offer data, size: 3404986
+14:08:27: Merging sale offers: -0, +9813 rows
+14:08:28: Saving new sale offer data, size: 3414799
+14:27:22: Date ID [40] already added.
+14:27:27:  - Relevant data discovered. Checking for completeness.
+14:27:32: The number of card stats for date ID [40] is incorrect
+14:27:32: Expected: 264    got: 43
+14:27:32:    - Gathered data is incomplete. Proceeding to run.
+14:27:39: Loaded date: 40 rows
+14:27:39: Loaded card: 264 rows
+14:27:39: Loaded seller: 7114 rows
+14:27:39: Loaded card_stats: 10262 rows
+14:27:44: Loaded sale_offer: 3414799 rows
+14:27:44: 9813 rows selected (99.71% reduced)
+14:28:02: Table loaded: 0.54
+14:28:09: Dictionary ready: 6.645
+14:28:09: Dataframe pickle loaded: 0.011
+14:28:09: Dictionary dataframe created: 0.003
+14:28:09: Card data sliced: 0.002
+14:28:09: Offers ready: 0.011
+14:28:09: Data pickled: 0.02
+14:28:09: Total time: 7.264
+14:28:18: Table loaded: 0.259
+14:28:21: Dictionary ready: 3.071
+14:28:21: Dataframe pickle loaded: 0.012
+14:28:21: Dictionary dataframe created: 0.002
+14:28:21: Card data sliced: 0.004
+14:28:21: Offers ready: 0.007
+14:28:21: Data pickled: 0.015
+14:28:21: Total time: 3.393
+14:28:34: Table loaded: 0.368
+14:28:39: Dictionary ready: 4.919
+14:28:39: Dataframe pickle loaded: 0.014
+14:28:39: Dictionary dataframe created: 0.003
+14:28:39: Card data sliced: 0.006
+14:28:39: Offers ready: 0.009
+14:28:39: Data pickled: 0.016
+14:28:39: Total time: 5.359
+14:28:52: Table loaded: 0.41
+14:28:57: Dictionary ready: 5.418
+14:28:57: Dataframe pickle loaded: 0.013
+14:28:57: Dictionary dataframe created: 0.003
+14:28:57: Card data sliced: 0.003
+14:28:57: Offers ready: 0.008
+14:28:57: Data pickled: 0.017
+14:28:57: Total time: 5.897
+14:29:10: Table loaded: 0.388
+14:29:16: Dictionary ready: 5.2
+14:29:16: Dataframe pickle loaded: 0.017
+14:29:16: Dictionary dataframe created: 0.003
+14:29:16: Card data sliced: 0.003
+14:29:16: Offers ready: 0.008
+14:29:16: Data pickled: 0.019
+14:29:16: Total time: 5.67
+14:29:32: Table loaded: 0.516
+14:29:39: Dictionary ready: 6.419
+14:29:39: Dataframe pickle loaded: 0.015
+14:29:39: Dictionary dataframe created: 0.005
+14:29:39: Card data sliced: 0.003
+14:29:39: Offers ready: 0.01
+14:29:39: Data pickled: 0.018
+14:29:39: Total time: 7.01
+14:29:46: Table loaded: 0.169
+14:29:48: Dictionary ready: 2.17
+14:29:48: Dataframe pickle loaded: 0.012
+14:29:48: Dictionary dataframe created: 0.002
+14:29:48: Card data sliced: 0.005
+14:29:48: Offers ready: 0.009
+14:29:48: Data pickled: 0.017
+14:29:48: Total time: 2.412
+14:29:55: Table loaded: 0.141
+14:29:57: Dictionary ready: 1.912
+14:29:57: Dataframe pickle loaded: 0.017
+14:29:57: Dictionary dataframe created: 0.002
+14:29:57: Card data sliced: 0.005
+14:29:57: Offers ready: 0.009
+14:29:57: Data pickled: 0.02
+14:29:57: Total time: 2.137
+14:30:18: Table loaded: 0.512
+14:30:25: Dictionary ready: 6.98
+14:30:25: Dataframe pickle loaded: 0.013
+14:30:25: Dictionary dataframe created: 0.003
+14:30:26: Card data sliced: 0.004
+14:30:26: Offers ready: 0.013
+14:30:26: Data pickled: 0.018
+14:30:26: Total time: 7.573
+14:30:32: Table loaded: 0.119
+14:30:33: Dictionary ready: 1.074
+14:30:33: Dataframe pickle loaded: 0.015
+14:30:33: Dictionary dataframe created: 0.002
+14:30:33: Card data sliced: 0.002
+14:30:33: Offers ready: 0.011
+14:30:33: Data pickled: 0.017
+14:30:33: Total time: 1.271
+14:30:54: Table loaded: 0.597
+14:31:02: Dictionary ready: 8.235
+14:31:02: Dataframe pickle loaded: 0.015
+14:31:02: Dictionary dataframe created: 0.004
+14:31:02: Card data sliced: 0.004
+14:31:02: Offers ready: 0.007
+14:31:02: Data pickled: 0.018
+14:31:02: Total time: 8.904
+14:31:21: Table loaded: 0.548
+14:31:28: Dictionary ready: 7.101
+14:31:28: Dataframe pickle loaded: 0.013
+14:31:28: Dictionary dataframe created: 0.003
+14:31:28: Card data sliced: 0.004
+14:31:28: Offers ready: 0.01
+14:31:28: Data pickled: 0.018
+14:31:28: Total time: 7.724
+14:31:38: Table loaded: 0.291
+14:31:42: Dictionary ready: 3.761
+14:31:42: Dataframe pickle loaded: 0.014
+14:31:42: Dictionary dataframe created: 0.002
+14:31:42: Card data sliced: 0.003
+14:31:42: Offers ready: 0.008
+14:31:42: Data pickled: 0.019
+14:31:42: Total time: 4.121
+14:31:56: Table loaded: 0.412
+14:32:01: Dictionary ready: 4.932
+14:32:01: Dataframe pickle loaded: 0.016
+14:32:01: Dictionary dataframe created: 0.002
+14:32:01: Card data sliced: 0.008
+14:32:01: Offers ready: 0.008
+14:32:01: Data pickled: 0.02
+14:32:01: Total time: 5.421
+14:32:15: Table loaded: 0.367
+14:32:20: Dictionary ready: 5.385
+14:32:20: Dataframe pickle loaded: 0.016
+14:32:20: Dictionary dataframe created: 0.004
+14:32:20: Card data sliced: 0.003
+14:32:20: Offers ready: 0.012
+14:32:20: Data pickled: 0.019
+14:32:20: Total time: 5.831
+14:32:28: Table loaded: 0.181
+14:32:30: Dictionary ready: 2.109
+14:32:30: Dataframe pickle loaded: 0.016
+14:32:30: Dictionary dataframe created: 0.002
+14:32:30: Card data sliced: 0.006
+14:32:30: Offers ready: 0.01
+14:32:30: Data pickled: 0.02
+14:32:30: Total time: 2.369
+14:32:51: Table loaded: 0.525
+14:33:00: Dictionary ready: 8.6
+14:33:00: Dataframe pickle loaded: 0.017
+14:33:00: Dictionary dataframe created: 0.005
+14:33:00: Card data sliced: 0.005
+14:33:00: Offers ready: 0.013
+14:33:00: Data pickled: 0.023
+14:33:00: Total time: 9.212
+14:33:08: Table loaded: 0.226
+14:33:11: Dictionary ready: 2.806
+14:33:11: Dataframe pickle loaded: 0.017
+14:33:11: Dictionary dataframe created: 0.002
+14:33:11: Card data sliced: 0.003
+14:33:11: Offers ready: 0.015
+14:33:11: Data pickled: 0.021
+14:33:11: Total time: 3.115
+14:33:18: Table loaded: 0.158
+14:33:20: Dictionary ready: 1.69
+14:33:20: Dataframe pickle loaded: 0.015
+14:33:20: Dictionary dataframe created: 0.002
+14:33:20: Card data sliced: 0.004
+14:33:20: Offers ready: 0.008
+14:33:20: Data pickled: 0.019
+14:33:20: Total time: 1.921
+14:33:27: Table loaded: 0.156
+14:33:29: Dictionary ready: 1.828
+14:33:29: Dataframe pickle loaded: 0.016
+14:33:29: Dictionary dataframe created: 0.005
+14:33:29: Card data sliced: 0.003
+14:33:29: Offers ready: 0.011
+14:33:29: Data pickled: 0.021
+14:33:29: Total time: 2.065
+14:33:47: Table loaded: 0.552
+14:33:54: Dictionary ready: 6.991
+14:33:54: Dataframe pickle loaded: 0.018
+14:33:54: Dictionary dataframe created: 0.003
+14:33:54: Card data sliced: 0.007
+14:33:54: Offers ready: 0.014
+14:33:54: Data pickled: 0.025
+14:33:54: Total time: 7.637
+14:34:13: Table loaded: 0.718
+14:34:22: Dictionary ready: 8.828
+14:34:22: Dataframe pickle loaded: 0.024
+14:34:22: Dictionary dataframe created: 0.003
+14:34:22: Card data sliced: 0.005
+14:34:22: Offers ready: 0.013
+14:34:22: Data pickled: 0.027
+14:34:22: Total time: 9.646
+14:34:32: Table loaded: 0.201
+14:34:39: Dictionary ready: 7.023
+14:34:39: Dataframe pickle loaded: 0.021
+14:34:39: Dictionary dataframe created: 0.004
+14:34:39: Card data sliced: 0.005
+14:34:39: Offers ready: 0.014
+14:34:39: Data pickled: 0.023
+14:34:39: Total time: 7.315
+14:34:50: Table loaded: 0.351
+14:35:05: Dictionary ready: 14.778
+14:35:05: Dataframe pickle loaded: 0.017
+14:35:05: Dictionary dataframe created: 0.003
+14:35:05: Card data sliced: 0.005
+14:35:05: Offers ready: 0.012
+14:35:05: Data pickled: 0.022
+14:35:05: Total time: 15.211
+14:35:22: Table loaded: 0.587
+14:36:02: Dictionary ready: 39.788
+14:36:02: Dataframe pickle loaded: 0.033
+14:36:02: Dictionary dataframe created: 0.003
+14:36:02: Card data sliced: 0.004
+14:36:02: Offers ready: 0.012
+14:36:02: Data pickled: 0.028
+14:36:02: Total time: 40.486
+14:36:10: Table loaded: 0.177
+14:36:23: Dictionary ready: 12.808
+14:36:23: Dataframe pickle loaded: 0.023
+14:36:23: Dictionary dataframe created: 0.002
+14:36:23: Card data sliced: 0.006
+14:36:23: Offers ready: 0.011
+14:36:23: Data pickled: 0.029
+14:36:23: Total time: 13.087
+14:36:30: Table loaded: 0.194
+14:36:46: Dictionary ready: 16.036
+14:36:46: Dataframe pickle loaded: 0.024
+14:36:46: Dictionary dataframe created: 0.003
+14:36:46: Card data sliced: 0.009
+14:36:46: Offers ready: 0.013
+14:36:46: Data pickled: 0.028
+14:36:46: Total time: 16.333
+14:37:05: Table loaded: 0.567
+14:38:08: Dictionary ready: 63.351
+14:38:08: Dataframe pickle loaded: 0.021
+14:38:08: Dictionary dataframe created: 0.003
+14:38:08: Card data sliced: 0.009
+14:38:08: Offers ready: 0.012
+14:38:08: Data pickled: 0.025
+14:38:08: Total time: 64.012
+14:38:22: Table loaded: 0.436
+14:39:07: Dictionary ready: 44.96
+14:39:07: Dataframe pickle loaded: 0.025
+14:39:07: Dictionary dataframe created: 0.003
+14:39:07: Card data sliced: 0.005
+14:39:07: Offers ready: 0.012
+14:39:07: Data pickled: 0.028
+14:39:07: Total time: 45.496
+14:39:22: Table loaded: 0.459
+14:40:20: Dictionary ready: 57.257
+14:40:20: Dataframe pickle loaded: 0.021
+14:40:20: Dictionary dataframe created: 0.003
+14:40:20: Card data sliced: 0.008
+14:40:20: Offers ready: 0.016
+14:40:20: Data pickled: 0.028
+14:40:20: Total time: 57.821
+14:40:29: Table loaded: 0.294
+14:41:03: Dictionary ready: 33.618
+14:41:03: Dataframe pickle loaded: 0.022
+14:41:03: Dictionary dataframe created: 0.002
+14:41:03: Card data sliced: 0.009
+14:41:03: Offers ready: 0.015
+14:41:03: Data pickled: 0.028
+14:41:03: Total time: 34.011
+14:41:18: Table loaded: 0.498
+14:42:34: Dictionary ready: 75.847
+14:42:34: Dataframe pickle loaded: 0.023
+14:42:34: Dictionary dataframe created: 0.002
+14:42:34: Card data sliced: 0.009
+14:42:34: Offers ready: 0.013
+14:42:34: Data pickled: 0.029
+14:42:34: Total time: 76.445
+14:42:58: Table loaded: 0.821
+14:44:45: Dictionary ready: 107.14
+14:44:45: Dataframe pickle loaded: 0.027
+14:44:45: Dictionary dataframe created: 0.004
+14:44:45: Card data sliced: 0.011
+14:44:45: Offers ready: 0.021
+14:44:45: Data pickled: 0.036
+14:44:45: Total time: 108.089
+14:45:06: Table loaded: 0.586
+14:46:38: Dictionary ready: 91.702
+14:46:38: Dataframe pickle loaded: 0.02
+14:46:38: Dictionary dataframe created: 0.003
+14:46:38: Card data sliced: 0.006
+14:46:38: Offers ready: 0.015
+14:46:38: Data pickled: 0.036
+14:46:38: Total time: 92.392
+14:47:02: Table loaded: 0.613
+14:48:44: Dictionary ready: 101.994
+14:48:44: Dataframe pickle loaded: 0.03
+14:48:44: Dictionary dataframe created: 0.005
+14:48:44: Card data sliced: 0.005
+14:48:44: Offers ready: 0.018
+14:48:44: Data pickled: 0.036
+14:48:44: Total time: 102.731
+14:49:08: Table loaded: 0.513
+14:50:40: Dictionary ready: 92.301
+14:50:40: Dataframe pickle loaded: 0.029
+14:50:40: Dictionary dataframe created: 0.004
+14:50:40: Card data sliced: 0.005
+14:50:40: Offers ready: 0.018
+14:50:40: Data pickled: 0.035
+14:50:40: Total time: 92.934
+14:51:00: Table loaded: 0.572
+14:52:24: Dictionary ready: 83.443
+14:52:24: Dataframe pickle loaded: 0.094
+14:52:24: Dictionary dataframe created: 0.006
+14:52:24: Card data sliced: 0.011
+14:52:24: Offers ready: 0.039
+14:52:24: Data pickled: 0.123
+14:52:24: Total time: 84.394
+14:52:40: Table loaded: 0.513
+14:53:51: Dictionary ready: 71.232
+14:53:51: Dataframe pickle loaded: 0.029
+14:53:51: Dictionary dataframe created: 0.003
+14:53:51: Card data sliced: 0.008
+14:53:51: Offers ready: 0.017
+14:53:51: Data pickled: 0.037
+14:53:51: Total time: 71.871
+14:54:12: Table loaded: 0.585
+14:55:36: Dictionary ready: 83.699
+14:55:36: Dataframe pickle loaded: 0.018
+14:55:36: Dictionary dataframe created: 0.002
+14:55:36: Card data sliced: 0.004
+14:55:36: Offers ready: 0.01
+14:55:36: Data pickled: 0.025
+14:55:36: Total time: 84.363
+14:55:45: Table loaded: 0.221
+14:56:12: Dictionary ready: 26.957
+14:56:12: Dataframe pickle loaded: 0.031
+14:56:12: Dictionary dataframe created: 0.003
+14:56:12: Card data sliced: 0.006
+14:56:12: Offers ready: 0.018
+14:56:12: Data pickled: 0.036
+14:56:12: Total time: 27.298
+14:56:29: Table loaded: 0.312
+14:57:20: Dictionary ready: 50.94
+14:57:20: Dataframe pickle loaded: 0.016
+14:57:20: Dictionary dataframe created: 0.002
+14:57:20: Card data sliced: 0.004
+14:57:20: Offers ready: 0.009
+14:57:20: Data pickled: 0.022
+14:57:20: Total time: 51.321
+14:57:28: Table loaded: 0.118
+14:57:45: Dictionary ready: 17.017
+14:57:45: Dataframe pickle loaded: 0.016
+14:57:45: Dictionary dataframe created: 0.001
+14:57:45: Card data sliced: 0.004
+14:57:45: Offers ready: 0.009
+14:57:45: Data pickled: 0.021
+14:57:45: Total time: 17.203
+14:57:57: Table loaded: 0.279
+14:58:36: Dictionary ready: 38.803
+14:58:36: Dataframe pickle loaded: 0.016
+14:58:36: Dictionary dataframe created: 0.002
+14:58:36: Card data sliced: 0.004
+14:58:36: Offers ready: 0.009
+14:58:36: Data pickled: 0.022
+14:58:36: Total time: 39.15
+14:58:51: Table loaded: 0.687
+14:59:55: Dictionary ready: 63.411
+14:59:55: Dataframe pickle loaded: 0.016
+14:59:55: Dictionary dataframe created: 0.002
+14:59:55: Card data sliced: 0.004
+14:59:55: Offers ready: 0.009
+14:59:55: Data pickled: 0.021
+14:59:55: Total time: 64.168
+15:00:16: Table loaded: 0.373
+15:01:04: Dictionary ready: 47.641
+15:01:04: Dataframe pickle loaded: 0.02
+15:01:04: Dictionary dataframe created: 0.002
+15:01:04: Card data sliced: 0.004
+15:01:04: Offers ready: 0.011
+15:01:04: Data pickled: 0.026
+15:01:04: Total time: 48.097
+15:01:14: Table loaded: 0.32
+15:01:53: Dictionary ready: 39.798
+15:01:53: Dataframe pickle loaded: 0.017
+15:01:53: Dictionary dataframe created: 0.003
+15:01:53: Card data sliced: 0.004
+15:01:53: Offers ready: 0.011
+15:01:53: Data pickled: 0.025
+15:01:53: Total time: 40.196
+15:02:02: Table loaded: 0.15
+15:02:23: Dictionary ready: 20.747
+15:02:23: Dataframe pickle loaded: 0.018
+15:02:23: Dictionary dataframe created: 0.001
+15:02:23: Card data sliced: 0.004
+15:02:23: Offers ready: 0.01
+15:02:23: Data pickled: 0.026
+15:02:23: Total time: 20.973
+15:02:40: Table loaded: 1.279
+15:03:48: Dictionary ready: 67.651
+15:03:48: Dataframe pickle loaded: 0.018
+15:03:48: Dictionary dataframe created: 0.002
+15:03:48: Card data sliced: 0.004
+15:03:48: Offers ready: 0.009
+15:03:48: Data pickled: 0.026
+15:03:48: Total time: 69.013
+15:03:56: Table loaded: 0.16
+15:04:13: Dictionary ready: 17.255
+15:04:13: Dataframe pickle loaded: 0.026
+15:04:13: Dictionary dataframe created: 0.002
+15:04:13: Card data sliced: 0.005
+15:04:13: Offers ready: 0.016
+15:04:13: Data pickled: 0.034
+15:04:13: Total time: 17.522
+15:04:34: Table loaded: 0.492
+15:05:30: Dictionary ready: 56.198
+15:05:30: Dataframe pickle loaded: 0.022
+15:05:30: Dictionary dataframe created: 0.002
+15:05:30: Card data sliced: 0.004
+15:05:30: Offers ready: 0.012
+15:05:30: Data pickled: 0.024
+15:05:30: Total time: 56.77
+15:05:45: Table loaded: 0.495
+15:07:05: Dictionary ready: 79.898
+15:07:05: Dataframe pickle loaded: 0.026
+15:07:05: Dictionary dataframe created: 0.003
+15:07:05: Card data sliced: 0.005
+15:07:05: Offers ready: 0.014
+15:07:05: Data pickled: 0.035
+15:07:05: Total time: 80.5
+15:07:18: Table loaded: 0.319
+15:08:07: Dictionary ready: 49.168
+15:08:07: Dataframe pickle loaded: 0.019
+15:08:07: Dictionary dataframe created: 0.002
+15:08:07: Card data sliced: 0.004
+15:08:07: Offers ready: 0.01
+15:08:07: Data pickled: 0.024
+15:08:07: Total time: 49.562
+15:08:21: Table loaded: 0.348
+15:09:28: Dictionary ready: 67.379
+15:09:28: Dataframe pickle loaded: 0.019
+15:09:28: Dictionary dataframe created: 0.002
+15:09:28: Card data sliced: 0.005
+15:09:28: Offers ready: 0.01
+15:09:28: Data pickled: 0.026
+15:09:28: Total time: 67.807
+15:09:42: Table loaded: 0.35
+15:10:57: Dictionary ready: 74.908
+15:10:57: Dataframe pickle loaded: 0.018
+15:10:57: Dictionary dataframe created: 0.002
+15:10:57: Card data sliced: 0.004
+15:10:57: Offers ready: 0.009
+15:10:57: Data pickled: 0.024
+15:10:57: Total time: 75.332
+15:11:13: Table loaded: 0.473
+15:12:18: Dictionary ready: 64.584
+15:12:18: Dataframe pickle loaded: 0.02
+15:12:18: Dictionary dataframe created: 0.002
+15:12:18: Card data sliced: 0.004
+15:12:18: Offers ready: 0.01
+15:12:18: Data pickled: 0.027
+15:12:18: Total time: 65.137
+15:12:29: Table loaded: 0.331
+15:13:24: Dictionary ready: 54.685
+15:13:24: Dataframe pickle loaded: 0.02
+15:13:24: Dictionary dataframe created: 0.002
+15:13:24: Card data sliced: 0.004
+15:13:24: Offers ready: 0.011
+15:13:24: Data pickled: 0.026
+15:13:24: Total time: 55.095
+15:13:37: Table loaded: 0.415
+15:14:34: Dictionary ready: 57.253
+15:14:34: Dataframe pickle loaded: 0.021
+15:14:34: Dictionary dataframe created: 0.002
+15:14:34: Card data sliced: 0.004
+15:14:34: Offers ready: 0.012
+15:14:34: Data pickled: 0.029
+15:14:34: Total time: 57.755
+15:14:46: Table loaded: 0.395
+15:15:50: Dictionary ready: 63.307
+15:15:50: Dataframe pickle loaded: 0.023
+15:15:50: Dictionary dataframe created: 0.003
+15:15:50: Card data sliced: 0.005
+15:15:50: Offers ready: 0.012
+15:15:50: Data pickled: 0.035
+15:15:50: Total time: 63.8
+15:16:05: Table loaded: 0.407
+15:17:12: Dictionary ready: 67.396
+15:17:12: Dataframe pickle loaded: 0.024
+15:17:12: Dictionary dataframe created: 0.003
+15:17:12: Card data sliced: 0.005
+15:17:12: Offers ready: 0.013
+15:17:12: Data pickled: 0.032
+15:17:12: Total time: 67.9
+15:17:26: Table loaded: 0.444
+15:18:34: Dictionary ready: 68.487
+15:18:34: Dataframe pickle loaded: 0.024
+15:18:34: Dictionary dataframe created: 0.002
+15:18:34: Card data sliced: 0.005
+15:18:34: Offers ready: 0.013
+15:18:34: Data pickled: 0.034
+15:18:35: Total time: 69.028
+15:18:45: ''
+15:18:45:  - Unpickling data. Container will restart in 30 minutes.
+15:18:49: Read old sale offer data, size: 3414799
+15:18:50: Merging sale offers: -9813, +31672 rows
+15:18:50: Saving new sale offer data, size: 3436658
