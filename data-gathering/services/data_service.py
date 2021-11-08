@@ -59,7 +59,9 @@ def setup_data():
     # Ensure the files exist and are ready for writing
     for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
         if not os.path.exists(f'./data/{entity}.csv'):
-            empty = pd.DataFrame(columns=config.HEADERS.get(entity))
+            empty = pd.DataFrame({col: pd.Series(dtype=col_type)
+                                  for col, col_type
+                                  in config.HEADERS.get(entity).items()})
             empty.to_csv(f'./data/{entity}.csv', compression='gzip',
                          sep=';', encoding='utf-8', index=False)
 
@@ -89,13 +91,17 @@ def pickle_data():
         df = pd.read_csv(f'./data/{entity}.csv', compression='gzip',
                          sep=';', encoding="utf-8")
         df_size = len(df.index)
-        log(f"Loaded {entity}: {df_size} rows")
+
         # Optimize performance by slicing only the relevant data
         if entity == 'sale_offer':
             df = df[df['date_id'] == config.THIS_DATE_ID]
             pct = 100.0 * (df_size - len(df.index)) / df_size
-            log(f"{len(df.index)} rows selected ({round(pct, 2)}% reduced)")
+            log(f"Loaded sale_offer: {df_size} rows  "
+                + f"[{len(df.index)} rows selected, {round(pct, 2)}% reduced]")
+        else:
+            log(f"Loaded {entity}: {df_size} rows")
 
+        # Save each to a pickle
         df.to_pickle(f'./.pickles/{entity}.pkl')
 
 
@@ -322,48 +328,63 @@ def clean_pickles():
     '''Load and validate local files, returning the number of removed rows.'''
 
     # Count the rows dropped
-    rows = 0
+    rows_dropped = 0
 
     # TODO: Check for wrong types
 
     # Validate dates
     date = load('date')
-    rows += len(date.index)
+    rows = len(date.index)
     date = drop_rows_with_nans(date)
     date = drop_duplicate_rows(date)
     rows -= len(date.index)
+    rows_dropped += rows
+    if rows:
+        log(f"{rows} rows dropped from date")
 
     # Validate cards
     card = load('card')
-    rows += len(card.index)
+    rows = len(card.index)
     card = drop_rows_with_nans(card)
     card = drop_duplicate_rows(card)
     rows -= len(card.index)
+    rows_dropped += rows
+    if rows:
+        log(f"{rows} rows dropped from card")
+
+    # Validate sellers
+    seller = load('seller')
+    rows = len(seller.index)
+    seller = drop_duplicate_rows(seller)
+    rows -= len(seller.index)
+    rows_dropped += rows
+    if rows:
+        log(f"{rows} rows dropped from seller")
 
     # Validate card stats
     card_stats = load('card_stats')
-    rows += len(card_stats.index)
+    rows = len(card_stats.index)
     card_stats = drop_rows_with_nans(card_stats)
     card_stats = drop_duplicate_rows(card_stats)
     card_stats = drop_negative_index(card_stats, 'card_id')
     card_stats = drop_negative_index(card_stats, 'date_id')
     rows -= len(card_stats.index)
-
-    # Validate sellers
-    seller = load('seller')
-    rows += len(seller.index)
-    seller = drop_duplicate_rows(seller)
-    rows -= len(seller.index)
+    rows_dropped += rows
+    if rows:
+        log(f"{rows} rows dropped from card_stats")
 
     # Validate sale offers
     sale_offer = load('sale_offer')
-    rows += len(sale_offer.index)
+    rows = len(sale_offer.index)
     sale_offer = drop_rows_with_nans(sale_offer)
     sale_offer = drop_duplicate_rows(sale_offer)
     sale_offer = drop_negative_index(sale_offer, 'seller_id')
     sale_offer = drop_negative_index(sale_offer, 'card_id')
     sale_offer = drop_negative_index(sale_offer, 'date_id')
     rows -= len(sale_offer.index)
+    rows_dropped += rows
+    if rows:
+        log(f"{rows} rows dropped from sale_offer")
 
     # Save the validated data
     date.to_pickle('./.pickles/date.pkl')
@@ -373,7 +394,7 @@ def clean_pickles():
     sale_offer.to_pickle('./.pickles/sale_offer.pkl')
 
     # Return the number of rows dropped
-    return rows
+    return rows_dropped
 
 
 # Drop rows with NaNs.
@@ -541,7 +562,8 @@ def add_offers(card_page):
         return
 
     # Extract information about the offers
-    scraped = pd.DataFrame(columns=config.HEADERS.get("sale_offer"))
+    scraped = pd.DataFrame({col: pd.Series(dtype=col_type) for col, col_type
+                            in config.HEADERS.get('sale_offer').items()})
     start = tm.time()
 
     # Card ID
@@ -658,14 +680,13 @@ def get_seller_id(seller_name, seller_df):
 # Return a set of all sellers found in a card page.
 def get_seller_names(card_soup):
     '''Return a set of all sellers found in a card page.'''
-    names = set(map(lambda x: str(x.find("a").string
-                                  if x.find("a") is not None
-                                  else ''),
-                    card_soup.findAll("span", {"class": "d-flex "
-                                      + "has-content-centered mr-1"})))
-    names.remove(None)
-    names.remove('')
-    return names
+    sellers = card_soup.findAll("span", {"class": "d-flex "
+                                + "has-content-centered mr-1"})
+
+    seller_names = {str(x.find("a").string) if x.find("a") is not None else ''
+                    for x in sellers}
+    seller_names.discard('')
+    return seller_names
 
 
 # Return whether stats given by card ID were saved that day.
