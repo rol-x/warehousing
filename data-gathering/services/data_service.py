@@ -223,6 +223,17 @@ def schedule_the_run():
         log(" - Job is done. Waiting for 1 hour.")
         tm.sleep(60 * 60)
 
+        # After waiting, compare the date and dates in csv file to add new one
+        localtm = tm.localtime()
+        date = tm.strftime("%d/%m/%Y", localtm).split('/')
+        date_df = load_csv('date')
+        this_date = date_df[(date_df['day'] == int(date[0]))
+                            & (date_df['month'] == int(date[1]))
+                            & (date_df['year'] == int(date[2]))]
+        if len(this_date.index) == 0:
+            add_date()
+            config.MAIN_LOGNAME = tm.strftime("%d%m%Y", localtm) + ".log"
+
 
 # Check whether all the datasets in local files are empty
 def is_first_run():
@@ -564,9 +575,11 @@ def add_offers(card_page):
                  if x.findAll("span") is not None]
 
     foils = [x.find("span", {"class": "icon st_SpecialIcon mr-1"})
-             for x in attributes if
+             ["data-original-title"] if
              x.find("span", {"class": "icon st_SpecialIcon mr-1"})
-             is not None]
+             is not None
+             else ''
+             for x in attributes]
 
     log("Attributes and foils: %s" % round(tm.time() - last, 3))
     last = tm.time()
@@ -575,10 +588,9 @@ def add_offers(card_page):
                       if x[0] is not None]
     card_language = [x[1]["data-original-title"] for x in cond_lang if
                      x[1] is not None]
-    is_foiled = [True if x["data-original-title"] == 'Foil'
-                 else False for x in foils]
+    is_foiled = [False if x == '' else True for x in foils]
 
-    log("Unpacking: %s" % round(tm.time() - last, 3))
+    log("Unpacking attributes: %s" % round(tm.time() - last, 3))
     last = tm.time()
 
     scraped['id'] = None
