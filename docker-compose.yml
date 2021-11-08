@@ -60,10 +60,3 @@ services:
     ports:
       - "3307:3306"
     restart: always
-
-  caching_service:
-    container_name: caching_service
-    image: memcached
-    ports:
-      - "11211:11211"
-    restart: always

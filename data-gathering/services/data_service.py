@@ -544,59 +544,76 @@ def add_offers(card_page):
         logr(f'Page title:  {card_page.find("title")}')
         return
 
+    # Extract information about the offers
+    scraped = pd.DataFrame(columns=config.HEADERS.get("sale_offer"))
     start = tm.time()
     last = start
-    scraped = pd.DataFrame(columns=config.HEADERS.get("sale_offer"))
 
-    # Get static and list info from the page
+    # Card ID
     card_name = (str(card_page.find("div", {"class": "flex-grow-1"}))
                  .split(">")[2]).split("<")[0]
+    card_id = get_card_id(card_name)
+
+    # Seller IDs
+    seller = load('seller')
     sellers_info = table.findAll("span", {"class": "seller-info d-flex "
                                           + "align-items-center"})
     seller_names = [info.find(
                     "span", {"class": "d-flex has-content-centered mr-1"})
                     for info in sellers_info]
+    seller_ids = [get_seller_id(x.string, seller) for x in seller_names]
 
+    # Prices
     prices = table.findAll("span", {"class": "font-weight-bold color-primary "
                                     + "small text-right text-nowrap"})
+    prices = [float(str(prices[2*i].string)[:-2]
+              .replace(".", "").replace(",", "."))
+              for i in range(len(seller_names))]
+
+    # Amounts
     amounts = table.findAll("span", {"class": "item-count small text-right"})
+    amounts = [int(amount.string) for amount in amounts]
+
+    log("Unpacked offers attributes: %s" % round(tm.time() - last, 3))
+    last = tm.time()
+
+    # Card attributes (condition, language, foil)
     attributes = table.findAll("div", {"class": "product-attributes col"})
 
-    # Ensure the table has proper content
-    if not (len(prices) / 2) == len(amounts) \
-            == len(seller_names) == len(attributes):
-        logr("The columns don't match in size!\n")
-        return
-
+    # Condition and language
     cond_lang = [x.findAll("span") for x in attributes
                  if x.findAll("span") is not None]
+    card_condition = [x[0]["data-original-title"] for x in cond_lang
+                      if x[0] is not None]
+    card_language = [x[1]["data-original-title"] for x in cond_lang if
+                     x[1] is not None]
 
+    # Foil
     foils = [x.find("span", {"class": "icon st_SpecialIcon mr-1"})
              ["data-original-title"] if
              x.find("span", {"class": "icon st_SpecialIcon mr-1"})
              is not None
              else ''
              for x in attributes]
-
-    card_condition = [x[0]["data-original-title"] for x in cond_lang
-                      if x[0] is not None]
-    card_language = [x[1]["data-original-title"] for x in cond_lang if
-                     x[1] is not None]
     is_foiled = [False if x == '' else True for x in foils]
 
-    log("Unpacked all attributes: %s" % round(tm.time() - last, 3))
+    log("Unpacked cards attributes: %s" % round(tm.time() - last, 3))
     last = tm.time()
 
+    # Ensure the table has proper content
+    if not (len(prices) == len(amounts)
+            == len(seller_ids) == len(cond_lang) == len(foils)):
+        logr("The columns don't match in size!\n")
+        return
+
     scraped['id'] = None
-    scraped['seller_id'] = [get_seller_id(x.string) for x in seller_names]
-    scraped['price'] = [float(str(prices[2*i].string)[:-2]
-                        .replace(".", "").replace(",", "."))
-                        for i in range(len(seller_names))]
-    scraped['card_id'] = get_card_id(card_name)
+    scraped['seller_id'] = seller_ids
+    scraped['price'] = prices
+    scraped['card_id'] = card_id
     scraped['card_condition'] = card_condition
     scraped['card_language'] = card_language
     scraped['is_foiled'] = is_foiled
-    scraped['amount'] = [int(amount.string) for amount in amounts]
+    scraped['amount'] = amounts
     scraped['date_id'] = config.THIS_DATE_ID
 
     log("Dataframe ready: %s" % round(tm.time() - last, 3))
@@ -649,9 +666,8 @@ def is_card_saved(card_name):
 
 
 # Return a seller ID given its name.
-def get_seller_id(seller_name):
+def get_seller_id(seller_name, seller_df):
     '''Return a seller ID given its name.'''
-    seller_df = load('seller')
     if seller_df is None:
         return -1
 
