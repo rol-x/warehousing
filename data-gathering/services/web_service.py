@@ -48,6 +48,8 @@ def iterate_over_sellers(driver, sellers):
     sellers_before = len(seller_df)
     read_sellers = len(sellers)
 
+    start = tm.time()
+
     # Define loop-control variables and iterate over every seller
     driver.implicitly_wait(1.5)
     new_sellers = 0
@@ -63,13 +65,14 @@ def iterate_over_sellers(driver, sellers):
             if add_seller(seller_soup):
                 new_sellers += 1
                 break
-            tm.sleep(3 ** (try_num + 1))
+            tm.sleep(3 + 3 ** (try_num + 1))
 
     # Log task finished
     driver.implicitly_wait(0.5)
     total_sellers = sellers_before + new_sellers
     logr(f"Done - {new_sellers} new sellers saved  (out of: "
-         + f"{read_sellers}, total: {total_sellers})\n")
+         + f"{read_sellers}, total: {total_sellers})")
+    logr(f"Time: {round(tm.time() - start, 3)}\n")
 
 
 # Return a list of all cards found in the expansion cards list.
@@ -82,6 +85,7 @@ def get_card_names(driver, expansion_name):
         saved_cards = [line.strip('\n') for line in exp_file.readlines()]
     logr("Task - Getting all card names from current expansion")
 
+    driver.implicitly_wait(2.5)
     all_cards = []
     page_no = 1
     while True:
@@ -115,6 +119,8 @@ def get_card_names(driver, expansion_name):
         # Advance to the next page
         page_no += 1
 
+    driver.implicitly_wait(0.5)
+
     # Save the complete cards list to a file
     with open('./data/' + exp_filename + '.txt', 'w',
               encoding="utf-8") as exp_file:
@@ -134,17 +140,17 @@ def click_load_more_button(driver):
     SPINNER = '//div[@class="spinner"]'
     while True:
         try:
-            WebDriverWait(driver, timeout=3, poll_frequency=0.25) \
+            WebDriverWait(driver, timeout=3.5, poll_frequency=0.3) \
                 .until(EC.invisibility_of_element_located((By.XPATH, SPINNER)))
 
-            button = WebDriverWait(driver, timeout=3, poll_frequency=0.25) \
+            button = WebDriverWait(driver, timeout=3.5, poll_frequency=0.3) \
                 .until(EC.element_to_be_clickable((By.XPATH, BUTTON)))
             if button.text == "SHOW MORE RESULTS":
                 button.click()
 
         # When there is no more to load
         except common.exceptions.TimeoutException:
-            driver.implicitly_wait(0)
+            driver.implicitly_wait(0.5)
             return True
 
         # Other related errors

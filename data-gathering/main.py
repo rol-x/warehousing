@@ -64,7 +64,6 @@ def main():
             # If clicking the load more button returned False, wait and repeat
             if not web.click_load_more_button(driver):
                 logr(f"Expanding the page timed out. Waiting to cool down.")
-                driver.implicitly_wait(1.5)
                 tm.sleep(30 * 2 ** try_num)
                 continue
 
@@ -77,7 +76,7 @@ def main():
 
             # Otherwise try again
             logr('Card page invalid. Retrying...')
-            tm.sleep(3 ** (try_num + 1))
+            tm.sleep(3 * 2 ** (try_num + 1))
 
         # Save the card if not saved already
         if not data.is_card_saved(card_name):
@@ -104,7 +103,7 @@ def main():
         logr(" = Offers = ")
         logr("Task - Updating sale offers")
         data.add_offers(card_soup)
-        tm.sleep(0.5)
+        tm.sleep(1.0)
 
     # Log program task completion
     logr("All cards, sellers and sale offers acquired")

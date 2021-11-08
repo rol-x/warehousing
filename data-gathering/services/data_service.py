@@ -547,7 +547,6 @@ def add_offers(card_page):
     # Extract information about the offers
     scraped = pd.DataFrame(columns=config.HEADERS.get("sale_offer"))
     start = tm.time()
-    last = start
 
     # Card ID
     card_name = (str(card_page.find("div", {"class": "flex-grow-1"}))
@@ -574,9 +573,6 @@ def add_offers(card_page):
     amounts = table.findAll("span", {"class": "item-count small text-right"})
     amounts = [int(amount.string) for amount in amounts]
 
-    log("Unpacked offers attributes: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     # Card attributes (condition, language, foil)
     attributes = table.findAll("div", {"class": "product-attributes col"})
 
@@ -597,9 +593,6 @@ def add_offers(card_page):
              for x in attributes]
     is_foiled = [False if x == '' else True for x in foils]
 
-    log("Unpacked cards attributes: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     # Ensure the table has proper content
     if not (len(prices) == len(amounts)
             == len(seller_ids) == len(cond_lang) == len(foils)):
@@ -616,32 +609,19 @@ def add_offers(card_page):
     scraped['amount'] = amounts
     scraped['date_id'] = config.THIS_DATE_ID
 
-    log("Dataframe ready: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     # Load and drop today's sales data for this card
     saved = load('sale_offer')
-
-    log("Dataframe pickle loaded: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     this_card_today = saved[(saved['card_id'] == scraped['card_id'].values[0])]
     saved.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
     data = pd.concat([saved, scraped])
-
-    log("Card offers replaced: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     data.to_pickle('./.pickles/sale_offer.pkl')
-
-    log("Data pickled: %s" % round(tm.time() - last, 3))
 
     # Log task finished
     logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
          + f"{len(this_card_today)}, total: {len(data)})")
-    log(f"Total time: %s\n\n" % round(tm.time() - start, 3))
+    logr(f"Time: {round(tm.time() - start, 3)}\n\n")
 
 
 # Return a session-valid card ID given its name.
