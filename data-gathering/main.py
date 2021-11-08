@@ -103,6 +103,9 @@ def main():
         logr(" = Offers = ")
         logr("Task - Updating sale offers")
         data.add_offers(card_soup)
+
+        # In case of exception and a restart, save the progress
+        config.START_FROM += 1
         tm.sleep(1.0)
 
     # Log program task completion
