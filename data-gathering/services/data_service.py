@@ -568,9 +568,6 @@ def add_offers(card_page):
         logr("The columns don't match in size!\n")
         return
 
-    log("Partially acquired attributes: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     cond_lang = [x.findAll("span") for x in attributes
                  if x.findAll("span") is not None]
 
@@ -581,16 +578,13 @@ def add_offers(card_page):
              else ''
              for x in attributes]
 
-    log("Attributes and foils: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     card_condition = [x[0]["data-original-title"] for x in cond_lang
                       if x[0] is not None]
     card_language = [x[1]["data-original-title"] for x in cond_lang if
                      x[1] is not None]
     is_foiled = [False if x == '' else True for x in foils]
 
-    log("Unpacking attributes: %s" % round(tm.time() - last, 3))
+    log("Unpacked all attributes: %s" % round(tm.time() - last, 3))
     last = tm.time()
 
     scraped['id'] = None
@@ -615,16 +609,12 @@ def add_offers(card_page):
     last = tm.time()
 
     this_card_today = saved[(saved['card_id'] == scraped['card_id'].values[0])]
-
-    log("Card data sliced: %s" % round(tm.time() - last, 3))
-    last = tm.time()
-
     saved.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
     data = pd.concat([saved, scraped])
 
-    log("Offers ready: %s" % round(tm.time() - last, 3))
+    log("Card offers replaced: %s" % round(tm.time() - last, 3))
     last = tm.time()
 
     data.to_pickle('./.pickles/sale_offer.pkl')
@@ -633,8 +623,8 @@ def add_offers(card_page):
 
     # Log task finished
     logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
-         + f"{len(this_card_today)}, total: {len(data)})\n\n")
-    log(f"Total time: %s" % round(tm.time() - start, 3))
+         + f"{len(this_card_today)}, total: {len(data)})")
+    log(f"Total time: %s\n\n" % round(tm.time() - start, 3))
 
 
 # Return a session-valid card ID given its name.
