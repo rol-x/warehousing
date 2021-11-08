@@ -108,12 +108,12 @@ def main():
 
     # Log program task completion
     logr("All cards, sellers and sale offers acquired")
+    config.START_FROM = 1
 
     # Clean the pickle data (post-acquisition)
     removed = data.clean_pickles()
     logr(f"Pickle data validated (removed {removed} records)\n")
 
-    # TODO: Fix error 16: resource busy
     # Transform the data back from pickle to .csv format
     data.unpickle_data()
     logr(" = Program execution finished = ")
