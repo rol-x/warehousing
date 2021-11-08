@@ -3,7 +3,7 @@
 
 # All logs except custom ones
 *.log
-!logs/*/*
+#!logs/*/*
 
 # Python cached modules info
 */*/__pycache__/
