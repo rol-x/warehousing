@@ -541,7 +541,7 @@ def add_card_stats(card_soup, card_id):
     logr(' = Card stats = ')
     logr('Card ID:       ' + str(card_id))
     logr('Price from:    ' + str(price_from))
-    logr(f'Averages:     {daily_avg}, {weekly_avg}, {monthly_avg}')
+    logr(f'Averages:      {daily_avg}, {weekly_avg}, {monthly_avg}')
     logr('Amount:        ' + str(available_items))
     logr('Date ID:       ' + str(config.DATE_ID) + '\n')
 
