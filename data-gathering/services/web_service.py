@@ -53,6 +53,8 @@ def iterate_over_sellers(driver, sellers):
     new_sellers = 0
     to_add = [name for name in sellers if name not in seller_df['name'].values]
     for seller_name in to_add:
+        if seller_name == '':
+            continue
 
         # Try to get seller data from page
         for try_num in range(3):
