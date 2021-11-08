@@ -29,7 +29,7 @@ def main():
     # Create run log file and connect the webdriver
     logs.setup_run_logfile()
     driver = web.connect_webdriver()
-    driver.implicitly_wait(0.5)
+    driver.implicitly_wait(1.5)
 
     # Transform the data from .csv to pickle format for faster changes
     data.pickle_data()
@@ -57,6 +57,7 @@ def main():
             # Open the card page and extend the view maximally
             driver.get(card_url)
             logs.log_url(driver.current_url)
+            tm.sleep(0.5)
             logr("                Expanding page...\n")
 
             # If clicking the load more button returned False, wait and repeat
@@ -82,12 +83,7 @@ def main():
 
         # Save the card market statistics if not saved today
         card_id = data.get_card_id(card_name)
-        if not data.are_card_stats_saved_today(card_id) or config.FORCE_UPDATE:
-            data.add_card_stats(card_soup, card_id)
-        else:
-            logr(' = Card stats = ')
-            logr(f"Card ID:  {card_id}")
-            logr('Already saved today\n')
+        data.add_card_stats(card_soup, card_id)
 
         # Get all sellers from the card page
         logr(" = Sellers = ")
@@ -104,7 +100,7 @@ def main():
 
         # In case of exception and a restart, save the progress
         config.START_FROM += 1
-        tm.sleep(1.0)
+        tm.sleep(2.5)
 
     # Log program task completion
     logr("All cards, sellers and sale offers acquired")
