@@ -19,6 +19,8 @@ services:
       - "4443:4443"
       - "4442:4442"
       - "4441:4441"
+    environment:
+      - TZ=Europe/Warsaw
     restart: always
 
   firefox_webdriver:
@@ -45,6 +47,8 @@ services:
       - ./flags:/flags
     ports:
       - "3308:3306"
+    environment:
+      - TZ=Europe/Warsaw
     restart: always
 
   mysql_database:
