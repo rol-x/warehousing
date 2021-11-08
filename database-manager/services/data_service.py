@@ -19,7 +19,7 @@ def ensure_complete_dataset():
 # Copy data directory, save the checksum as global variable
 def isolate_data():
     try:
-        shutil.rmtree('./.data')
+        shutil.rmtree('./.data', ignore_errors=True)
         os.rmdir('./.data')
     except Exception:
         ...
