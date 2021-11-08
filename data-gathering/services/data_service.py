@@ -94,7 +94,7 @@ def pickle_data():
 
         # Optimize performance by slicing only the relevant data
         if entity == 'sale_offer':
-            df = df[df['date_id'] == config.THIS_DATE_ID]
+            df = df[df['date_id'] == config.DATE_ID]
             pct = 100.0 * (df_size - len(df.index)) / df_size
             log(f"Loaded sale_offer: {df_size} rows  "
                 + f"[{len(df.index)} rows selected, {round(pct, 2)}% reduced]")
@@ -130,18 +130,19 @@ def replace_sale_offers(new_offers):
     # Load the original csv data and make room for updated version
     old = pd.read_csv(f'./data/sale_offer.csv', compression='gzip',
                       sep=';', encoding="utf-8")
-    log("Read old sale offer data, size: " + str(len(old.index)))
     added_card_ids = list(new_offers['card_id'].unique())
     tb_dropped = old[old['card_id'].isin(added_card_ids)
-                     & (old['date_id'] == config.THIS_DATE_ID)].index
-    old = old.drop(tb_dropped)
-    log(f"Merging sale offers: -{len(tb_dropped)}, +{len(new_offers)} rows")
+                     & (old['date_id'] == config.DATE_ID)].index
 
-    # Merge new offers with previous ones and refresh the index and id
+    log(f"Merging sale offers: -{len(tb_dropped)}, +{len(new_offers)} rows")
+    log(f"Size before: {len(old.index)}")
+
+    # Merge new offers with previous ones
+    old = old.drop(tb_dropped)
     old = pd.concat([old, new_offers]).reset_index(drop=True)
-    old.index += 1
-    old["id"] = old.index
-    log("Saving new sale offer data, size: " + str(len(old.index)))
+    old["id"] = old.index + 1
+
+    log(f"Size after: {len(old.index)}")
     return old
 
 
@@ -165,8 +166,8 @@ def add_date():
 
     # Today's date is already saved
     if(len(same_date) > 0):
-        config.THIS_DATE_ID = date.loc[same_date, "id"].item()
-        log(f"Date ID [{config.THIS_DATE_ID}] already added.")
+        config.DATE_ID = date.loc[same_date, "id"].item()
+        log(f"Date ID [{config.DATE_ID}] already added.")
 
     # Else, update the local data
     else:
@@ -175,17 +176,15 @@ def add_date():
                             "month": int(month),
                             "year": int(year),
                             "weekday": int(weekday)}, ignore_index=True)
-        date.reset_index(drop=True, inplace=True)
-        date.index += 1
         date.to_csv("./data/date.csv", compression='gzip',
                     sep=';', encoding="utf-8", index=False)
-        config.THIS_DATE_ID = list(date.index)[-1]
+        config.DATE_ID = list(date.index)[-1]
 
         log('== Added date ==')
         log('Day:           ' + str(day))
         log('Month:         ' + str(month))
         log('Year:          ' + str(year))
-        log('Date ID:       ' + str(config.THIS_DATE_ID) + '\n')
+        log('Date ID:       ' + str(config.DATE_ID) + '\n')
 
 
 # Check the time and files status to run the code once a day.
@@ -210,7 +209,7 @@ def schedule_the_run():
         log(" - Relevant data discovered. Checking for completeness.")
 
         # If yes, break out of the wait loop
-        if not is_data_complete(config.THIS_DATE_ID):
+        if not is_data_complete(config.DATE_ID):
             log("   - Gathered data is incomplete. Proceeding to run.")
             break
 
@@ -439,8 +438,6 @@ def add_card(card_soup):
                         "name": card_name,
                         "expansion": expansion_name,
                         "rarity": rarity}, ignore_index=True)
-    card.reset_index(drop=True, inplace=True)
-    card.index += 1
     card.to_pickle("./.pickles/card.pkl")
 
     # Logging
@@ -498,8 +495,6 @@ def add_seller(seller_soup):
                             "member_since": member_since,
                             "country": country,
                             "address": address}, ignore_index=True)
-    seller.reset_index(drop=True, inplace=True)
-    seller.index += 1
     seller.to_pickle('./.pickles/seller.pkl')
 
     # Logging
@@ -527,28 +522,28 @@ def add_card_stats(card_soup, card_id):
 
     # Update the local file
     card_stats = load('card_stats')
+    tb_dropped = card_stats[(card_stats['card_id'] == card_id)
+                            & (card_stats['date_id'] == config.DATE_ID)].index
+    card_stats = card_stats.drop(tb_dropped)
     card_stats = card_stats.append({"id": len(card_stats.index) + 1,
                                     "card_id": int(card_id),
                                     "price_from": float(price_from),
-                                    "monthly_avg": float(monthly_avg),
-                                    "weekly_avg": float(weekly_avg),
-                                    "daily_avg": float(daily_avg),
                                     "available_items": int(available_items),
-                                    "date_id": config.THIS_DATE_ID},
+                                    "daily_avg": float(daily_avg),
+                                    "weekly_avg": float(weekly_avg),
+                                    "monthly_avg": float(monthly_avg),
+                                    "date_id": config.DATE_ID},
                                    ignore_index=True)
-    card_stats.reset_index(drop=True, inplace=True)
-    card_stats.index += 1
+
     card_stats.to_pickle('./.pickles/card_stats.pkl')
 
     # Logging
-    logr('== Added card stats ==')
+    logr(' = Card stats = ')
     logr('Card ID:       ' + str(card_id))
     logr('Price from:    ' + str(price_from))
-    logr('30-day avg:    ' + str(monthly_avg))
-    logr('7-day avg:     ' + str(weekly_avg))
-    logr('1-day avg:     ' + str(daily_avg))
+    logr(f'Averages:     {daily_avg}, {weekly_avg}, {monthly_avg}')
     logr('Amount:        ' + str(available_items))
-    logr('Date ID:       ' + str(config.THIS_DATE_ID) + '\n')
+    logr('Date ID:       ' + str(config.DATE_ID) + '\n')
 
 
 # Extract information about the offers from provided card soup.
@@ -617,7 +612,7 @@ def add_offers(card_page):
         logr("The columns don't match in size!\n")
         return
 
-    scraped['id'] = None
+    scraped['id'] = range(len(prices))
     scraped['seller_id'] = seller_ids
     scraped['price'] = prices
     scraped['card_id'] = card_id
@@ -625,7 +620,7 @@ def add_offers(card_page):
     scraped['card_language'] = card_language
     scraped['is_foiled'] = is_foiled
     scraped['amount'] = amounts
-    scraped['date_id'] = config.THIS_DATE_ID
+    scraped['date_id'] = config.DATE_ID
 
     # Load and drop today's sales data for this card
     saved = load('sale_offer')
@@ -694,7 +689,7 @@ def are_card_stats_saved_today(card_id):
     '''Return whether stats given by card ID were saved that day.'''
     card_stats = load('card_stats')
     sm = card_stats[(card_stats['card_id'] == card_id) &
-                    (card_stats['date_id'] == config.THIS_DATE_ID)]
+                    (card_stats['date_id'] == config.DATE_ID)]
 
     if len(sm) > 0:
         return True
