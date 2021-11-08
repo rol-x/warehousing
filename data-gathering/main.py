@@ -10,10 +10,8 @@ from services import web_service as web
 from services.logs_service import log, logr
 
 # TODO: Change singular to plural in entities use, not in model
-# TODO: Convert sale_offer mid-way for faster pickling?
-# TODO: Look into seller adding and page expanding.
 # TODO: Cast id columns of card_stats to int.
-# TODO: Check out empty seller name fiasco.
+# TODO: Check out '' seller adding fiasco.
 
 
 # Main function
@@ -64,7 +62,7 @@ def main():
             # If clicking the load more button returned False, wait and repeat
             if not web.click_load_more_button(driver):
                 logr(f"Expanding the page timed out. Waiting to cool down.")
-                tm.sleep(30 * 2 ** try_num)
+                tm.sleep(20 * 1.5 ** try_num)
                 continue
 
             # Create a soup from the website source code
@@ -76,7 +74,7 @@ def main():
 
             # Otherwise try again
             logr('Card page invalid. Retrying...')
-            tm.sleep(3 * 2 ** (try_num + 1))
+            tm.sleep(20 * 1.5 ** try_num)
 
         # Save the card if not saved already
         if not data.is_card_saved(card_name):

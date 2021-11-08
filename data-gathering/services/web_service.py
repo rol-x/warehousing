@@ -40,7 +40,6 @@ def create_soup(page_source):
     return soup
 
 
-# TODO: Remove load from here, move the loop out to main
 # Add every new seller from a set of seller names.
 def iterate_over_sellers(driver, sellers):
     '''Add every new seller from a set of seller names.'''
@@ -54,7 +53,9 @@ def iterate_over_sellers(driver, sellers):
     driver.implicitly_wait(1.5)
     new_sellers = 0
     to_add = [name for name in sellers if name not in seller_df['name'].values]
-    logr(f"{len(to_add)} new sellers to be added.")
+    if len(to_add) > 1:
+        logr(f"{len(to_add)} new sellers to be added.")
+
     for seller_name in to_add:
 
         # Try to get seller data from page

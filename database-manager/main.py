@@ -12,11 +12,9 @@ from services import flags_service as flags
 from services import logs_service as logs
 from services.logs_service import log
 
-# TODO: Write simple database connection, create empty tables if there are none
+# TODO: Connect to database, create empty tables if there are none
 # TODO: Check local data against database contents & decide how much to update
-# TODO: Write database updating section for inserting and updating data
 # TODO: Verify the integrity of the database before and after the update
-# TODO: Complete main logging and run logging
 
 
 def load_database_data(new_dates):
