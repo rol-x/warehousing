@@ -6,7 +6,7 @@ FORCE_UPDATE = True
 EXPANSION_NAME = 'Battlebond'
 
 # Variables connected to a single run of code
-THIS_DATE_ID = 0
+DATE_ID = 0
 MAIN_LOGNAME = 'other_main.log'
 RUN_LOGNAME = 'other_run.log'
 
@@ -37,10 +37,10 @@ HEADERS = {"date": {"id": "int",
            "card_stats": {"id": "int",
                           "card_id": "int",
                           "price_from": "float",
-                          "monthly_avg": "float",
-                          "weekly_avg": "float",
-                          "daily_avg": "float",
                           "available_items": "int",
+                          "daily_avg": "float",
+                          "weekly_avg": "float",
+                          "monthly_avg": "float",
                           "date_id": "int"},
 
            "sale_offer": {"id": "int",
