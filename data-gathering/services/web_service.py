@@ -140,10 +140,10 @@ def click_load_more_button(driver):
     SPINNER = '//div[@class="spinner"]'
     while True:
         try:
-            WebDriverWait(driver, timeout=3.5, poll_frequency=0.3) \
+            WebDriverWait(driver, timeout=3, poll_frequency=0.3) \
                 .until(EC.invisibility_of_element_located((By.XPATH, SPINNER)))
 
-            button = WebDriverWait(driver, timeout=3.5, poll_frequency=0.3) \
+            button = WebDriverWait(driver, timeout=3, poll_frequency=0.3) \
                 .until(EC.element_to_be_clickable((By.XPATH, BUTTON)))
             if button.text == "SHOW MORE RESULTS":
                 button.click()
