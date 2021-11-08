@@ -54,9 +54,8 @@ def iterate_over_sellers(driver, sellers):
     driver.implicitly_wait(1.5)
     new_sellers = 0
     to_add = [name for name in sellers if name not in seller_df['name'].values]
+    logr(f"{len(to_add)} new sellers to be added.")
     for seller_name in to_add:
-        if seller_name == '':
-            continue
 
         # Try to get seller data from page
         for try_num in range(3):

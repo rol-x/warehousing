@@ -441,10 +441,6 @@ def add_seller(seller_soup):
     if seller_name is None:
         return False
 
-    if seller_name.string == '':
-        logr("Gotcha!")
-        return False
-
     # Seller name
     seller_name = str(seller_name.string)
 
@@ -664,9 +660,10 @@ def get_seller_names(card_soup):
     '''Return a set of all sellers found in a card page.'''
     names = set(map(lambda x: str(x.find("a").string
                                   if x.find("a") is not None
-                                  else ""),
+                                  else ''),
                     card_soup.findAll("span", {"class": "d-flex "
-                                      + "has-content-centered " + "mr-1"})))
+                                      + "has-content-centered mr-1"})))
+    names.remove(None)
     names.remove('')
     return names
 
