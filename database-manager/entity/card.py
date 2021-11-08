@@ -24,7 +24,6 @@ class Card(object):
             return
 
         # Get the attributes
-        # TODO: MEMCACHED on CARD DF INDEX
         self.id = len(load('card').index) + 1
         self.name = str(card_soup.find("h1")).split('<')[1][3:]
         self.expansion_name = card_info[1].find('span')['data-original-title']
