@@ -1,11 +1,6 @@
 import time as tm
 
 import config
-from entity import card as Card
-from entity import card_stats as CardStats
-from entity import date as Date
-from entity import sale_offer as SaleOffer
-from entity import seller as Seller
 from services import data_service as data
 from services import db_service as db
 from services import flags_service as flags
@@ -76,78 +71,38 @@ def main():
 
     # Connect to MySQL server and set the connection as a global variable
     db.connect_to_database()
+    log("Database connection established")
 
     # Ensure proper database and tables exist
-    db.setup_database()
+    db.run_query("USE gathering", silent=False)
 
     # Test the setup
     # db_service.insert_test_data()
 
     # Read the local data from the files
     new_data = data.load_isolated_data()
-    Date.new_data = new_data['date']
-    Card.new_data = new_data['card']
-    Seller.new_data = new_data['seller']
-    CardStats.new_data = new_data['card_stats']
-    SaleOffer.new_data = new_data['sale_offer']
+    for table_name, dataframe in new_data.items():
+        data.update_table(table_name, dataframe)
+        log("Updated %s" % table_name)
 
-    # Read the database data from a relevant date_id onwards
-    old_data = load_database_data(new_data['date'])
-    Date.old_data = old_data['date']
-    Card.old_data = old_data['card']
-    Seller.old_data = old_data['seller']
-    CardStats.old_data = old_data['card_stats']
-    SaleOffer.old_data = old_data['sale_offer']
-
-    # Prepare the data for database insertion
-    Date.prepare_data()
-    Card.prepare_data()
-    Seller.prepare_data()
-    CardStats.prepare_data()
-    SaleOffer.prepare_data()
-
-    tables = [Date, Card, Seller, CardStats, SaleOffer]
-
-    # Iterate over every table
-    for entity in tables:
-        log("Currently in table: %s" % entity.name)
-
-        # Get the relevant differences between datasets
-        to_be_deleted, to_be_inserted = \
-            data.calculate_deltas(entity.old_data, entity.new_data)
-
-        # Save indices of rows to delete from the database
-        tbd_values = []
-        for row in to_be_deleted:
-            tbd_values.append(tuple(row[0]))
-
-        # Save the data that needs to be inserted to the table
-        tbi_values = []
-        for row in to_be_inserted:
-            tbi_values.append(tuple(row[1:]))
-
-        if tbd_values:
-            db.run_delete_query(entity, tbd_values)
-        if tbi_values:
-            db.run_insert_query(entity, tbi_values)
-
-        log(f"Data in {entity.name} table updated.")
-
-        r = db.run_fetch_query(f"SELECT * FROM {entity.name} LIMIT 5")
-        count = db.run_fetch_query(f"SELECT COUNT(*) \
-                                             FROM {entity.name} LIMIT 5")
-        log(count.values())
-        log(r.values())
-        tm.sleep(6)
+    for table_name in new_data.keys():
+        table = data.select_table(table_name)
+        log("Table: %s" % table_name)
+        log(table.head())
+        log(table.tail())
+        tm.sleep(5)
 
     # Close the connection to the database
     db.close_connection()
+    log("Connection closed")
 
     # Update the database files checksum stored locally
     flags.save_database_checksum(config.NEW_CHECKSUM)
+    log("Checksum: %s set" % config.NEW_CHECKSUM)
 
     # Remove temporary database data files
     data.clean_up()
+    log("Cleaned up")
 
 
 # Main function

@@ -2,6 +2,7 @@ import os
 import shutil
 import time as tm
 
+import config
 import pandas as pd
 
 from services.logs_service import log
@@ -18,35 +19,26 @@ def ensure_complete_dataset():
 
 # Copy data directory, save the checksum as global variable
 def isolate_data():
-    try:
-        shutil.rmtree('./.data', ignore_errors=True)
-        os.rmdir('./.data')
-    except Exception:
-        ...
+    shutil.rmtree('./.data', ignore_errors=True)
     shutil.copytree('./data', './.data')
     log("Data isolated.")
 
 
 # Remove created temporary directory for data files
 def clean_up():
-    try:
-        shutil.rmtree('./.data', ignore_errors=True)
-        os.rmdir('./.data')
-        log("Cleaned up.")
-    except Exception:
-        ...
+    shutil.rmtree('./.data', ignore_errors=True)
+    log("Cleaned up.")
 
 
-# Return one specified dataframe
-def load(entity):
-    df = None
-    try:
-        df = pd.read_csv(f'./data/{entity}.csv', compression='gzip',
-                         sep=';', encoding="utf-8")
-    except Exception as exception:
-        log(exception)
-        raise SystemExit from exception
-    return df
+def select_table(entity):
+    return pd.read_sql_table(entity, config.CONN, schema='gathering')
+
+
+# TODO: Check out 'append'
+def update_table(entity, df):
+    df.to_sql(entity, config.CONN, schema='gathering',
+              if_exist='replace', index=False, index_label='id')
+    log("Updated table " + entity)
 
 
 # Load and return all the data in dataframes

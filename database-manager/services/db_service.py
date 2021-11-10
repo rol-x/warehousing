@@ -7,12 +7,13 @@ from services.logs_service import log
 
 def connect_to_database():
     try:
-        config.DATABASE = mysql.connector.connect(
+        config.CONN = mysql.connector.connect(
                             host="mysql_database",
                             user="database-manager",
                             password="h4Rd_p4sSW0rD")
     except Exception as exception:
         log(exception)
+        log("Database connection failed")
         raise SystemExit from exception
     log("Database connection established")
 
@@ -20,7 +21,7 @@ def connect_to_database():
 def run_fetch_query(query, silent=False):
     if not silent:
         log(f"Executing query: {query}")
-    with config.DATABASE.cursor(buffered=True) as cursor:
+    with config.CONN.cursor(buffered=True) as cursor:
         cursor.execute(query)
         values = cursor.fetchall()
         columns = cursor.column_names
@@ -33,24 +34,24 @@ def run_fetch_query(query, silent=False):
 def run_query(query, silent=True):
     if not silent:
         log(f"Executing query: {query}")
-    with config.DATABASE.cursor(buffered=True) as cursor:
+    with config.CONN.cursor(buffered=True) as cursor:
         cursor.execute(query)
 
 
 def run_insert_query(entity, values):
     query = f"INSERT INTO {entity.name} ({entity.headers}) \
               VALUES ({entity.args})"
-    with config.DATABASE.cursor() as cursor:
+    with config.CONN.cursor() as cursor:
         cursor.executemany(query, values)
-        config.DATABASE.commit()
+        config.CONN.commit()
         log(f"{cursor.rowcount} was inserted.")
 
 
 def run_delete_query(entity, values):
     query = f"DELETE FROM {entity.name} a WHERE a.id = %s"
-    with config.DATABASE.cursor() as cursor:
+    with config.CONN.cursor() as cursor:
         cursor.executemany(query, values)
-        config.DATABASE.commit()
+        config.CONN.commit()
         log(f"{cursor.rowcount} was deleted.")
 
 
@@ -272,4 +273,4 @@ def run_update(new_data):
 
 
 def close_connection():
-    config.DATABASE.close()
+    config.CONN.close()

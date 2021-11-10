@@ -590,24 +590,18 @@ def add_offers(card_page):
     attributes = table.findAll("div", {"class": "product-attributes col"})
 
     # Condition and language
-    card_condition = []
     card_language = []
-    cond_lang = [x.findAll("span") for x in attributes
-                 if x.findAll("span") is not None]
-    for x in cond_lang:
-        if x[0] is not None:
-            try:
-                value = x[0]["data-original-title"]
-            except Exception:
-                value = ''
-            card_condition.append(value)
+    card_condition = []
+    for attr in attributes:
+        cond = attr.find("span", {"class": "badge"})
+        if cond is not None:
+            card_condition.append(cond.string)
+            lang = attr.find("span", {"class": "icon mr-2"})
+            if lang is not None:
+                card_language.append(lang['data-original-title'])
 
-        if x[1] is not None:
-            try:
-                value = x[1]["data-original-title"]
-            except Exception:
-                value = ''
-        card_language.append(value)
+    log(len(card_language))
+    log(len(card_condition))
 
     # Foil
     foils = [x.find("span", {"class": "icon st_SpecialIcon mr-1"})
@@ -620,7 +614,7 @@ def add_offers(card_page):
 
     # Ensure the table has proper content
     if not (len(prices) == len(amounts)
-            == len(seller_ids) == len(cond_lang) == len(foils)):
+            == len(seller_ids) == len(attributes) == len(foils)):
         logr("The columns don't match in size!\n")
         return
 
