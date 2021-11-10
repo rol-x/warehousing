@@ -178,13 +178,13 @@ def add_date():
                             "weekday": int(weekday)}, ignore_index=True)
         date.to_csv("./data/date.csv", compression='gzip',
                     sep=';', encoding="utf-8", index=False)
-        config.DATE_ID = list(date.index)[-1]
+        config.DATE_ID = list(date["id"])[-1]
 
-        log('== Added date ==')
-        log('Day:           ' + str(day))
-        log('Month:         ' + str(month))
-        log('Year:          ' + str(year))
-        log('Date ID:       ' + str(config.DATE_ID) + '\n')
+        log('== Date ==')
+        log('Day:          ' + str(day))
+        log('Month:        ' + str(month))
+        log('Year:         ' + str(year))
+        log('Date ID:      ' + str(config.DATE_ID) + '\n')
 
 
 # Check the time and files status to run the code once a day.
@@ -541,7 +541,7 @@ def add_card_stats(card_soup, card_id):
     logr(' = Card stats = ')
     logr('Card ID:       ' + str(card_id))
     logr('Price from:    ' + str(price_from))
-    logr(f'Averages:      {daily_avg}, {weekly_avg}, {monthly_avg}')
+    logr('Averages:      ' + f'{daily_avg}, {weekly_avg}, {monthly_avg}')
     logr('Amount:        ' + str(available_items))
     logr('Date ID:       ' + str(config.DATE_ID) + '\n')
 
@@ -590,12 +590,24 @@ def add_offers(card_page):
     attributes = table.findAll("div", {"class": "product-attributes col"})
 
     # Condition and language
+    card_condition = []
+    card_language = []
     cond_lang = [x.findAll("span") for x in attributes
                  if x.findAll("span") is not None]
-    card_condition = [x[0]["data-original-title"] for x in cond_lang
-                      if x[0] is not None]
-    card_language = [x[1]["data-original-title"] for x in cond_lang if
-                     x[1] is not None]
+    for x in cond_lang:
+        if x[0] is not None:
+            try:
+                value = x[0]["data-original-title"]
+            except Exception:
+                value = ''
+            card_condition.append(value)
+
+        if x[1] is not None:
+            try:
+                value = x[1]["data-original-title"]
+            except Exception:
+                value = ''
+        card_language.append(value)
 
     # Foil
     foils = [x.find("span", {"class": "icon st_SpecialIcon mr-1"})
