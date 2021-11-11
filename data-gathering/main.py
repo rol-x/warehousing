@@ -55,6 +55,7 @@ def main():
         for try_num in range(3):
 
             # Open the card page and extend the view maximally
+            start = tm.time()
             driver.get(card_url)
             logs.log_url(driver.current_url)
             tm.sleep(0.5)
@@ -65,6 +66,7 @@ def main():
                 logr(f"Expanding the page timed out. Waiting to cool down.")
                 tm.sleep(20 * 1.5 ** try_num)
                 continue
+            logr(f"                Time: {round(tm.time() - start, 3)}\n")
 
             # Create a soup from the website source code
             card_soup = web.create_soup(driver.page_source)
