@@ -637,9 +637,9 @@ def add_offers(card_page):
     logr(f"Time: {round(tm.time() - start, 3)}\n\n")
 
 
-# Return a session-valid card ID given its name.
+# Return a specific card's ID given its name.
 def get_card_id(card_name):
-    '''Return a session-valid card ID given its name.'''
+    '''Return a specific card's ID given its name.'''
     card_df = load('card')
     this_card = card_df[(card_df['name'] == card_name)]
 
