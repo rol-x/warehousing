@@ -590,37 +590,25 @@ def add_offers(card_page):
     attributes = table.findAll("div", {"class": "product-attributes col"})
 
     # Condition and language
-    card_condition = []
-    card_language = []
-    cond_lang = [x.findAll("span") for x in attributes
-                 if x.findAll("span") is not None]
-    for x in cond_lang:
-        if x[0] is not None:
-            try:
-                value = x[0]["data-original-title"]
-            except Exception:
-                value = ''
-            card_condition.append(value)
+    spans = [x.findAll("span") for x in attributes
+             if x.findAll("span") is not None]
+    card_language = [str(x[1]["data-original-title"]) if x[1] is not None
+                     else '' for x in spans]
 
-        if x[1] is not None:
-            try:
-                value = x[1]["data-original-title"]
-            except Exception:
-                value = ''
-        card_language.append(value)
+    card_condition = [str(attr.find("span", {"class": "badge"}).string)
+                      if attr.find("span", {"class": "badge"}) is not None
+                      else '' for attr in attributes]
 
     # Foil
     foils = [x.find("span", {"class": "icon st_SpecialIcon mr-1"})
              ["data-original-title"] if
              x.find("span", {"class": "icon st_SpecialIcon mr-1"})
-             is not None
-             else ''
-             for x in attributes]
+             is not None else '' for x in attributes]
     is_foiled = [False if x == '' else True for x in foils]
 
     # Ensure the table has proper content
     if not (len(prices) == len(amounts)
-            == len(seller_ids) == len(cond_lang) == len(foils)):
+            == len(seller_ids) == len(attributes) == len(foils)):
         logr("The columns don't match in size!\n")
         return
 
