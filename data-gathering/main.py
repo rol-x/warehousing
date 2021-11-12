@@ -59,7 +59,7 @@ def main():
             driver.get(card_url)
             logs.log_url(driver.current_url)
             tm.sleep(0.5)
-            logr("                Expanding page...\n")
+            logr("                Expanding page...")
 
             # If clicking the load more button returned False, wait and repeat
             if not web.click_load_more_button(driver):
