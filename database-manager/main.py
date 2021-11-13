@@ -1,3 +1,4 @@
+import os
 import time as tm
 
 import config
@@ -10,28 +11,6 @@ from services.logs_service import log
 # TODO: Connect to database, create empty tables if there are none
 # TODO: Check local data against database contents & decide how much to update
 # TODO: Verify the integrity of the database before and after the update
-
-
-def load_database_data(new_dates):
-
-    # Read the date, card and seller data from the database
-    date = data.load_database_frame(db.table_content('date'))
-    card = data.load_database_frame(db.table_content('card'))
-    seller = data.load_database_frame(db.table_content('seller'))
-
-    # Determine which dates are new to the database
-    update_dates = data.compare_dates(date, new_dates)
-    log("Update dates: ")
-    log(update_dates)
-
-    # Load the relevant slices from the database
-    card_stats_slice = data.load_database_frame(
-        db.table_content_since('card_stats', update_dates))
-    sale_offer_slice = data.load_database_frame(
-        db.table_content_since('sale_offer', update_dates))
-
-    return {"date": date, "card": card, "seller": seller,
-            "card_stats": card_stats_slice, "sale_offer": sale_offer_slice}
 
 
 # Main function
@@ -74,10 +53,11 @@ def main():
     log("Database connection established")
 
     # Ensure proper database and tables exist
-    db.run_query("USE gathering", silent=False)
+    db.run_query("USE gathering")
 
     # Test the setup
     # db_service.insert_test_data()
+    log(os.listdir('./data'))
 
     # Read the local data from the files
     new_data = data.load_isolated_data()
@@ -91,6 +71,9 @@ def main():
         log(table.head())
         log(table.tail())
         tm.sleep(5)
+
+    tm.sleep(10)
+    db.test()
 
     # Close the connection to the database
     db.close_connection()

@@ -1,14 +1,17 @@
 """Store and initialize global configuration of the program."""
 
 # Variables connected to this single run of the code
-CONN = None
+DB = None
 NEW_CHECKSUM = ''
 MAIN_LOGNAME = 'other_main.log'
 RUN_LOGNAME = 'other_run.log'
 
 # Fixed variables
-NAME = 'database-manager'
 CONTAINER_DELAY = 20
+NAME = 'database-manager'
+HOST = 'mysql_database'
+USER = 'database-manager'
+PWD = 'h4Rd_p4sSW0rD'
 HEADERS = {"date": ["id",
                     "day",
                     "month",
