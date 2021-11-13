@@ -11,11 +11,11 @@ MAIN_LOGNAME = 'other_main.log'
 RUN_LOGNAME = 'other_run.log'
 
 # Fixed variables
+CONTAINER_DELAY = 10
 NAME = 'data-gathering'
 BASE_URL = 'https://www.cardmarket.com/en/Magic/Products/Singles/'
 USERS_URL = 'https://www.cardmarket.com/en/Magic/Users/'
 WEBDRIVER_HOSTNAME = 'firefox_webdriver'
-CONTAINER_DELAY = 10
 HEADERS = {"date": {"id": "int",
                     "day": "int",
                     "month": "int",

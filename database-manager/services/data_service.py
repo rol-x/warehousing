@@ -20,7 +20,9 @@ def ensure_complete_dataset():
 # Copy data directory, save the checksum as global variable
 def isolate_data():
     shutil.rmtree('./.data', ignore_errors=True)
-    shutil.copytree('./data', './.data')
+    for file in os.listdir('./data'):
+        if file.split('.')[-1] == 'csv':
+            shutil.copyfile('./data/' + file, './.data/' + file)
     log("Data isolated.")
 
 
@@ -30,15 +32,14 @@ def clean_up():
     log("Cleaned up.")
 
 
-def select_table(entity):
-    return pd.read_sql_table(entity, config.CONN, schema='gathering')
+def select_table(entity: str) -> pd.DataFrame:
+    return pd.read_sql_table(entity, config.DB.connect(), schema='gathering')
 
 
 # TODO: Check out 'append'
-def update_table(entity, df):
-    df.to_sql(entity, config.CONN, schema='gathering',
-              if_exist='replace', index=False, index_label='id')
-    log("Updated table " + entity)
+def update_table(entity: str, df: pd.DataFrame) -> None:
+    df.to_sql(entity, config.DB.connect(), schema='gathering',
+              if_exists='replace', index=False, index_label='id')
 
 
 # Load and return all the data in dataframes
