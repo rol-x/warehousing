@@ -8,8 +8,8 @@ from services.logs_service import log
 
 def connect_to_database():
     try:
-        url = 'mysql://{}:{}@{}'.format(config.USER, config.PWD, config.HOST)
-        config.DB = sqlalchemy.create_engine(url)
+        uri = 'mysql://{}:{}@{}'.format(config.USER, config.PWD, config.HOST)
+        config.DB = sqlalchemy.create_engine(uri)
         # config.DB.execute("CREATE DATABASE gathering")
         # config.DB.execute("USE gathering")
     except Exception as exception:
@@ -22,8 +22,11 @@ def run_query(query):
     log(f"Running query: {query}")
     with config.DB.connect() as connection:
         result = connection.execute(query)
-        for row in result:
-            log(row)
+        try:
+            for row in result:
+                log(row)
+        except Exception:
+            ...
 
 
 def run_queries_as_transaction(query_list):
@@ -31,6 +34,7 @@ def run_queries_as_transaction(query_list):
     with config.DB.begin() as connection:
         for query in query_list:
             connection.execute(query)
+        log("Transaction completed")
 
 
 # Setup empty database to be ready for data.
@@ -146,4 +150,4 @@ def test():
 
 
 def close_connection():
-    config.DB.close()
+    config.DB.dispose()

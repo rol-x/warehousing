@@ -21,24 +21,21 @@ def ensure_complete_dataset():
 def isolate_data():
     shutil.rmtree('./.data', ignore_errors=True)
     for file in os.listdir('./data'):
-        if file.split('.')[-1] == 'csv':
-            shutil.copyfile('./data/' + file, './.data/' + file)
-    log("Data isolated.")
+        shutil.copy('./data/' + file, './.data/' + file)
 
 
 # Remove created temporary directory for data files
 def clean_up():
     shutil.rmtree('./.data', ignore_errors=True)
-    log("Cleaned up.")
 
 
 def select_table(entity: str) -> pd.DataFrame:
-    return pd.read_sql_table(entity, config.DB.connect(), schema='gathering')
+    return pd.read_sql_table(entity, config.DB, schema='gathering')
 
 
 # TODO: Check out 'append'
 def update_table(entity: str, df: pd.DataFrame) -> None:
-    df.to_sql(entity, config.DB.connect(), schema='gathering',
+    df.to_sql(entity, config.DB, schema='gathering',
               if_exists='replace', index=False, index_label='id')
 
 

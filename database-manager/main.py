@@ -3,7 +3,7 @@ import time as tm
 
 import config
 from services import data_service as data
-from services import db_service as db
+from services import database_service as db
 from services import flags_service as flags
 from services import logs_service as logs
 from services.logs_service import log
@@ -26,6 +26,14 @@ def main():
 
     # Wait until new verified dataset is present
     while True:
+        log(flags.calculate_checksum('./data'))
+        log(flags.get_database_checksum())
+
+        log(len(flags.calculate_checksum('./data')))
+        log(len(flags.get_database_checksum()))
+
+        log(flags.calculate_checksum('./data')
+            == flags.get_database_checksum())
 
         # Check if there are differences between database and local files
         if flags.calculate_checksum('./data') == flags.get_database_checksum():
@@ -45,47 +53,44 @@ def main():
 
     # Copy data directory to temporary location to prevent mid-update changes
     data.isolate_data()
+    log("Data isolated.")
+
     config.NEW_CHECKSUM = flags.calculate_checksum('./.data')
     log("Checksum: %s" % config.NEW_CHECKSUM)
 
     # Connect to MySQL server and set the connection as a global variable
     db.connect_to_database()
     log("Database connection established")
-
-    # Ensure proper database and tables exist
     db.run_query("USE gathering")
-
-    # Test the setup
-    # db_service.insert_test_data()
-    log(os.listdir('./data'))
 
     # Read the local data from the files
     new_data = data.load_isolated_data()
     for table_name, dataframe in new_data.items():
+        start = tm.time()
         data.update_table(table_name, dataframe)
-        log("Updated %s" % table_name)
+        log(f"Updated {table_name} in {round(tm.time() - start, 3)} seconds.")
 
     for table_name in new_data.keys():
         table = data.select_table(table_name)
         log("Table: %s" % table_name)
-        log(table.head())
-        log(table.tail())
-        tm.sleep(5)
+        log(table.info())
+        log(table.describe())
+        tm.sleep(3)
 
     tm.sleep(10)
     db.test()
 
     # Close the connection to the database
     db.close_connection()
-    log("Connection closed")
+    log("Connection closed.")
 
     # Update the database files checksum stored locally
     flags.save_database_checksum(config.NEW_CHECKSUM)
-    log("Checksum: %s set" % config.NEW_CHECKSUM)
+    log("Checksum: %s set." % config.NEW_CHECKSUM)
 
     # Remove temporary database data files
     data.clean_up()
-    log("Cleaned up")
+    log("Cleaned up.")
 
 
 # Main function
