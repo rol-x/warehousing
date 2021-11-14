@@ -1,4 +1,3 @@
-import os
 import time as tm
 
 import config
@@ -8,9 +7,7 @@ from services import flags_service as flags
 from services import logs_service as logs
 from services.logs_service import log
 
-# TODO: Connect to database, create empty tables if there are none
-# TODO: Check local data against database contents & decide how much to update
-# TODO: Verify the integrity of the database before and after the update
+# TODO: Fix trying to expand the page when it's not ready (and waiting 20 s.)
 
 
 # Main function
@@ -26,14 +23,8 @@ def main():
 
     # Wait until new verified dataset is present
     while True:
-        log(flags.calculate_checksum('./data'))
-        log(flags.get_database_checksum())
-
-        log(len(flags.calculate_checksum('./data')))
-        log(len(flags.get_database_checksum()))
-
-        log(flags.calculate_checksum('./data')
-            == flags.get_database_checksum())
+        log(f"Local files checksum: {flags.calculate_checksum('./data')}")
+        log(f"Database checksum: {flags.get_database_checksum()}")
 
         # Check if there are differences between database and local files
         if flags.calculate_checksum('./data') == flags.get_database_checksum():
