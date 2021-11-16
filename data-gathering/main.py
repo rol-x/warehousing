@@ -58,13 +58,13 @@ def main():
             start = tm.time()
             driver.get(card_url)
             logs.log_url(driver.current_url)
-            tm.sleep(0.5)
+            tm.sleep(1.5)
             logr("                Expanding page...")
 
             # If clicking the load more button returned False, wait and repeat
             if not web.click_load_more_button(driver):
                 logr(f"Expanding the page timed out. Waiting to cool down.")
-                tm.sleep(20 * 1.5 ** try_num)
+                tm.sleep(10 * 1.5 ** try_num)
                 continue
             logr(f"                Time: {round(tm.time() - start, 3)}\n")
 
@@ -77,7 +77,7 @@ def main():
 
             # Otherwise try again
             logr('Card page invalid. Retrying...')
-            tm.sleep(20 * 1.5 ** try_num)
+            tm.sleep(10 * 1.5 ** try_num)
 
         # Save the card if not saved already
         if not data.is_card_saved(card_name):
@@ -102,7 +102,7 @@ def main():
 
         # In case of exception and a restart, save the progress
         config.START_FROM += 1
-        tm.sleep(2.5)
+        tm.sleep(1.5)
 
     # Log program task completion
     logr("All cards, sellers and sale offers acquired")
