@@ -46,6 +46,7 @@ def main():
         if progress < config.START_FROM:
             continue
         logs.log_progress(card_name, progress, len(card_list))
+        driver.implicitly_wait(0)
 
         # Compose the card page url from the card's name
         card_url = config.BASE_URL + config.EXPANSION_NAME + '/' \
@@ -54,17 +55,19 @@ def main():
         # Try to load the page 3 times
         for try_num in range(3):
 
-            # Open the card page and extend the view maximally
+            # Wait for the card page to be loaded
             start = tm.time()
-            driver.get(card_url)
-            logs.log_url(driver.current_url)
-            tm.sleep(1.5)
-            logr("                Expanding page...")
+            if not web.load_card_page(driver, card_url):
+                logr(f"                Page loading timed out. Retrying...\n")
+                web.cooldown(try_num - 1)
+                continue
+            web.cooldown(-5)
 
-            # If clicking the load more button returned False, wait and repeat
+            # Keep pressing the Load More button
+            logr("                Expanding page...")
             if not web.click_load_more_button(driver):
-                logr(f"Expanding the page timed out. Waiting to cool down.")
-                tm.sleep(10 * 1.5 ** try_num)
+                logr(f"                Expanding timed out. Retrying...")
+                web.cooldown(try_num)
                 continue
             logr(f"                Time: {round(tm.time() - start, 3)}\n")
 
@@ -77,7 +80,7 @@ def main():
 
             # Otherwise try again
             logr('Card page invalid. Retrying...')
-            tm.sleep(10 * 1.5 ** try_num)
+            web.cooldown(try_num)
 
         # Save the card if not saved already
         if not data.is_card_saved(card_name):
@@ -93,6 +96,7 @@ def main():
         sellers = data.get_seller_names(card_soup)
 
         # Investigate and add only not added sellers
+        driver.implicitly_wait(2.5)
         web.iterate_over_sellers(driver, sellers)
 
         # Get all sale offers from the page
@@ -102,7 +106,7 @@ def main():
 
         # In case of exception and a restart, save the progress
         config.START_FROM += 1
-        tm.sleep(1.5)
+        web.cooldown(-4)
 
     # Log program task completion
     logr("All cards, sellers and sale offers acquired")

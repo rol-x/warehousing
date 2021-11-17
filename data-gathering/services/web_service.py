@@ -50,7 +50,6 @@ def iterate_over_sellers(driver, sellers):
     start = tm.time()
 
     # Define loop-control variables and iterate over every seller
-    driver.implicitly_wait(1.5)
     new_sellers = 0
     to_add = [name for name in sellers if name not in seller_df['name'].values]
     if len(to_add) > 1:
@@ -68,7 +67,6 @@ def iterate_over_sellers(driver, sellers):
             tm.sleep(3 + 3 ** (try_num + 1))
 
     # Log task finished
-    driver.implicitly_wait(0.5)
     total_sellers = sellers_before + new_sellers
     logr(f"Done - {new_sellers} new sellers saved  (out of: "
          + f"{read_sellers}, total: {total_sellers})")
@@ -132,10 +130,30 @@ def get_card_names(driver, expansion_name):
     return all_cards
 
 
+def load_card_page(driver, card_url):
+    CARD_INFO = '//dd[@class="col-6 col-xl-7"]'
+    TABLE = '//div[@class="table article-table table-striped"]'
+    driver.get(card_url)
+    log_url(driver.current_url)
+    try:
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.title_contains("MTG Singles | Cardmarket"))
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.presence_of_element_located((By.XPATH, CARD_INFO)))
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.presence_of_element_located((By.XPATH, TABLE)))
+        return True
+
+    except common.exceptions.TimeoutException:
+        return False
+    except Exception as exception:
+        logr(exception)
+        return False
+
+
 # Deplete the Load More button to have a complete list of card sellers.
 def click_load_more_button(driver):
     '''Deplete the Load More button to have a complete list of card sellers.'''
-    driver.implicitly_wait(0)
     BUTTON = '//button[@id="loadMoreButton"]'
     SPINNER = '//div[@class="spinner"]'
     while True:
@@ -150,7 +168,6 @@ def click_load_more_button(driver):
 
         # When there is no more to load
         except common.exceptions.TimeoutException:
-            driver.implicitly_wait(0.5)
             return True
 
         # Other related errors
@@ -162,7 +179,11 @@ def click_load_more_button(driver):
             return False
         except Exception as exception:
             logr(exception)
-            raise SystemExit from exception
+            return False
+
+
+def cooldown(coefficient):
+    tm.sleep(10 * 1.5 ** coefficient)
 
 
 # Return the given string in url-compatible form, like 'Spell-Snare'.
