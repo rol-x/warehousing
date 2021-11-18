@@ -10,8 +10,8 @@ def connect_to_database():
     try:
         uri = 'mysql://{}:{}@{}'.format(config.USER, config.PWD, config.HOST)
         config.DB = sqlalchemy.create_engine(uri)
-        # config.DB.execute("CREATE DATABASE gathering")
-        # config.DB.execute("USE gathering")
+        config.DB.execute("CREATE DATABASE IF NOT EXISTS gathering")
+        config.DB.execute("USE gathering")
     except Exception as exception:
         log(exception)
         log("Database connection failed")
@@ -133,20 +133,6 @@ def test():
                 AND so.date_id = cs.date_id \
                 WHERE s.id=1 AND d.id=45 AND c.id=5")
     tm.sleep(60)
-
-    # Date        ->  every time, check the delta, update
-    # Card        ->  check if needed, check the delta, update
-    # Seller      ->  every time, check the delta, update
-    # Card stats  ->  every time, slice current day, create or update on these
-    # Sale offer  ->  every time, slice current day and card, create or update
-
-    # Date OK  \                        Date OK   \
-    #           -->  Card stats         Seller OK  -->  Sale offer
-    # Card OK  /                        Card OK   /
-
-    # Date FAIL or Card FAIL  -->  ROLLBACK {Faulty}, Card stats, Sale offer
-    # Seller FAIL  -->  ROLLBACK Seller, Sale offer
-    # {Any} FAIL  -->  ROLLBACK {Faulty}
 
 
 def close_connection():

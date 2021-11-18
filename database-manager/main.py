@@ -52,7 +52,6 @@ def main():
     # Connect to MySQL server and set the connection as a global variable
     db.connect_to_database()
     log("Database connection established")
-    db.run_query("USE gathering")
 
     # Read the local data from the files
     new_data = data.load_isolated_data()
