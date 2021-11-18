@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+import time as tm
 
 import config
 
@@ -15,24 +15,14 @@ def setup_logs():
     if not os.path.exists(f'./logs/{config.NAME}'):
         os.mkdir(f'./logs/{config.NAME}')
 
-
-# Prepare the main log file.
-def setup_main_logfile():
-    '''Prepare the main log file.'''
-    config.MAIN_LOGNAME = datetime.now().strftime("%d%m%Y") + ".log"
+    # Prepare the main log filename
+    config.MAIN_LOGNAME = tm.strftime("%d%m%Y", tm.localtime()) + ".log"
 
 
-# Prepare the local log files for single run.
+# Prepare the log file for a single run.
 def setup_run_logfile():
-    '''Prepare the local log files for single run.'''
-    config.RUN_LOGNAME = datetime.now().strftime("%d%m%Y_%H%M") + ".log"
-    with open(f"./logs/{config.NAME}/{config.RUN_LOGNAME}", "a+",
-              encoding="utf-8"):
-        pass
-    if os.path.getsize(f"./logs/{config.NAME}/{config.RUN_LOGNAME}"):
-        logr(" = Separate code execution = \n")
-    else:
-        logr(" = Creation of this file = \n")
+    '''Prepare the log file for a single run.'''
+    config.RUN_LOGNAME = tm.strftime("%d%m%Y_%H%M", tm.localtime()) + ".log"
 
 
 # Log a message to a local file and the console.
@@ -41,24 +31,18 @@ def logr(msg):
     msg = str(msg)
     with open(f"./logs/{config.NAME}/{config.RUN_LOGNAME}", 'a+',
               encoding="utf-8") as logfile:
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        timestamp = tm.strftime("%H:%M:%S", tm.localtime())
         logfile.write(timestamp + ": " + msg + "\n")
     print(msg)
 
 
-# Log the current url to the console and log file.
-def log_url(url):
-    '''Log the current url to the console and log file.'''
-    logr("URL change  ->  " + url)
-
-
-# Log a message to the main run file and the console.
+# Log a message to the main log file and the console.
 def log(msg):
-    '''Log a message to the main run file and the console.'''
+    '''Log a message to the main log file and the console.'''
     msg = str(msg)
     with open(f'./logs/{config.NAME}/{config.MAIN_LOGNAME}',
               'a+', encoding="utf-8") as logfile:
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        timestamp = tm.strftime("%H:%M:%S", tm.localtime())
         logfile.write(timestamp + ": " + msg + "\n")
     print(msg)
 
@@ -69,3 +53,9 @@ def log_progress(card_name, progress, cards_total):
     logr(f" == {card_name} ==    ({progress}/{cards_total}  "
          + str(round(100*progress/cards_total, 2))
          + "%)")
+
+
+# Log the current url to the console and log file.
+def log_url(url):
+    '''Log the current url to the console and log file.'''
+    logr("URL change  ->  " + url)

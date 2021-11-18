@@ -1,61 +1,97 @@
-import time
+import time as tm
 
 import config
-import services.flags_service as flags
-from handlers import db_handler, file_handler
-from services.logs_service import log, setup_logs, setup_main_logfile
+from services import data_service as data
+from services import database_service as db
+from services import flags_service as flags
+from services import logs_service as logs
+from services.logs_service import log
 
-# TODO: Write simple database connection, create empty tables if there are none
-# TODO: Check local data against database contents & decide how much to update
-# TODO: Write database updating section for inserting and updating data
-# TODO: Verify the integrity of the database before and after the update
-# TODO: Complete main logging and run logging
+# TODO: Fix trying to expand the page when it's not ready (and waiting 20 s.)
 
 
 # Main function
 def main():
-    # Set the current run log filename
-    setup_logs()
+    # Set the logs directory and main log file up
+    logs.setup_logs()
 
-    # Create the file for database files checksum
-    flags.create_database_checksum_file()
+    # Set the flags directory and database checksum file up
+    flags.setup_flags()
 
-    # Setup the file to log to
-    setup_main_logfile()
+    # Ensure at least one proper data-gathering run is completed
+    data.ensure_complete_dataset()
 
-    # Wait until change in files is detected and any updates are finished
-    file_handler.wait_for_new_data()
+    # Wait until new verified dataset is present
+    while True:
+        log(f"Local files checksum: {flags.calculate_checksum('./data')}")
+        log(f"Database checksum: {flags.get_database_checksum()}")
+
+        # Check if there are differences between database and local files
+        if flags.calculate_checksum('./data') == flags.get_database_checksum():
+            log(" - Newest data already in database. Waiting 30 minutes.")
+            tm.sleep(30 * 60)
+            continue
+
+        # Check if ready, validated dataset is waiting for us to register
+        if flags.calculate_checksum('./data') \
+                in flags.get_validated_checksums():
+            log(" - Verified new data available for database update.")
+            break
+
+        # Some change in files was detected, ensure it's a proper dataset
+        log(" - New data found, but is not complete. Waiting 15 minutes.")
+        tm.sleep(15 * 60)
 
     # Copy data directory to temporary location to prevent mid-update changes
-    file_handler.isolate_data()
+    data.isolate_data()
+    log("Data isolated.")
+
+    config.NEW_CHECKSUM = flags.calculate_checksum('./.data')
+    log("Checksum: %s" % config.NEW_CHECKSUM)
 
     # Connect to MySQL server and set the connection as a global variable
-    db_handler.connect_to_database()
+    db.connect_to_database()
+    log("Database connection established")
 
-    # Ensure proper database and tables exist
-    db_handler.setup_database()
+    # Read the local data from the files
+    new_data = data.load_isolated_data()
+    for table_name, dataframe in new_data.items():
+        start = tm.time()
+        data.update_table(table_name, dataframe)
+        log(f"Updated {table_name} in {round(tm.time() - start, 3)} seconds.")
 
-    # Take the new data and load the differences into the database
-    db_handler.run_update()
+    for table_name in new_data.keys():
+        table = data.select_table(table_name)
+        log("Table: %s" % table_name)
+        log(table.info())
+        log(table.describe())
+        tm.sleep(3)
+
+    tm.sleep(10)
+    db.test()
 
     # Close the connection to the database
-    db_handler.close_connection()
+    db.close_connection()
+    log("Connection closed.")
 
     # Update the database files checksum stored locally
     flags.save_database_checksum(config.NEW_CHECKSUM)
-    log("New database checksum saved: %s" % config.NEW_CHECKSUM)
+    log("Checksum: %s set." % config.NEW_CHECKSUM)
 
     # Remove temporary database data files
-    file_handler.clean_up()
+    data.clean_up()
+    log("Cleaned up.")
 
 
 # Main function
 if __name__ == '__main__':
     print("Started: database-manager")
-    time.sleep(config.CONTAINER_DELAY)
+    tm.sleep(config.CONTAINER_DELAY)
     try:
         while True:
             main()
     except Exception as exception:
         log(exception)
+        log(" - Container will restart in 10 minutes.")
+        tm.sleep(10 * 60)
         raise SystemExit from exception

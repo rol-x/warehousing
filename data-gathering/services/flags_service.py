@@ -11,19 +11,13 @@ def setup_flags():
         os.mkdir('./flags')
 
     # Create a file for storing checksums of validated datasets
-    create_validated_checksums_file()
+    with open('./flags/validated-checksums.sha1', 'a+', encoding="utf-8"):
+        pass
 
 
 # Return calculated checksum based on the contents of data directory
-def calculate_data_checksum(dir_path):
-    return str(dirhash(dir_path, 'sha1'))
-
-
-# Create the checksums file for storing validated datasets.
-def create_validated_checksums_file():
-    '''Create the checksums file for storing validated datasets.'''
-    with open('./flags/validated-checksums.sha1', 'a+', encoding="utf-8"):
-        pass
+def calculate_checksum(directory_path):
+    return str(dirhash(directory_path, 'sha1'))
 
 
 # Save given data chceksum to an external file

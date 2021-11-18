@@ -1,15 +1,17 @@
-from random import normalvariate, random
-from time import sleep, time
+import time as tm
 
 import config
 from bs4 import BeautifulSoup
-from entity.seller import add_seller
 from selenium import common, webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from urllib3.exceptions import MaxRetryError
 
-from handlers.data_handler import load_df
-from services.logs_service import logr, log_url
+# Web service shouldn't do that
+from services.data_service import add_seller, load
+from services.logs_service import log_url, logr
 
 
 # Return the Firefox webdriver in headless mode.
@@ -31,17 +33,6 @@ def connect_webdriver():
         raise SystemExit from exception
 
 
-# Return the Firefox webdriver in headless mode.
-def reconnect(driver):
-    '''Return the Firefox webdriver in headless mode.'''
-    logr('Restarting the webdriver connection')
-    realistic_pause(config.WAIT_COEF)
-    driver.close()
-    realistic_pause(config.WAIT_COEF)
-    driver = connect_webdriver()
-    return driver
-
-
 # Use the BeautifulSoup module to parse the page content into soup.
 def create_soup(page_source):
     '''Use the BeautifulSoup module to parse the page content into soup.'''
@@ -50,40 +41,36 @@ def create_soup(page_source):
 
 
 # Add every new seller from a set of seller names.
-def add_sellers_from_set(driver, sellers):
+def iterate_over_sellers(driver, sellers):
     '''Add every new seller from a set of seller names.'''
-    seller_df = load_df('seller')
+    seller_df = load('seller')
     sellers_before = len(seller_df)
     read_sellers = len(sellers)
 
+    start = tm.time()
+
     # Define loop-control variables and iterate over every seller
     new_sellers = 0
-    tries = 0
-    seller_ok = False
-    for seller_name in sellers:
+    to_add = [name for name in sellers if name not in seller_df['name'].values]
+    if len(to_add) > 1:
+        logr(f"{len(to_add)} new sellers to be added.")
 
-        # Check if the record already exists
-        if seller_name not in seller_df['seller_name'].values:
+    for seller_name in to_add:
 
-            # TODO: Selenium wait here
-            # Try to get seller data from page
-            while tries < config.MAX_TRIES:
-                realistic_pause(0.8*config.WAIT_COEF)
-                driver.get(config.USERS_URL + seller_name)
-                seller_soup = BeautifulSoup(driver.page_source, 'html.parser')
-                seller_ok = add_seller(seller_soup)
-                if seller_ok:
-                    tries = config.MAX_TRIES
-                    new_sellers += 1
-                else:
-                    tries += 1
-                    realistic_pause(config.WAIT_COEF)
-            tries = 0
+        # Try to get seller data from page
+        for try_num in range(3):
+            driver.get(config.USERS_URL + seller_name)
+            seller_soup = create_soup(driver.page_source)
+            if add_seller(seller_soup):
+                new_sellers += 1
+                break
+            tm.sleep(3 + 3 ** (try_num + 1))
 
     # Log task finished
     total_sellers = sellers_before + new_sellers
     logr(f"Done - {new_sellers} new sellers saved  (out of: "
-         + f"{read_sellers}, total: {total_sellers})\n")
+         + f"{read_sellers}, total: {total_sellers})")
+    logr(f"Time: {round(tm.time() - start, 3)}\n")
 
 
 # Return a list of all cards found in the expansion cards list.
@@ -96,6 +83,7 @@ def get_card_names(driver, expansion_name):
         saved_cards = [line.strip('\n') for line in exp_file.readlines()]
     logr("Task - Getting all card names from current expansion")
 
+    driver.implicitly_wait(2.5)
     all_cards = []
     page_no = 1
     while True:
@@ -128,7 +116,8 @@ def get_card_names(driver, expansion_name):
 
         # Advance to the next page
         page_no += 1
-        realistic_pause(0.3*config.WAIT_COEF)
+
+    driver.implicitly_wait(0.5)
 
     # Save the complete cards list to a file
     with open('./data/' + exp_filename + '.txt', 'w',
@@ -141,33 +130,44 @@ def get_card_names(driver, expansion_name):
     return all_cards
 
 
+def load_card_page(driver, card_url):
+    CARD_INFO = '//dd[@class="col-6 col-xl-7"]'
+    TABLE = '//div[@class="table article-table table-striped"]'
+    driver.get(card_url)
+    log_url(driver.current_url)
+    try:
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.title_contains("MTG Singles | Cardmarket"))
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.presence_of_element_located((By.XPATH, CARD_INFO)))
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.presence_of_element_located((By.XPATH, TABLE)))
+        return True
+
+    except common.exceptions.TimeoutException:
+        return False
+    except Exception as exception:
+        logr(exception)
+        return False
+
+
 # Deplete the Load More button to have a complete list of card sellers.
 def click_load_more_button(driver):
     '''Deplete the Load More button to have a complete list of card sellers.'''
-    elapsed_t = 0.0
-    start_t = time()
-    realistic_pause(0.6*config.WAIT_COEF)
+    BUTTON = '//button[@id="loadMoreButton"]'
+    SPINNER = '//div[@class="spinner"]'
     while True:
         try:
-            # Locate the button element
-            load_more_button = driver \
-                .find_element_by_xpath('//button[@id="loadMoreButton"]')
+            WebDriverWait(driver, timeout=3, poll_frequency=0.3) \
+                .until(EC.invisibility_of_element_located((By.XPATH, SPINNER)))
 
-            # Confirm the button is not an empty object
-            if load_more_button.text == "":
-                return True
+            button = WebDriverWait(driver, timeout=3, poll_frequency=0.3) \
+                .until(EC.element_to_be_clickable((By.XPATH, BUTTON)))
+            if button.text == "SHOW MORE RESULTS":
+                button.click()
 
-            # Click the button and wait
-            driver.execute_script("arguments[0].click();", load_more_button)
-            realistic_pause(0.25*config.WAIT_COEF)
-
-            # Check for timeout
-            elapsed_t = time() - start_t
-            if elapsed_t > config.BUTTON_TIMEOUT:
-                return False
-
-        # When there is no button
-        except common.exceptions.NoSuchElementException:
+        # When there is no more to load
+        except common.exceptions.TimeoutException:
             return True
 
         # Other related errors
@@ -177,11 +177,13 @@ def click_load_more_button(driver):
             return False
         except common.exceptions.ErrorInResponseException:
             return False
-        except common.exceptions.InvalidSessionIdException:
-            realistic_pause(config.WAIT_COEF)
+        except Exception as exception:
+            logr(exception)
             return False
-        except common.exceptions.WebDriverException:
-            return False
+
+
+def cooldown(coefficient):
+    tm.sleep(10 * 1.5 ** coefficient)
 
 
 # Return the given string in url-compatible form, like 'Spell-Snare'.
@@ -208,14 +210,6 @@ def is_valid_card_page(card_soup):
     if len(card_info) > 0 and table is not None:
         return True
     return False
-
-
-# Wait about mean_val seconds before proceeding to the rest of the code.
-def realistic_pause(mean_val):
-    '''Wait ~mean_val seconds before proceeding to the rest of the code.'''
-    std_val = mean_val * random() * 0.3 + 0.1
-    sleep_time = abs(normalvariate(mean_val, std_val)) + 0.2
-    sleep(sleep_time)
 
 
 # Return the number of cards in the search results.

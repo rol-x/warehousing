@@ -1,10 +1,19 @@
-data-exploration/.ipynb_checkpoints/
-__pycache__/
-*/__pycache__/
-*.pyc
-*.pyo
-*.pyproj
-.vscode
-.vscode/settings.json
-geckodriver.log
-.old
+# Helper notebooks
+*.ipynb
+
+# All logs except custom ones
+*.log
+#!logs/*/*
+
+# Python cached modules info
+*/*/__pycache__/
+
+# Visual Studio Code setup
+.vscode/
+
+# Temporary mid-run directories
+.pickles/
+.data/
+
+# Local database info
+.mysql/
