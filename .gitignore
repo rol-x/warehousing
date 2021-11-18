@@ -1,12 +1,19 @@
-__pycache__/
-*/__pycache__/
-*.pyc
-*.pyo
-*.pyproj
-.vscode
-.vscode/settings.json
-geckodriver.log
+# Helper notebooks
+*.ipynb
+
+# All logs except custom ones
+*.log
+#!logs/*/*
+
+# Python cached modules info
+*/*/__pycache__/
+
+# Visual Studio Code setup
+.vscode/
+
+# Temporary mid-run directories
 .pickles/
-.mysql/
 .data/
-.old/
+
+# Local database info
+.mysql/

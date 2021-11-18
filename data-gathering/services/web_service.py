@@ -40,7 +40,6 @@ def create_soup(page_source):
     return soup
 
 
-# TODO: Remove load from here, move the loop out to main
 # Add every new seller from a set of seller names.
 def iterate_over_sellers(driver, sellers):
     '''Add every new seller from a set of seller names.'''
@@ -48,10 +47,14 @@ def iterate_over_sellers(driver, sellers):
     sellers_before = len(seller_df)
     read_sellers = len(sellers)
 
+    start = tm.time()
+
     # Define loop-control variables and iterate over every seller
-    driver.implicitly_wait(1.5)
     new_sellers = 0
     to_add = [name for name in sellers if name not in seller_df['name'].values]
+    if len(to_add) > 1:
+        logr(f"{len(to_add)} new sellers to be added.")
+
     for seller_name in to_add:
 
         # Try to get seller data from page
@@ -61,13 +64,13 @@ def iterate_over_sellers(driver, sellers):
             if add_seller(seller_soup):
                 new_sellers += 1
                 break
-            tm.sleep(3 ** (try_num + 1))
+            tm.sleep(3 + 3 ** (try_num + 1))
 
     # Log task finished
-    driver.implicitly_wait(0.5)
     total_sellers = sellers_before + new_sellers
     logr(f"Done - {new_sellers} new sellers saved  (out of: "
-         + f"{read_sellers}, total: {total_sellers})\n")
+         + f"{read_sellers}, total: {total_sellers})")
+    logr(f"Time: {round(tm.time() - start, 3)}\n")
 
 
 # Return a list of all cards found in the expansion cards list.
@@ -80,6 +83,7 @@ def get_card_names(driver, expansion_name):
         saved_cards = [line.strip('\n') for line in exp_file.readlines()]
     logr("Task - Getting all card names from current expansion")
 
+    driver.implicitly_wait(2.5)
     all_cards = []
     page_no = 1
     while True:
@@ -113,6 +117,8 @@ def get_card_names(driver, expansion_name):
         # Advance to the next page
         page_no += 1
 
+    driver.implicitly_wait(0.5)
+
     # Save the complete cards list to a file
     with open('./data/' + exp_filename + '.txt', 'w',
               encoding="utf-8") as exp_file:
@@ -124,25 +130,44 @@ def get_card_names(driver, expansion_name):
     return all_cards
 
 
+def load_card_page(driver, card_url):
+    CARD_INFO = '//dd[@class="col-6 col-xl-7"]'
+    TABLE = '//div[@class="table article-table table-striped"]'
+    driver.get(card_url)
+    log_url(driver.current_url)
+    try:
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.title_contains("MTG Singles | Cardmarket"))
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.presence_of_element_located((By.XPATH, CARD_INFO)))
+        WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
+            .until(EC.presence_of_element_located((By.XPATH, TABLE)))
+        return True
+
+    except common.exceptions.TimeoutException:
+        return False
+    except Exception as exception:
+        logr(exception)
+        return False
+
+
 # Deplete the Load More button to have a complete list of card sellers.
 def click_load_more_button(driver):
     '''Deplete the Load More button to have a complete list of card sellers.'''
-    driver.implicitly_wait(0)
     BUTTON = '//button[@id="loadMoreButton"]'
     SPINNER = '//div[@class="spinner"]'
     while True:
         try:
-            WebDriverWait(driver, timeout=3, poll_frequency=0.25) \
+            WebDriverWait(driver, timeout=3, poll_frequency=0.3) \
                 .until(EC.invisibility_of_element_located((By.XPATH, SPINNER)))
 
-            button = WebDriverWait(driver, timeout=3, poll_frequency=0.25) \
+            button = WebDriverWait(driver, timeout=3, poll_frequency=0.3) \
                 .until(EC.element_to_be_clickable((By.XPATH, BUTTON)))
             if button.text == "SHOW MORE RESULTS":
                 button.click()
 
         # When there is no more to load
         except common.exceptions.TimeoutException:
-            driver.implicitly_wait(0)
             return True
 
         # Other related errors
@@ -154,7 +179,11 @@ def click_load_more_button(driver):
             return False
         except Exception as exception:
             logr(exception)
-            raise SystemExit from exception
+            return False
+
+
+def cooldown(coefficient):
+    tm.sleep(10 * 1.5 ** coefficient)
 
 
 # Return the given string in url-compatible form, like 'Spell-Snare'.

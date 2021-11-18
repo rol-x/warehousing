@@ -10,9 +10,8 @@ from services import web_service as web
 from services.logs_service import log, logr
 
 # TODO: Change singular to plural in entities use, not in model
-# TODO: Convert sale_offer mid-way for faster pickling?
-# TODO: Look into seller adding and page expanding.
 # TODO: Cast id columns of card_stats to int.
+# TODO: Check out '' seller adding fiasco.
 
 
 # Main function
@@ -30,7 +29,7 @@ def main():
     # Create run log file and connect the webdriver
     logs.setup_run_logfile()
     driver = web.connect_webdriver()
-    driver.implicitly_wait(0.5)
+    driver.implicitly_wait(1.5)
 
     # Transform the data from .csv to pickle format for faster changes
     data.pickle_data()
@@ -47,6 +46,7 @@ def main():
         if progress < config.START_FROM:
             continue
         logs.log_progress(card_name, progress, len(card_list))
+        driver.implicitly_wait(0)
 
         # Compose the card page url from the card's name
         card_url = config.BASE_URL + config.EXPANSION_NAME + '/' \
@@ -55,17 +55,21 @@ def main():
         # Try to load the page 3 times
         for try_num in range(3):
 
-            # Open the card page and extend the view maximally
-            driver.get(card_url)
-            logs.log_url(driver.current_url)
-            logr("                Expanding page...\n")
-
-            # If clicking the load more button returned False, wait and repeat
-            if not web.click_load_more_button(driver):
-                logr(f"Expanding the page timed out. Waiting to cool down.")
-                driver.implicitly_wait(1.5)
-                tm.sleep(30 * 2 ** try_num)
+            # Wait for the card page to be loaded
+            start = tm.time()
+            if not web.load_card_page(driver, card_url):
+                logr(f"                Page loading timed out. Retrying...\n")
+                web.cooldown(try_num - 1)
                 continue
+            web.cooldown(-5)
+
+            # Keep pressing the Load More button
+            logr("                Expanding page...")
+            if not web.click_load_more_button(driver):
+                logr(f"                Expanding timed out. Retrying...")
+                web.cooldown(try_num)
+                continue
+            logr(f"                Time: {round(tm.time() - start, 3)}\n")
 
             # Create a soup from the website source code
             card_soup = web.create_soup(driver.page_source)
@@ -76,7 +80,7 @@ def main():
 
             # Otherwise try again
             logr('Card page invalid. Retrying...')
-            tm.sleep(3 ** (try_num + 1))
+            web.cooldown(try_num)
 
         # Save the card if not saved already
         if not data.is_card_saved(card_name):
@@ -84,12 +88,7 @@ def main():
 
         # Save the card market statistics if not saved today
         card_id = data.get_card_id(card_name)
-        if not data.are_card_stats_saved_today(card_id) or config.FORCE_UPDATE:
-            data.add_card_stats(card_soup, card_id)
-        else:
-            logr(' = Card stats = ')
-            logr(f"Card ID:  {card_id}")
-            logr('Already saved today\n')
+        data.add_card_stats(card_soup, card_id)
 
         # Get all sellers from the card page
         logr(" = Sellers = ")
@@ -97,22 +96,26 @@ def main():
         sellers = data.get_seller_names(card_soup)
 
         # Investigate and add only not added sellers
+        driver.implicitly_wait(2.5)
         web.iterate_over_sellers(driver, sellers)
 
         # Get all sale offers from the page
         logr(" = Offers = ")
         logr("Task - Updating sale offers")
         data.add_offers(card_soup)
-        tm.sleep(0.5)
+
+        # In case of exception and a restart, save the progress
+        config.START_FROM += 1
+        web.cooldown(-4)
 
     # Log program task completion
     logr("All cards, sellers and sale offers acquired")
+    config.START_FROM = 1
 
     # Clean the pickle data (post-acquisition)
     removed = data.clean_pickles()
     logr(f"Pickle data validated (removed {removed} records)\n")
 
-    # TODO: Fix error 16: resource busy
     # Transform the data back from pickle to .csv format
     data.unpickle_data()
     logr(" = Program execution finished = ")

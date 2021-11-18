@@ -6,49 +6,49 @@ FORCE_UPDATE = False
 EXPANSION_NAME = 'Battlebond'
 
 # Variables connected to a single run of code
-THIS_DATE_ID = 0
+DATE_ID = 0
 MAIN_LOGNAME = 'other_main.log'
 RUN_LOGNAME = 'other_run.log'
 
 # Fixed variables
+CONTAINER_DELAY = 10
 NAME = 'data-gathering'
 BASE_URL = 'https://www.cardmarket.com/en/Magic/Products/Singles/'
 USERS_URL = 'https://www.cardmarket.com/en/Magic/Users/'
 WEBDRIVER_HOSTNAME = 'firefox_webdriver'
-CONTAINER_DELAY = 10
-HEADERS = {"date": ["id",
-                    "day",
-                    "month",
-                    "year",
-                    "weekday"],
+HEADERS = {"date": {"id": "int",
+                    "day": "int",
+                    "month": "int",
+                    "year": "int",
+                    "weekday": "int"},
 
-           "card": ["id",
-                    "name",
-                    "expansion",
-                    "rarity"],
+           "card": {"id": "int",
+                    "name": "str",
+                    "expansion": "str",
+                    "rarity": "str"},
 
-           "seller": ["id",
-                      "name",
-                      "type",
-                      "member_since",
-                      "country",
-                      "address"],
+           "seller": {"id": "int",
+                      "name": "str",
+                      "type": "str",
+                      "member_since": "int",
+                      "country": "str",
+                      "address": "str"},
 
-           "card_stats": ["id",
-                          "card_id",
-                          "price_from",
-                          "monthly_avg",
-                          "weekly_avg",
-                          "daily_avg",
-                          "available_items",
-                          "date_id"],
+           "card_stats": {"id": "int",
+                          "card_id": "int",
+                          "price_from": "float",
+                          "available_items": "int",
+                          "daily_avg": "float",
+                          "weekly_avg": "float",
+                          "monthly_avg": "float",
+                          "date_id": "int"},
 
-           "sale_offer": ["id",
-                          "seller_id",
-                          "price",
-                          "card_id",
-                          "card_condition",
-                          "card_language",
-                          "is_foiled",
-                          "amount",
-                          "date_id"]}
+           "sale_offer": {"id": "int",
+                          "seller_id": "int",
+                          "price": "float",
+                          "card_id": "int",
+                          "card_condition": "str",
+                          "card_language": "str",
+                          "is_foiled": "bool",
+                          "amount": "int",
+                          "date_id": "int"}}
