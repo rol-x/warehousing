@@ -16,9 +16,7 @@ services:
       - ./flags:/flags
       - pickle_data:/.pickles
     ports:
-      - "4443:4443"
-      - "4442:4442"
-      - "4441:4441"
+      - "4443:4444"
     environment:
       - TZ=Europe/Warsaw
     restart: always
