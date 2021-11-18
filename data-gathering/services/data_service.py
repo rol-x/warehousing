@@ -206,7 +206,7 @@ def schedule_the_run():
     while True:
 
         # Log and check whether another run is needed
-        log(" - Relevant data discovered. Checking for completeness.")
+        log(" - Local files discovered. Checking for completeness.")
 
         # If yes, break out of the wait loop
         if not is_data_complete(config.DATE_ID):
