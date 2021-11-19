@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from urllib3.exceptions import MaxRetryError
 
 # Web service shouldn't do that
-from services.data_service import add_seller, load
+from services.data_service import add_seller, load_csv
 from services.logs_service import log_url, logr
 
 
@@ -43,8 +43,7 @@ def create_soup(page_source):
 # Add every new seller from a set of seller names.
 def iterate_over_sellers(driver, sellers):
     '''Add every new seller from a set of seller names.'''
-    seller_df = load('seller')
-    sellers_before = len(seller_df)
+    seller_df = load_csv('seller')
     read_sellers = len(sellers)
 
     start = tm.time()
@@ -60,16 +59,20 @@ def iterate_over_sellers(driver, sellers):
         # Try to get seller data from page
         for try_num in range(3):
             driver.get(config.USERS_URL + seller_name)
+            cooldown(-4 + 3 * try_num)   # 1.97s -> 6.67s -> 22.5s
             seller_soup = create_soup(driver.page_source)
-            if add_seller(seller_soup):
+            updated = add_seller(seller_df, seller_soup)
+            if updated is not None:
+                seller_df = updated
                 new_sellers += 1
                 break
-            tm.sleep(3 + 3 ** (try_num + 1))
+            cooldown(-7 + 2 * try_num)  # 0.58s -> 1.31s -> 2.96s
 
-    # Log task finished
-    total_sellers = sellers_before + new_sellers
+    # Task finished
+    seller_df.to_csv(f'./data/seller.csv', compression='gzip',
+                     sep=';', encoding='utf-8', index=False)
     logr(f"Done - {new_sellers} new sellers saved  (out of: "
-         + f"{read_sellers}, total: {total_sellers})")
+         + f"{read_sellers}, total: {len(seller_df.index)})")
     logr(f"Time: {round(tm.time() - start, 3)}\n")
 
 

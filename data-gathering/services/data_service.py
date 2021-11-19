@@ -36,12 +36,15 @@ def load(entity):
     except pd.errors.EmptyDataError as empty_err:
         logr(f'No data in {entity}.pkl\n')
         logr(empty_err)
+        return pd.DataFrame()
     except pd.errors.ParserError as parser_err:
         logr(f'Parser error while loading {entity}.pkl\n')
         logr(parser_err)
+        return pd.DataFrame()
     except Exception as exception:
         logr(f'Exception occured while loading {entity}.pkl\n')
         logr(exception)
+        return pd.DataFrame()
 
 
 # Prepare the local data directory.
@@ -93,7 +96,7 @@ def pickle_data():
         df_size = len(df.index)
 
         # Optimize performance by slicing only the relevant data
-        if entity == 'sale_offer':
+        if entity == 'sale_offer' and df_size:
             df = df[df['date_id'] == config.DATE_ID]
             pct = 100.0 * (df_size - len(df.index)) / df_size
             log(f"Loaded sale_offer: {df_size} rows  "
@@ -449,7 +452,7 @@ def add_card(card_soup):
 
 
 # Extract information about a seller from provided soup.
-def add_seller(seller_soup):
+def add_seller(sellers, seller_soup):
     '''Extract information about a seller from provided soup.'''
 
     # Get rows from the seller information table on page
@@ -457,30 +460,34 @@ def add_seller(seller_soup):
 
     # User not loaded correctly
     if seller_name is None:
-        return False
+        return None
 
-    # Seller name
-    seller_name = str(seller_name.string)
+    try:
+        # Seller name
+        seller_name = str(seller_name.string)
 
-    # Type
-    s_type = seller_soup \
-        .find("span", {"class": "ml-2 personalInfo-bold"}).string
+        # Type
+        s_type = seller_soup \
+            .find("span", {"class": "ml-2 personalInfo-bold"}).string
 
-    # Member since
-    member_since = seller_soup \
-        .find("span", {"class": "ml-1 personalInfo-light d-none d-md-block"}) \
-        .string.split(' ')[-1]
+        # Member since
+        member_since = seller_soup \
+            .find("span", {"class": "ml-1 personalInfo-light "
+                           + "d-none d-md-block"}).string.split(' ')[-1]
 
-    # Country
-    country = seller_soup \
-        .find("div", {"class": "col-12 col-md-6"}) \
-        .find("span")["data-original-title"]
+        # Country
+        country = seller_soup \
+            .find("div", {"class": "col-12 col-md-6"}) \
+            .find("span")["data-original-title"]
 
-    # Address
-    address_div = seller_soup \
-        .findAll("div", {"class": "d-flex align-items-center "
-                         + "justify-content-start flex-wrap "
-                         + "personalInfo col-8 col-md-9"})[-1].findAll("p")
+        # Address
+        address_div = seller_soup \
+            .findAll("div", {"class": "d-flex align-items-center "
+                             + "justify-content-start flex-wrap "
+                             + "personalInfo col-8 col-md-9"})[-1].findAll("p")
+    except Exception:
+        return None
+
     address = ''
     for line in address_div:
         address += line.string + ', '
@@ -488,19 +495,15 @@ def add_seller(seller_soup):
     if address == country:
         address = ''
 
-    seller = load('seller')
-    seller = seller.append({"id": len(seller.index) + 1,
-                            "name": seller_name,
-                            "type": s_type,
-                            "member_since": member_since,
-                            "country": country,
-                            "address": address}, ignore_index=True)
-    seller.to_pickle('./.pickles/seller.pkl')
-
     # Logging
-    logr(f"Seller added:  {seller_name} [{len(seller.index) + 1}]")
+    logr(f"Seller:  {seller_name} from {country} [{len(sellers.index) + 1}]")
 
-    return True
+    return sellers.append({"id": len(sellers.index) + 1,
+                           "name": seller_name,
+                           "type": s_type,
+                           "member_since": member_since,
+                           "country": country,
+                           "address": address}, ignore_index=True)
 
 
 # Extract information about card statistics from provided soup.
@@ -681,6 +684,7 @@ def get_seller_names(card_soup):
     seller_names = {str(x.find("a").string) if x.find("a") is not None else ''
                     for x in sellers}
     seller_names.discard('')
+    seller_names.discard('Name')
     return seller_names
 
 
