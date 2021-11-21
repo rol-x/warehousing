@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from urllib3.exceptions import MaxRetryError
 
 # Web service shouldn't do that
-from services.data_service import add_seller, load_csv
+from services.data_service import add_seller
 from services.logs_service import log_url, logr
 
 
@@ -41,11 +41,9 @@ def create_soup(page_source):
 
 
 # Add every new seller from a set of seller names.
-def iterate_over_sellers(driver, sellers):
+def iterate_over_sellers(driver, sellers, seller_df):
     '''Add every new seller from a set of seller names.'''
-    seller_df = load_csv('seller')
     read_sellers = len(sellers)
-
     start = tm.time()
 
     # Define loop-control variables and iterate over every seller

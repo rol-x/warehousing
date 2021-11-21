@@ -97,7 +97,7 @@ def main():
 
         # Investigate and add only not added sellers
         driver.implicitly_wait(2.5)
-        web.iterate_over_sellers(driver, sellers)
+        web.iterate_over_sellers(driver, sellers, data.load_csv('seller'))
 
         # Get all sale offers from the page
         logr(" = Offers = ")
