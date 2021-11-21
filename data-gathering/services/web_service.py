@@ -9,9 +9,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from urllib3.exceptions import MaxRetryError
 
-# Web service shouldn't do that
-from services.data_service import add_seller
 from services.logs_service import log_url, logr
+
+driver: webdriver
 
 
 # Return the Firefox webdriver in headless mode.
@@ -19,11 +19,11 @@ def connect_webdriver():
     '''Return the Firefox webdriver in headless mode.'''
     options = Options()
     options.headless = True
+    global driver
     try:
         driver = webdriver.Remote("http://" + config.WEBDRIVER_HOSTNAME
                                   + ":4444/wd/hub", options=options)
         logr('Webdriver connection ready\n')
-        return driver
     except MaxRetryError as exception:
         logr(exception)
         logr('The connection to remote webdriver failed. '
@@ -34,48 +34,14 @@ def connect_webdriver():
 
 
 # Use the BeautifulSoup module to parse the page content into soup.
-def create_soup(page_source):
+def get_soup():
     '''Use the BeautifulSoup module to parse the page content into soup.'''
-    soup = BeautifulSoup(page_source, 'html.parser')
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
     return soup
 
 
-# Add every new seller from a set of seller names.
-def iterate_over_sellers(driver, sellers, seller_df):
-    '''Add every new seller from a set of seller names.'''
-    read_sellers = len(sellers)
-    start = tm.time()
-
-    # Define loop-control variables and iterate over every seller
-    new_sellers = 0
-    to_add = [name for name in sellers if name not in seller_df['name'].values]
-    if len(to_add) > 1:
-        logr(f"{len(to_add)} new sellers to be added.")
-
-    for seller_name in to_add:
-
-        # Try to get seller data from page
-        for try_num in range(3):
-            driver.get(config.USERS_URL + seller_name)
-            cooldown(-4 + 3 * try_num)   # 1.97s -> 6.67s -> 22.5s
-            seller_soup = create_soup(driver.page_source)
-            updated = add_seller(seller_df, seller_soup)
-            if updated is not None:
-                seller_df = updated
-                new_sellers += 1
-                break
-            cooldown(-7 + 2 * try_num)  # 0.58s -> 1.31s -> 2.96s
-
-    # Task finished
-    seller_df.to_csv(f'./data/seller.csv', compression='gzip',
-                     sep=';', encoding='utf-8', index=False)
-    logr(f"Done - {new_sellers} new sellers saved  (out of: "
-         + f"{read_sellers}, total: {len(seller_df.index)})")
-    logr(f"Time: {round(tm.time() - start, 3)}\n")
-
-
 # Return a list of all cards found in the expansion cards list.
-def get_card_names(driver, expansion_name):
+def get_card_names(expansion_name):
     '''Return a list of all cards found in the expansion cards list.'''
     # Load the number of cards stored in a local file
     exp_filename = urlify(expansion_name)
@@ -131,10 +97,11 @@ def get_card_names(driver, expansion_name):
     return all_cards
 
 
-def load_card_page(driver, card_url):
+def load_card_page(card_name):
     CARD_INFO = '//dd[@class="col-6 col-xl-7"]'
     TABLE = '//div[@class="table article-table table-striped"]'
-    driver.get(card_url)
+    driver.get(config.BASE_URL
+               + config.EXPANSION_NAME + '/' + urlify(card_name))
     log_url(driver.current_url)
     try:
         WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
@@ -153,7 +120,7 @@ def load_card_page(driver, card_url):
 
 
 # Deplete the Load More button to have a complete list of card sellers.
-def click_load_more_button(driver):
+def click_load_more_button():
     '''Deplete the Load More button to have a complete list of card sellers.'''
     BUTTON = '//button[@id="loadMoreButton"]'
     SPINNER = '//div[@class="spinner"]'
@@ -181,6 +148,10 @@ def click_load_more_button(driver):
         except Exception as exception:
             logr(exception)
             return False
+
+
+def load_seller_page(seller_name):
+    driver.get(config.USERS_URL + seller_name)
 
 
 def cooldown(coefficient):

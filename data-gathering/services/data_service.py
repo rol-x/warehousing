@@ -11,40 +11,43 @@ from services import flags_service as flags
 from services.logs_service import log, logr
 
 
-# Try to load a .csv file into a dataframe.
-def load_csv(entity):
-    '''Try to return a dataframe from the respective .csv file.'''
-    try:
-        return pd.read_csv(f'./data/{entity}.csv',
-                           compression='gzip', sep=';', encoding="utf-8")
-    except pd.errors.EmptyDataError as empty_err:
-        logr(f'No data in {entity}.csv\n')
-        logr(empty_err)
-    except pd.errors.ParserError as parser_err:
-        logr(f'Parser error while loading {entity}.csv\n')
-        logr(parser_err)
-    except Exception as exception:
-        logr(f'Exception occured while loading {entity}.csv\n')
-        logr(exception)
+def load_df(entity):
+    if entity in ['date', 'seller']:
+        try:
+            return pd.read_csv(f'./data/{entity}.csv',
+                               compression='gzip', sep=';', encoding="utf-8")
+        except pd.errors.EmptyDataError as empty_err:
+            logr(f'No data in {entity}.csv\n')
+            logr(empty_err)
+        except pd.errors.ParserError as parser_err:
+            logr(f'Parser error while loading {entity}.csv\n')
+            logr(parser_err)
+        except Exception as exception:
+            logr(f'Exception occured while loading {entity}.csv\n')
+            logr(exception)
+    if entity in ['card', 'card_stats', 'sale_offer']:
+        try:
+            return pd.read_pickle(f'./.pickles/{entity}.pkl')
+        except pd.errors.EmptyDataError as empty_err:
+            logr(f'No data in {entity}.pkl\n')
+            logr(empty_err)
+            return pd.DataFrame()
+        except pd.errors.ParserError as parser_err:
+            logr(f'Parser error while loading {entity}.pkl\n')
+            logr(parser_err)
+            return pd.DataFrame()
+        except Exception as exception:
+            logr(f'Exception occured while loading {entity}.pkl\n')
+            logr(exception)
+            return pd.DataFrame()
 
 
-# Try to load a .pkl file into a dataframe.
-def load(entity):
-    '''Try to return a dataframe from the respective .pkl file.'''
-    try:
-        return pd.read_pickle(f'./.pickles/{entity}.pkl')
-    except pd.errors.EmptyDataError as empty_err:
-        logr(f'No data in {entity}.pkl\n')
-        logr(empty_err)
-        return pd.DataFrame()
-    except pd.errors.ParserError as parser_err:
-        logr(f'Parser error while loading {entity}.pkl\n')
-        logr(parser_err)
-        return pd.DataFrame()
-    except Exception as exception:
-        logr(f'Exception occured while loading {entity}.pkl\n')
-        logr(exception)
-        return pd.DataFrame()
+def save_df(df, entity):
+    if entity in ['date', 'seller']:
+        df.to_csv(f'./data/{entity}.csv', compression='gzip',
+                  sep=';', encoding='utf-8', index=False)
+    if entity in ['card', 'card_stats', 'sale_offer']:
+        df.to_pickle(f'./.pickles/{entity}.pkl')
 
 
 # Prepare the local data directory.
@@ -90,7 +93,7 @@ def pickle_data():
     sys.setrecursionlimit(10000)
 
     # Ensure the files exist and are ready for writing
-    for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
+    for entity in ['card', 'card_stats', 'sale_offer']:
         df = pd.read_csv(f'./data/{entity}.csv', compression='gzip',
                          sep=';', encoding="utf-8")
         df_size = len(df.index)
@@ -111,8 +114,8 @@ def pickle_data():
 # Convert the data from pickles to csv format.
 def unpickle_data():
     '''Convert the data from pickles to csv format.'''
-    for entity in ['date', 'card', 'seller', 'card_stats', 'sale_offer']:
-        df = load(entity)
+    for entity in ['card', 'card_stats', 'sale_offer']:
+        df = load_df(entity)
         if df is not None:
 
             # Merge new sale offers with previous ones
@@ -154,7 +157,7 @@ def add_date():
     '''Get the current date ID and save the date if necessary.'''
 
     # Load the date dataframe
-    date = load_csv('date')
+    date_df = load_df('date')
 
     # Prepare the attributes
     now = tm.localtime()
@@ -163,25 +166,25 @@ def add_date():
     weekday = weekday if weekday > 0 else 7
 
     # Check for the same datetime record
-    same_date = date.index[(date['day'] == int(day))
-                           & (date['month'] == int(month))
-                           & (date['year'] == int(year))]
+    same_date = date_df.index[(date_df['day'] == int(day))
+                              & (date_df['month'] == int(month))
+                              & (date_df['year'] == int(year))]
 
     # Today's date is already saved
     if(len(same_date) > 0):
-        config.DATE_ID = date.loc[same_date, "id"].item()
+        config.DATE_ID = date_df.loc[same_date, "id"].item()
         log(f"Date ID [{config.DATE_ID}] already added.")
 
     # Else, update the local data
     else:
-        date = date.append({"id": len(date.index) + 1,
-                            "day": int(day),
-                            "month": int(month),
-                            "year": int(year),
-                            "weekday": int(weekday)}, ignore_index=True)
-        date.to_csv("./data/date.csv", compression='gzip',
-                    sep=';', encoding="utf-8", index=False)
-        config.DATE_ID = list(date["id"])[-1]
+        date_df = date_df.append({"id": len(date_df.index) + 1,
+                                  "day": int(day),
+                                  "month": int(month),
+                                  "year": int(year),
+                                  "weekday": int(weekday)}, ignore_index=True)
+        date_df.to_csv("./data/date.csv", compression='gzip',
+                       sep=';', encoding="utf-8", index=False)
+        config.DATE_ID = list(date_df["id"])[-1]
 
         log('== Date ==')
         log('Day:          ' + str(day))
@@ -208,33 +211,31 @@ def schedule_the_run():
     # If today's date is already saved in date.pkl
     while True:
 
-        # Log and check whether another run is needed
-        log(" - Local files discovered. Checking for completeness.")
-
-        # If yes, break out of the wait loop
-        if not is_data_complete(config.DATE_ID):
-            log("   - Gathered data is incomplete. Proceeding to run.")
-            break
-
-        # If not, save this complete dataset as validated in a checksum form
+        # Check whether dataset checksum is already saved
+        log(" - Checking for completeness of local files.")
         checksum = flags.calculate_checksum("./data")
         if checksum not in flags.get_validated_checksums():
+
+            # If not, check whether the data is complete, and run if not
+            if not is_data_complete(config.DATE_ID):
+                log("   - Gathered data is incomplete. Proceeding to run.")
+                break
+
+            # If the data is complete, save the checksum to the control file
             log("   - Data validation completed successfully.")
             log("   - Saving checksum: " + checksum)
             flags.save_validated_checksum(checksum)
 
-        # Or note that it's already validated and continue waiting
         else:
             log("   - Dataset already validated. All needed data saved.")
 
-        # If the data doesn't need to be gathered, wait 1 hour
         log(" - Job is done. Waiting for 1 hour.")
         tm.sleep(60 * 60)
 
         # After waiting, compare the date and dates in csv file to add new one
         localtm = tm.localtime()
         date = tm.strftime("%d/%m/%Y", localtm).split('/')
-        date_df = load_csv('date')
+        date_df = load_df('date')
         this_date = date_df[(date_df['day'] == int(date[0]))
                             & (date_df['month'] == int(date[1]))
                             & (date_df['year'] == int(date[2]))]
@@ -249,10 +250,10 @@ def is_first_run():
     with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \
             as exp_file:
         card_list = exp_file.readlines()
-    card = load_csv('card')
-    card_stats = load_csv('card_stats')
-    seller = load_csv('seller')
-    sale_offer = load_csv('sale_offer')
+    card = load_df('card')
+    card_stats = load_df('card_stats')
+    seller = load_df('seller')
+    sale_offer = load_df('sale_offer')
 
     # Return if all of the data-related files have empty dataframes inside
     if len(card.index) == 0 \
@@ -272,10 +273,10 @@ def is_data_complete(date_id):
     with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \
             as exp_file:
         card_list = exp_file.readlines()
-    card = load_csv('card')
-    card_stats = load_csv('card_stats')
-    seller = load_csv('seller')
-    sale_offer = load_csv('sale_offer')
+    card = load_df('card')
+    card_stats = load_df('card_stats')
+    seller = load_df('seller')
+    sale_offer = load_df('sale_offer')
 
     # Check for any empty file
     if len(card_list) == 0 \
@@ -326,7 +327,7 @@ def is_data_complete(date_id):
 
 
 # Load and clean local files, returning the number of removed rows.
-def clean_pickles():
+def prune_local_data():
     '''Load and validate local files, returning the number of removed rows.'''
 
     # Count the rows dropped
@@ -335,7 +336,7 @@ def clean_pickles():
     # TODO: Check for wrong types
 
     # Validate dates
-    date = load('date')
+    date = load_df('date')
     rows = len(date.index)
     date = drop_rows_with_nans(date)
     date = drop_duplicate_rows(date)
@@ -345,7 +346,7 @@ def clean_pickles():
         log(f"{rows} rows dropped from date")
 
     # Validate cards
-    card = load('card')
+    card = load_df('card')
     rows = len(card.index)
     card = drop_rows_with_nans(card)
     card = drop_duplicate_rows(card)
@@ -355,7 +356,7 @@ def clean_pickles():
         log(f"{rows} rows dropped from card")
 
     # Validate sellers
-    seller = load('seller')
+    seller = load_df('seller')
     rows = len(seller.index)
     seller = drop_duplicate_rows(seller)
     rows -= len(seller.index)
@@ -364,7 +365,7 @@ def clean_pickles():
         log(f"{rows} rows dropped from seller")
 
     # Validate card stats
-    card_stats = load('card_stats')
+    card_stats = load_df('card_stats')
     rows = len(card_stats.index)
     card_stats = drop_rows_with_nans(card_stats)
     card_stats = drop_duplicate_rows(card_stats)
@@ -376,7 +377,7 @@ def clean_pickles():
         log(f"{rows} rows dropped from card_stats")
 
     # Validate sale offers
-    sale_offer = load('sale_offer')
+    sale_offer = load_df('sale_offer')
     rows = len(sale_offer.index)
     sale_offer = drop_rows_with_nans(sale_offer)
     sale_offer = drop_duplicate_rows(sale_offer)
@@ -389,11 +390,11 @@ def clean_pickles():
         log(f"{rows} rows dropped from sale_offer")
 
     # Save the validated data
-    date.to_pickle('./.pickles/date.pkl')
-    card.to_pickle('./.pickles/card.pkl')
-    seller.to_pickle('./.pickles/seller.pkl')
-    card_stats.to_pickle('./.pickles/card_stats.pkl')
-    sale_offer.to_pickle('./.pickles/sale_offer.pkl')
+    save_df(date, 'date')
+    save_df(card, 'card')
+    save_df(seller, 'seller')
+    save_df(card_stats, 'card_stats')
+    save_df(sale_offer, 'sale_offer')
 
     # Return the number of rows dropped
     return rows_dropped
@@ -436,12 +437,12 @@ def add_card(card_soup):
     expansion_name = card_info[1].find('span')['data-original-title']
     rarity = card_info[0].find('span')['data-original-title']
 
-    card = load('card')
+    card = load_df('card')
     card = card.append({"id": len(card.index) + 1,
                         "name": card_name,
                         "expansion": expansion_name,
                         "rarity": rarity}, ignore_index=True)
-    card.to_pickle("./.pickles/card.pkl")
+    save_df(card, 'card')
 
     # Logging
     logr('== Added card ==')
@@ -452,7 +453,7 @@ def add_card(card_soup):
 
 
 # Extract information about a seller from provided soup.
-def add_seller(sellers, seller_soup):
+def add_seller(seller_df, seller_soup):
     '''Extract information about a seller from provided soup.'''
 
     # Get rows from the seller information table on page
@@ -496,14 +497,14 @@ def add_seller(sellers, seller_soup):
         address = ''
 
     # Logging
-    logr(f"Seller:  {seller_name} from {country} [{len(sellers.index) + 1}]")
+    logr(f"Seller:  {seller_name} from {country} [{len(seller_df.index) + 1}]")
 
-    return sellers.append({"id": len(sellers.index) + 1,
-                           "name": seller_name,
-                           "type": s_type,
-                           "member_since": member_since,
-                           "country": country,
-                           "address": address}, ignore_index=True)
+    return seller_df.append({"id": len(seller_df.index) + 1,
+                             "name": seller_name,
+                             "type": s_type,
+                             "member_since": member_since,
+                             "country": country,
+                             "address": address}, ignore_index=True)
 
 
 # Extract information about card statistics from provided soup.
@@ -524,7 +525,7 @@ def add_card_stats(card_soup, card_id):
     available_items = card_info[-6].string
 
     # Update the local file
-    card_stats = load('card_stats')
+    card_stats = load_df('card_stats')
     tb_dropped = card_stats[(card_stats['card_id'] == card_id)
                             & (card_stats['date_id'] == config.DATE_ID)].index
     card_stats = card_stats.drop(tb_dropped)
@@ -538,7 +539,7 @@ def add_card_stats(card_soup, card_id):
                                     "date_id": config.DATE_ID},
                                    ignore_index=True)
 
-    card_stats.to_pickle('./.pickles/card_stats.pkl')
+    save_df(card_stats, 'card_stats')
 
     # Logging
     logr(' = Card stats = ')
@@ -570,7 +571,7 @@ def add_offers(card_page):
     card_id = get_card_id(card_name)
 
     # Seller IDs
-    seller = load('seller')
+    seller = load_df('seller')
     sellers_info = table.findAll("span", {"class": "seller-info d-flex "
                                           + "align-items-center"})
     seller_names = [info.find(
@@ -626,13 +627,13 @@ def add_offers(card_page):
     scraped['date_id'] = config.DATE_ID
 
     # Load and drop today's sales data for this card
-    saved = load('sale_offer')
+    saved = load_df('sale_offer')
     this_card_today = saved[(saved['card_id'] == scraped['card_id'].values[0])]
     saved.drop(this_card_today.index, inplace=True)
 
     # Concatenate the remaining and new offers and save to file
     data = pd.concat([saved, scraped])
-    data.to_pickle('./.pickles/sale_offer.pkl')
+    save_df(data, 'sale_offer')
 
     # Log task finished
     logr(f"Done - {len(data) - len(saved)} sale offers saved  (before: "
@@ -640,10 +641,17 @@ def add_offers(card_page):
     logr(f"Time: {round(tm.time() - start, 3)}\n\n")
 
 
+def save_new_sellers(seller_df, new_sellers, read_sellers, start):
+    save_df(seller_df, 'seller')
+    logr(f"Done - {new_sellers} new sellers saved  (out of: "
+         + f"{read_sellers}, total: {len(seller_df.index)})")
+    logr(f"Time: {round(tm.time() - start, 3)}\n")
+
+
 # Return a specific card's ID given its name.
 def get_card_id(card_name):
     '''Return a specific card's ID given its name.'''
-    card_df = load('card')
+    card_df = load_df('card')
     this_card = card_df[(card_df['name'] == card_name)]
 
     if len(this_card) == 0:
@@ -655,7 +663,7 @@ def get_card_id(card_name):
 # Return whether a card with the same name is already saved.
 def is_card_saved(card_name):
     '''Return whether a card with the same name is already saved.'''
-    card_df = load('card')
+    card_df = load_df('card')
     if card_name in card_df['name'].values:
         return True
     return False
@@ -691,7 +699,7 @@ def get_seller_names(card_soup):
 # Return whether stats given by card ID were saved that day.
 def are_card_stats_saved_today(card_id):
     '''Return whether stats given by card ID were saved that day.'''
-    card_stats = load('card_stats')
+    card_stats = load_df('card_stats')
     sm = card_stats[(card_stats['card_id'] == card_id) &
                     (card_stats['date_id'] == config.DATE_ID)]
 

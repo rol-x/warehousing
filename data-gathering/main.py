@@ -28,36 +28,32 @@ def main():
 
     # Create run log file and connect the webdriver
     logs.setup_run_logfile()
-    driver = web.connect_webdriver()
-    driver.implicitly_wait(1.5)
+    web.connect_webdriver()
+    web.driver.implicitly_wait(1.5)
 
     # Transform the data from .csv to pickle format for faster changes
     data.pickle_data()
 
     # Clean the local pickle data (pre-acquisition)
-    removed = data.clean_pickles()
+    removed = data.prune_local_data()
     logr(f"Local pickle data validated (removed {removed} records)\n")
 
     # Get card names and open each card's URL
     progress = 0
-    card_list = web.get_card_names(driver, config.EXPANSION_NAME)
+    card_list = web.get_card_names(config.EXPANSION_NAME)
     for card_name in card_list:
         progress += 1
         if progress < config.START_FROM:
             continue
         logs.log_progress(card_name, progress, len(card_list))
-        driver.implicitly_wait(0)
-
-        # Compose the card page url from the card's name
-        card_url = config.BASE_URL + config.EXPANSION_NAME + '/' \
-            + web.urlify(card_name)
+        web.driver.implicitly_wait(0)
 
         # Try to load the page 3 times
         for try_num in range(3):
 
             # Wait for the card page to be loaded
             start = tm.time()
-            if not web.load_card_page(driver, card_url):
+            if not web.load_card_page(card_name):
                 logr(f"                Page loading timed out. Retrying...\n")
                 web.cooldown(try_num - 1)
                 continue
@@ -65,14 +61,14 @@ def main():
 
             # Keep pressing the Load More button
             logr("                Expanding page...")
-            if not web.click_load_more_button(driver):
+            if not web.click_load_more_button():
                 logr(f"                Expanding timed out. Retrying...")
                 web.cooldown(try_num)
                 continue
             logr(f"                Time: {round(tm.time() - start, 3)}\n")
 
             # Create a soup from the website source code
-            card_soup = web.create_soup(driver.page_source)
+            card_soup = web.get_soup()
 
             # If the card page is valid, save it
             if web.is_valid_card_page(card_soup):
@@ -93,11 +89,35 @@ def main():
         # Get all sellers from the card page
         logr(" = Sellers = ")
         logr("Task - Updating sellers")
-        sellers = data.get_seller_names(card_soup)
+        seller_set = data.get_seller_names(card_soup)
+        read_sellers = len(seller_set)
 
         # Investigate and add only not added sellers
-        driver.implicitly_wait(2.5)
-        web.iterate_over_sellers(driver, sellers, data.load_csv('seller'))
+        web.driver.implicitly_wait(2.5)
+        start = tm.time()
+
+        # Define loop-control variables and iterate over every seller
+        new_sellers = 0
+        seller_df = data.load_df('seller')
+        to_add = [x for x in seller_set if x not in seller_df['name'].values]
+        if len(to_add) > 1:
+            logr(f"{len(to_add)} new sellers to be added.")
+        for seller_name in to_add:
+
+            # Try to get seller data from page
+            for try_num in range(3):
+                seller_soup = web.load_seller_page(seller_name)
+                web.cooldown(-4 + 3 * try_num)   # 1.97s -> 6.67s -> 22.5s
+                seller_soup = web.get_soup()
+                updated = data.add_seller(seller_df, seller_soup)
+                if updated is not None:
+                    seller_df = updated
+                    new_sellers += 1
+                    break
+                web.cooldown(-7 + 2 * try_num)  # 0.58s -> 1.31s -> 2.96s
+
+        # Task finished
+        data.save_new_sellers(seller_df, new_sellers, read_sellers, start)
 
         # Get all sale offers from the page
         logr(" = Offers = ")
@@ -113,7 +133,7 @@ def main():
     config.START_FROM = 1
 
     # Clean the pickle data (post-acquisition)
-    removed = data.clean_pickles()
+    removed = data.prune_local_data()
     logr(f"Pickle data validated (removed {removed} records)\n")
 
     # Transform the data back from pickle to .csv format
