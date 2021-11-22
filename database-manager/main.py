@@ -62,13 +62,21 @@ def main():
 
     for table_name in new_data.keys():
         table = data.select_table(table_name)
-        log("Table: %s" % table_name)
-        log(table.info())
-        log(table.describe())
-        tm.sleep(3)
+        log("Table selected: %s" % table_name)
 
-    tm.sleep(10)
-    db.test()
+    # Generate new tables
+    seller = data.select_table('seller')
+    for s_type in seller['type'].unique().values:
+        data.update_table(seller[seller['type'] == s_type], s_type)
+
+    card = data.select_table('card')
+    for rarity in card['rarity'].unique().values:
+        data.update_table(card[card['rarity'] == rarity], rarity)
+
+    offers = data.select_table('sale_offer')
+    for date_id in offers['date_id'].unique().values:
+        data.update_table(offers[offers['date_id'] == date_id],
+                          'sale_offer_' + str(date_id))
 
     # Close the connection to the database
     db.close_connection()

@@ -54,8 +54,7 @@ services:
     environment:
       MYSQL_DATABASE: gathering
       MYSQL_USER: database-manager
-      MYSQL_PASSWORD: pZV3RjEjpZV3RjEj
-      MYSQL_ROOT_PASSWORD: pZV3RjEjpZV3RjEj
+      MYSQL_PASSWORD: pZV3RjEj_pZV3RjEj
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
