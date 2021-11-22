@@ -11,8 +11,8 @@ from services import flags_service as flags
 from services.logs_service import log, logr
 
 
-def load_df(entity):
-    if entity in ['date', 'seller']:
+def load_df(entity, force_csv=False):
+    if entity in ['date', 'seller'] or force_csv:
         try:
             return pd.read_csv(f'./data/{entity}.csv',
                                compression='gzip', sep=';', encoding="utf-8")
@@ -102,10 +102,10 @@ def pickle_data():
         if entity == 'sale_offer' and df_size:
             df = df[df['date_id'] == config.DATE_ID]
             pct = 100.0 * (df_size - len(df.index)) / df_size
-            log(f"Loaded sale_offer: {df_size} rows  "
+            log(f"Pickling sale_offer: {df_size} rows  "
                 + f"[{len(df.index)} rows selected, {round(pct, 2)}% reduced]")
         else:
-            log(f"Loaded {entity}: {df_size} rows")
+            log(f"Pickling {entity}: {df_size} rows")
 
         # Save each to a pickle
         df.to_pickle(f'./.pickles/{entity}.pkl')
@@ -116,6 +116,7 @@ def unpickle_data():
     '''Convert the data from pickles to csv format.'''
     for entity in ['card', 'card_stats', 'sale_offer']:
         df = load_df(entity)
+        log(f"Unpickling {entity}.")
         if df is not None:
 
             # Merge new sale offers with previous ones
@@ -250,10 +251,10 @@ def is_first_run():
     with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \
             as exp_file:
         card_list = exp_file.readlines()
-    card = load_df('card')
-    card_stats = load_df('card_stats')
-    seller = load_df('seller')
-    sale_offer = load_df('sale_offer')
+    card = load_df('card', force_csv=True)
+    card_stats = load_df('card_stats', force_csv=True)
+    seller = load_df('seller', force_csv=True)
+    sale_offer = load_df('sale_offer', force_csv=True)
 
     # Return if all of the data-related files have empty dataframes inside
     if len(card.index) == 0 \
@@ -273,10 +274,10 @@ def is_data_complete(date_id):
     with open('./data/' + config.EXPANSION_NAME + '.txt', encoding="utf-8") \
             as exp_file:
         card_list = exp_file.readlines()
-    card = load_df('card')
-    card_stats = load_df('card_stats')
-    seller = load_df('seller')
-    sale_offer = load_df('sale_offer')
+    card = load_df('card', force_csv=True)
+    card_stats = load_df('card_stats', force_csv=True)
+    seller = load_df('seller', force_csv=True)
+    sale_offer = load_df('sale_offer', force_csv=True)
 
     # Check for any empty file
     if len(card_list) == 0 \
