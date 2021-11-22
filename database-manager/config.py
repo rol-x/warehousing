@@ -11,7 +11,7 @@ CONTAINER_DELAY = 20
 NAME = 'database-manager'
 HOST = 'mysql_database'
 USER = 'database-manager'
-PWD = 'h4Rd_p4sSW0rD'
+PWD = 'pZV3RjEjpZV3RjEj'
 HEADERS = {"date": ["id",
                     "day",
                     "month",
