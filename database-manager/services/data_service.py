@@ -34,7 +34,7 @@ def select_table(entity: str) -> pd.DataFrame:
 
 
 # TODO: Check out 'append'
-def update_table(entity: str, df: pd.DataFrame) -> None:
+def update_table(df: pd.DataFrame, entity: str) -> None:
     df.to_sql(entity, config.DB, schema='gathering',
               if_exists='replace', index=False, index_label='id')
 

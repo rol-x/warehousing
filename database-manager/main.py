@@ -57,7 +57,7 @@ def main():
     new_data = data.load_isolated_data()
     for table_name, dataframe in new_data.items():
         start = tm.time()
-        data.update_table(table_name, dataframe)
+        data.update_table(dataframe, table_name)
         log(f"Updated {table_name} in {round(tm.time() - start, 3)} seconds.")
 
     for table_name in new_data.keys():
@@ -66,15 +66,15 @@ def main():
 
     # Generate new tables
     seller = data.select_table('seller')
-    for s_type in seller['type'].unique().values:
+    for s_type in seller['type'].unique():
         data.update_table(seller[seller['type'] == s_type], s_type)
 
     card = data.select_table('card')
-    for rarity in card['rarity'].unique().values:
+    for rarity in card['rarity'].unique():
         data.update_table(card[card['rarity'] == rarity], rarity)
 
     offers = data.select_table('sale_offer')
-    for date_id in offers['date_id'].unique().values:
+    for date_id in offers['date_id'].unique():
         data.update_table(offers[offers['date_id'] == date_id],
                           'sale_offer_' + str(date_id))
 
