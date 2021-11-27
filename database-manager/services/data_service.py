@@ -35,8 +35,12 @@ def select_table(entity: str) -> pd.DataFrame:
 
 # TODO: Check out 'append'
 def update_table(df: pd.DataFrame, entity: str) -> None:
-    df.to_sql(entity, config.DB, schema='gathering',
-              if_exists='replace', index=False, index_label='id')
+    try:
+        df.to_sql(entity, config.DB, schema='gathering',
+                  if_exists='replace', index=False, index_label='id')
+    except Exception as exception:
+        log(exception)
+        raise SystemExit from exception
 
 
 # Load and return all the data in dataframes

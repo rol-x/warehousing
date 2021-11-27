@@ -44,10 +44,8 @@ def main():
 
     # Copy data directory to temporary location to prevent mid-update changes
     data.isolate_data()
-    log("Data isolated.")
-
     config.NEW_CHECKSUM = flags.calculate_checksum('./.data')
-    log("Checksum: %s" % config.NEW_CHECKSUM)
+    log("Data isolated.")
 
     # Connect to MySQL server and set the connection as a global variable
     db.connect_to_database()
@@ -57,8 +55,10 @@ def main():
     new_data = data.load_isolated_data()
     for table_name, dataframe in new_data.items():
         start = tm.time()
+        log(f"Updating {table_name}...")
         data.update_table(dataframe, table_name)
-        log(f"Updated {table_name} in {round(tm.time() - start, 3)} seconds.")
+        log(f"Updated {table_name} in "
+            + f"{round(tm.time() - start, 3)} seconds.\n")
 
     for table_name in new_data.keys():
         table = data.select_table(table_name)
