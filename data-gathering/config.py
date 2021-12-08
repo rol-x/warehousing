@@ -2,7 +2,7 @@
 
 # Variables for user custom program configuration
 START_FROM = 1
-FORCE_UPDATE = False
+FORCE_UPDATE = True
 EXPANSION_NAME = 'Battlebond'
 
 # Variables connected to a single run of code
