@@ -103,6 +103,7 @@ def load_card_page(card_name):
     driver.get(config.BASE_URL
                + config.EXPANSION_NAME + '/' + urlify(card_name))
     log_url(driver.current_url)
+    cooldown(-8)
     try:
         WebDriverWait(driver, timeout=5, poll_frequency=0.5) \
             .until(EC.title_contains("MTG Singles | Cardmarket"))

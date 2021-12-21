@@ -55,9 +55,9 @@ def main():
             start = tm.time()
             if not web.load_card_page(card_name):
                 logr(f"                Page loading timed out. Retrying...\n")
-                web.cooldown(try_num - 1)
+                web.cooldown(try_num)
                 continue
-            web.cooldown(-5)
+            web.cooldown(-6)  # 0.87 seconds
 
             # Keep pressing the Load More button
             logr("                Expanding page...")
