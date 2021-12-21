@@ -7,8 +7,6 @@ from services import flags_service as flags
 from services import logs_service as logs
 from services.logs_service import log
 
-# TODO: Fix trying to expand the page when it's not ready (and waiting 20 s.)
-
 
 # Main function
 def main():
@@ -49,34 +47,27 @@ def main():
 
     # Connect to MySQL server and set the connection as a global variable
     db.connect_to_database()
-    log("Database connection established")
+    log("Database connection established.")
 
     # Read the local data from the files
-    new_data = data.load_isolated_data()
-    for table_name, dataframe in new_data.items():
+    tables = data.decompress_data()
+
+    for table_name in tables:
         start = tm.time()
         log(f"Updating {table_name}...")
-        data.update_table(dataframe, table_name)
+        db.update_table(table_name)
         log(f"Updated {table_name} in "
             + f"{round(tm.time() - start, 3)} seconds.\n")
 
-    for table_name in new_data.keys():
-        table = data.select_table(table_name)
-        log("Table selected: %s" % table_name)
+    for table_name in tables:
+        start = tm.time()
+        table = data.load_table(*db.select_table(table_name, "LIMIT 1000"))
+        log("Table selected: %s (in %.3f seconds) "
+            % (table_name, tm.time() - start))
+        log(table.head())
 
-    # Generate new tables
-    seller = data.select_table('seller')
-    for s_type in seller['type'].unique():
-        data.update_table(seller[seller['type'] == s_type], s_type)
-
-    card = data.select_table('card')
-    for rarity in card['rarity'].unique():
-        data.update_table(card[card['rarity'] == rarity], rarity)
-
-    offers = data.select_table('sale_offer')
-    for date_id in offers['date_id'].unique():
-        data.update_table(offers[offers['date_id'] == date_id],
-                          'sale_offer_' + str(date_id))
+    if "id" not in table.columns:
+        raise ValueError
 
     # Close the connection to the database
     db.close_connection()
@@ -100,6 +91,6 @@ if __name__ == '__main__':
             main()
     except Exception as exception:
         log(exception)
-        log(" - Container will restart in 10 minutes.")
-        tm.sleep(10 * 60)
+        log(" - Container will restart in 30 minutes.")
+        tm.sleep(30 * 60)
         raise SystemExit from exception

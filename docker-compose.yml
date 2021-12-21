@@ -35,6 +35,7 @@ services:
       - ./logs:/logs
       - ./flags:/flags
       - isolated_data:/.data
+      - shared_data:/var/lib/mysql-files/
     ports:
       - "3308:3306"
     environment:
@@ -52,11 +53,14 @@ services:
     container_name: mysql_database
     image: mysql/mysql-server
     environment:
-      MYSQL_DATABASE: gathering
-      MYSQL_USER: database-manager
-      MYSQL_PASSWORD: pZV3RjEj_pZV3RjEj
+      - MYSQL_DATABASE=gathering
+      - MYSQL_USER=database-manager
+      - MYSQL_PASSWORD=1234
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_ROOT_HOST=%
     volumes:
       - mysql_data:/var/lib/mysql
+      - shared_data:/var/lib/mysql-files
     ports:
       - "3307:3306"
     restart: always
@@ -64,4 +68,5 @@ services:
 volumes:
   pickle_data:
   isolated_data:
+  shared_data:
   mysql_data:
