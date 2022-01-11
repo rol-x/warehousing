@@ -40,7 +40,7 @@ function sleep(ms) {
 async function cheapestBuy(req, res) {
     console.log("Cheapest Buy calculation (date_id: " + dateId + ")");
 
-    var query = "DROP VIEW IF EXISTS V1"
+    var query = "DROP VIEW IF EXISTS T1"
     con.query(query, (err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message });
@@ -104,6 +104,7 @@ async function cheapestBuy(req, res) {
     });
 }
 
+// Returns "No results found"
 async function bulkBuy(req, res) {
     console.log("Bulk Buy calculation (date_id: " + dateId + ")");
 
@@ -163,6 +164,7 @@ async function bulkBuy(req, res) {
     });
 }
 
+// Works
 async function bestSetSeller(req, res) {
     console.log("Best Set Seller calculation (date_id: " + dateId + ")");
 
@@ -278,7 +280,7 @@ async function bestSetSeller(req, res) {
     });
 }
 
-
+// Works
 function dealFinder(req, res) {
     var isFoiled = req.body.foil == true ? 1 : 0;
     var query = "SELECT card_id, \
