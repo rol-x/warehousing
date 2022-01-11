@@ -1,7 +1,5 @@
 import os
 
-from checksumdir import dirhash
-
 
 # Create flags directory and validated checksums file.
 def setup_flags():
@@ -13,11 +11,6 @@ def setup_flags():
     # Create a file for storing database checksum
     with open('./flags/database-checksum.sha1', 'a+', encoding="utf-8"):
         pass
-
-
-# Return calculated checksum based on the contents of data directory
-def calculate_checksum(directory_path):
-    return str(dirhash(directory_path, 'sha1'))
 
 
 # Get checksums of data files that has been validated

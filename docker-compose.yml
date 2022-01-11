@@ -42,6 +42,23 @@ services:
       - TZ=Europe/Warsaw
     restart: always
 
+  data_miner:
+    container_name: data_miner
+    build:
+      context: ./data-miner
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_database
+    command: python -u ./main.py
+    volumes:
+      - ./logs:/logs
+      - ./flags:/flags
+    ports:
+      - "3309:3306"
+    environment:
+      - TZ=Europe/Warsaw
+    restart: always
+
   node_server:
     container_name: node_server
     build:
@@ -80,7 +97,7 @@ services:
     restart: always
 
 volumes:
-  pickle_data:
-  isolated_data:
-  shared_data:
-  mysql_data:
+  pickle_data: null
+  isolated_data: null
+  shared_data: null
+  mysql_data: null

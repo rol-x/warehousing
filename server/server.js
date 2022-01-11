@@ -53,18 +53,15 @@ async function cheapestBuy(req, res) {
     await sleep(1000);
 
     var isFoiled = req.body.foil == true ? 1 : 0;
-    var query = "CREATE VIEW V1 \
-                 AS \
+    var query = "CREATE VIEW T1 AS \
                  SELECT \
-                        so.seller_id AS seller_id, \
-                        cs.date_id AS date_id, \
-                        so.price AS price, \
-                        AVG(cs.weekly_avg) AS weekly_average \
-                 FROM \
-                        sale_offer so \
-                 INNER JOIN card_stats cs ON so.card_id = cs.card_id AND so.date_id = cs.date_id \
-                 WHERE so.card_id IN (" + String(req.body.cards.join(", ")) + ") \
-                   AND cs.date_id>=" + String(dateId - 14) + "\
+                        seller_id, \
+                        card_id, \
+                        date_id, \
+                        AVG(price) as price, \
+                        AVG(weekly_avg) AS weekly_average \
+                 FROM V1 \
+                 WHERE card_id IN (" + String(req.body.cards.join(", ")) + ") \
                    AND card_condition=\"" + String(req.body.cond) + "\" \
                    AND card_language=\"" + String(req.body.lang) + "\" \
                    AND is_foiled=" + isFoiled + " \
@@ -82,14 +79,14 @@ async function cheapestBuy(req, res) {
     await sleep(1000);
 
     var query = "SELECT seller.name AS seller_name, \
-                        V1.seller_id AS seller_id, \
+                        T1.seller_id AS seller_id, \
                         seller.country AS seller_country, \
                         seller.address AS seller_address, \
                         AVG(price) AS avgerage_price, \
                         MIN(price) AS best_price \
-                 FROM V1 \
+                 FROM T1 \
                  LEFT JOIN seller ON V1.seller_id = seller.id \
-                 GROUP BY V1.seller_id \
+                 GROUP BY T1.seller_id \
                  HAVING avgerage_price <= AVG(weekly_average) \
                  ORDER BY best_price \
                  LIMIT 3"
