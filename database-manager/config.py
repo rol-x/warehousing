@@ -17,6 +17,7 @@ DB_CONFIG = {
 CONTAINER_DELAY = 30
 NAME = 'database-manager'
 
+# SQL related data
 HEADERS = {"date": "id, day, month, year, weekday",
            "card": "id, name, expansion, rarity",
            "seller": "id, name, type, member_since, country, address",

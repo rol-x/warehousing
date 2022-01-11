@@ -42,6 +42,20 @@ services:
       - TZ=Europe/Warsaw
     restart: always
 
+  node_server:
+    container_name: node_server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_database
+    command: node ./server.js
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Europe/Warsaw
+    restart: always
+
   firefox_webdriver:
     container_name: firefox_webdriver
     image: selenium/standalone-firefox

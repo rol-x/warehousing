@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>The Gathering | Cheapest Buy</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body class="page">
+  <div class="spacer"></div>
+  <h1 class="title">Search for the cheapest buy of the wanted card</h1>
+  <form method="post" id="search-form" name="search-form">
+    <div class="row">
+      <div class="col-form">
+        <label for="cardCondition">Card condition</label>
+        <select id="cardCondition" name="cardCondition">
+          <option value="M">Mint</option>
+          <option selected="selected" value="NM">Near Mint</option>
+          <option value="EX">Excellent</option>
+          <option value="GD">Good</option>
+          <option value="LP">Light Played</option>
+          <option value="PL">Played</option>
+          <option value="PO">Poor</option>
+        </select>
+      </div>
+
+      <div class="col-form">
+        <label for="cardLanguage">Card language</label>
+        <select id="cardLanguage" name="cardLanguage">
+          <option selected="selected" value="English">English</option>
+          <option value="S-Chinese">S-Chinese</option>
+          <option value="Japanese">Japanese</option>
+          <option value="German">German</option>
+        </select>
+      </div>
+
+      <div class="col-form">
+        <label for="isFoiled">Is foiled</label>
+        <input type="checkbox" name="isFoiled"><br>
+      </div>
+
+      <div class="col-form">
+        <label for="cardIds">Card IDs</label>
+        <input type="text" name="cardIds" value="1, 264">
+      </div>
+
+      <div class="col-form">
+        <input type="submit" class="button-form" value="Search">
+      </div>
+    </div>
+  </form>
+
+  <pre id="messageBox" class="messageBox"></pre>
+
+  <script src="cheapest-buy.js"></script>
+</body>
+
+</html>

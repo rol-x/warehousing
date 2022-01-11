@@ -1,7 +1,8 @@
 # Helper notebooks
+.ipynb_checkpoints
 *.ipynb
 
-# All logs except custom ones
+# All logs (optionally except custom ones)
 *.log
 #!logs/*/*
 
@@ -15,5 +16,6 @@
 .pickles/
 .data/
 
-# Local database info
-.mysql/
+# Nodejs related files
+node_modules
+npm-debug.log
