@@ -20,14 +20,13 @@ def set_current_date():
         log(f"Failed to fetch current date_id.")
         log(error)
     finally:
-        log("Date ID: " + str(config.DATE_ID))
         cursor.close()
 
 
-def create_view_V1():
+def create_table_last_two_weeks():
     cursor = config.DB_CONN.cursor()
-    drop = "DROP VIEW IF EXISTS V1"
-    create = "CREATE VIEW V1 \
+    drop = "DROP TABLE IF EXISTS last_two_weeks"
+    create = "CREATE TABLE last_two_weeks \
              AS \
              SELECT \
                     so.seller_id AS seller_id, \
@@ -46,26 +45,26 @@ def create_view_V1():
     try:
         cursor.execute(drop)
         cursor.execute(create)
-        log("Created view V1")
+        log("Created table last_two_weeks")
     except mysql.connector.Error as error:
-        log(f"Error creating view V1.")
+        log(f"Error creating table last_two_weeks.")
         log(error)
     finally:
         cursor.close()
 
 
-def create_view_offers_today():
+def create_table_offers_today():
     cursor = config.DB_CONN.cursor()
-    drop = "DROP VIEW IF EXISTS OFFERS_TODAY"
-    create = "CREATE VIEW OFFERS_TODAY AS \
+    drop = "DROP TABLE IF EXISTS offers_today"
+    create = "CREATE TABLE offers_today AS \
               SELECT * FROM sale_offer \
               WHERE date_id=" + str(config.DATE_ID)
     try:
         cursor.execute(drop)
         cursor.execute(create)
-        log("Created view OFFERS_TODAY")
+        log("Created table offers_today")
     except mysql.connector.Error as error:
-        log(f"Error creating view OFFERS_TODAY.")
+        log(f"Error creating table offers_today.")
         log(error)
     finally:
         cursor.close()

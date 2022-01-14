@@ -19,7 +19,6 @@
     const cardCondition = form.elements['cardCondition'].value;
     const cardLanguage = form.elements['cardLanguage'].value;
     const isFoiled = form.elements['isFoiled'].checked;
-    const moneyLimit = form.elements['moneyLimit'].value
 
     let options = {
       method: 'POST',
@@ -28,11 +27,10 @@
       body: JSON.stringify({
           cond: cardCondition,
           lang: cardLanguage,
-          foil: isFoiled,
-          money: moneyLimit
+          foil: isFoiled
       }), };
 
-    fetch('/api/bulk-buy', options)
+    fetch('/api/dealmakers', options)
       .then(handleResponse)
       .then(showMessage)
       .catch(function (err) {

@@ -30,8 +30,8 @@ def main():
         log("Date ID: %s" % config.DATE_ID)
 
         # Create data marts
-        db.create_view_V1()
-        db.create_view_offers_today()
+        db.create_table_last_two_weeks()
+        db.create_table_offers_today()
 
         # Close the connection to the database
         db.close_connection()
