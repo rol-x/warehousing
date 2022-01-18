@@ -4,9 +4,8 @@ import config
 from services import database_service as db
 from services import flags_service as flags
 from services import logs_service as logs
+from services import mining_service as miner
 from services.logs_service import log
-
-# CREATE THE VIEWS FROM server.js HERE
 
 
 # Main function
@@ -36,6 +35,10 @@ def main():
         # Close the connection to the database
         db.close_connection()
         log("Connection closed.")
+
+        sale_offer = miner.load_sale_offer()
+        log("Sale offer yesterday for card 5: \n%s" %
+            sale_offer[(sale_offer.date_id == config.DATE_ID - 1) & (sale_offer.card_id == 5)])  # noqa
 
         log("- Job is done. Waiting 60 minutes.")
         tm.sleep(60 * 60)
