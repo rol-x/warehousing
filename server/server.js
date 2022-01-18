@@ -20,17 +20,8 @@ var con = mysql.createConnection({
 });
 
 var dateId = 1
-con.connect(function (err) {
-    if (err) { console.log(err.message); throw err; }
-    var date = "SELECT MAX(date_id) AS this_date FROM sale_offer"
-    con.query(date, function (err, row) {
-        if (err) throw err;
-        dateId = row[0].this_date;
-        console.log("Connected to the database (Date ID: " + dateId + ").");
-    });
-});
 
-//////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
 function sleep(ms) {
     return new Promise((resolve) => {
@@ -38,7 +29,40 @@ function sleep(ms) {
     });
 }
 
-// Works
+async function connect() {
+    await sleep(10 * 1000);
+    con.connect(async function (err) {
+        if (err) { console.log(err.message); throw err; }
+        console.log("Database connection established.");
+        var check = "SELECT COUNT(DISTINCT `table_name`) AS tables \
+                    FROM `information_schema`.`columns` \
+                    WHERE `table_schema` = 'gathering'"
+        wait = true;
+        while (wait) {
+            con.query(check, function (err, row) {
+                if (err) throw err;
+                wait = false;
+                if (row[0].tables < 7) {
+                    console.log("Waiting for the database to be ready...");
+                    wait = true;
+                }
+            });
+            if (wait) {
+                await sleep(60 * 1000);
+            }
+        }
+        var date = "SELECT MAX(date_id) AS this_date FROM sale_offer"
+        con.query(date, function (err, row) {
+            if (err) throw err;
+            dateId = row[0].this_date;
+            console.log("Date ID: " + dateId + ".");
+        });
+    });
+} connect();
+
+//////////////////////////////////////////////////////////
+
+// Shows the cheapest reliable price of a card
 async function cheapestBuy(req, res) {
     console.log("Cheapest Buy calculation (date_id: " + dateId + ")");
 
@@ -106,7 +130,7 @@ async function cheapestBuy(req, res) {
     });
 }
 
-// Works
+// Returns a seller with most of the provided cards
 async function bestSetSeller(req, res) {
     console.log("Best Set Seller calculation (date_id: " + dateId + ")");
 
@@ -202,7 +226,7 @@ async function bestSetSeller(req, res) {
     });
 }
 
-// Works
+// Finds the best sellers for buying discounted cards
 async function dealmakers(req, res) {
     console.log("Dealmakers calculation (date_id: " + dateId + ")");
 
@@ -273,7 +297,7 @@ async function dealmakers(req, res) {
     });
 }
 
-// Works
+// Orders provided cards by the discount available
 function dealFinder(req, res) {
     var isFoiled = req.body.foil == true ? 1 : 0;
     var query = "SELECT card_id, \

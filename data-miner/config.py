@@ -14,7 +14,7 @@ DB_CONFIG = {
 }
 
 # Fixed variables
-CONTAINER_DELAY = 30
+CONTAINER_DELAY = 60
 NAME = 'database-manager'
 HEADERS = {"date": "id, day, month, year, weekday",
            "card": "id, name, expansion, rarity",

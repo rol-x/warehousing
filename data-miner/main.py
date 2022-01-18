@@ -16,13 +16,17 @@ def main():
     # Wait until new verified dataset is present
     while True:
         if flags.get_database_checksum() != flags.get_validated_checksums()[-1]:  # noqa
-            log(" - New data found to be loaded into the database. Waiting 10 minutes.")  # noqa
-            tm.sleep(10 * 60)
+            log(" - New data found to be loaded into the database. Waiting 5 minutes.")  # noqa
+            tm.sleep(5 * 60)
             continue
 
         # Connect to the database and get current date_id
         db.connect_to_database()
         log("Connected to the database.")
+
+        while db.check_database() < 5:
+            log("Waiting for the database to be ready...")
+            tm.sleep(60)
 
         # Set current date ID
         db.set_current_date()

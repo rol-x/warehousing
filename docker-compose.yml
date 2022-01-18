@@ -9,7 +9,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - firefox_webdriver
-    command: python -u ./main.py
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -29,7 +28,6 @@ services:
     depends_on:
       - data_gathering
       - mysql_database
-    command: python -u ./main.py
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -49,7 +47,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mysql_database
-    command: python -u ./main.py
     volumes:
       - ./logs:/logs
       - ./flags:/flags
@@ -66,7 +63,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mysql_database
-    command: node ./server.js
     ports:
       - "8080:8080"
     environment:

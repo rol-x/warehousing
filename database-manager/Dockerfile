@@ -1,10 +1,8 @@
-FROM python:3
+FROM python:3.8-slim
 
 COPY . .
 
-RUN pip install checksumdir
-RUN pip install mysql-connector-python
-RUN pip install pandas
+RUN pip install checksumdir mysql-connector-python pandas
 
 CMD [ "python", "-u", "./main.py" ]
 

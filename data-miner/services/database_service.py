@@ -10,6 +10,23 @@ def connect_to_database():
         cursor.execute("USE gathering")
 
 
+def check_database():
+    cursor = config.DB_CONN.cursor(buffered=True)
+    check = "SELECT COUNT(DISTINCT `table_name`) AS tables \
+             FROM `information_schema`.`columns` \
+             WHERE `table_schema` = 'gathering'"
+    tables = -1
+    try:
+        cursor.execute(check)
+        tables = cursor.fetchone()[0]
+    except mysql.connector.Error as error:
+        log(f"Failed to fetch the number of tables.")
+        log(error)
+    finally:
+        cursor.close()
+        return tables
+
+
 def set_current_date():
     cursor = config.DB_CONN.cursor(buffered=True)
     date = "SELECT MAX(date_id) as this_date FROM sale_offer"
