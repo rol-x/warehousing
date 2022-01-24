@@ -144,8 +144,6 @@ def click_load_more_button():
             return False
         except common.exceptions.NoSuchAttributeException:
             return False
-        except common.exceptions.ErrorInResponseException:
-            return False
         except Exception as exception:
             logr(exception)
             return False

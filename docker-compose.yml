@@ -9,7 +9,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - firefox_webdriver
-    command: python -u ./main.py
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -29,7 +28,6 @@ services:
     depends_on:
       - data_gathering
       - mysql_database
-    command: python -u ./main.py
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -38,6 +36,35 @@ services:
       - shared_data:/var/lib/mysql-files/
     ports:
       - "3308:3306"
+    environment:
+      - TZ=Europe/Warsaw
+    restart: always
+
+  data_miner:
+    container_name: data_miner
+    build:
+      context: ./data-miner
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_database
+    volumes:
+      - ./logs:/logs
+      - ./flags:/flags
+    ports:
+      - "3309:3306"
+    environment:
+      - TZ=Europe/Warsaw
+    restart: always
+
+  node_server:
+    container_name: node_server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_database
+    ports:
+      - "8080:8080"
     environment:
       - TZ=Europe/Warsaw
     restart: always
@@ -66,7 +93,7 @@ services:
     restart: always
 
 volumes:
-  pickle_data:
-  isolated_data:
-  shared_data:
-  mysql_data:
+  pickle_data: null
+  isolated_data: null
+  shared_data: null
+  mysql_data: null
