@@ -12,9 +12,9 @@ def connect_to_database():
 
 def check_database():
     cursor = config.DB_CONN.cursor(buffered=True)
-    check = "SELECT COUNT(DISTINCT `table_name`) AS tables \
-             FROM `information_schema`.`columns` \
-             WHERE `table_schema` = 'gathering'"
+    check = """SELECT COUNT(*) AS tables_number
+               FROM INFORMATION_SCHEMA.TABLES
+               WHERE TABLE_SCHEMA = 'gathering'"""
     tables = -1
     try:
         cursor.execute(check)
@@ -23,6 +23,7 @@ def check_database():
         log(f"Failed to fetch the number of tables.")
         log(error)
     finally:
+        log(f"Tables number: {tables}")
         cursor.close()
         return tables
 

@@ -26,7 +26,7 @@ def main():
 
         while db.check_database() < 5:
             log("Waiting for the database to be ready...")
-            tm.sleep(60)
+            tm.sleep(2 * 60)
 
         # Set current date ID
         db.set_current_date()

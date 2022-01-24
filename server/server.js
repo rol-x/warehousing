@@ -34,21 +34,22 @@ async function connect() {
     con.connect(async function (err) {
         if (err) { console.log(err.message); throw err; }
         console.log("Database connection established.");
-        var check = "SELECT COUNT(DISTINCT `table_name`) AS tables \
-                    FROM `information_schema`.`columns` \
-                    WHERE `table_schema` = 'gathering'"
+        var check = "SELECT COUNT(*) AS tables_number \
+                     FROM INFORMATION_SCHEMA.TABLES \
+                     WHERE TABLE_SCHEMA = 'gathering'"
         wait = true;
         while (wait) {
             con.query(check, function (err, row) {
                 if (err) throw err;
                 wait = false;
-                if (row[0].tables < 7) {
+                if (row[0].tables_number < 7) {
+                    console.log("Tables number: " + row[0].tables_number)
                     console.log("Waiting for the database to be ready...");
                     wait = true;
                 }
             });
             if (wait) {
-                await sleep(60 * 1000);
+                await sleep(120 * 1000);
             }
         }
         var date = "SELECT MAX(date_id) AS this_date FROM sale_offer"
