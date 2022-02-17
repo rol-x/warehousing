@@ -49,6 +49,9 @@ def main():
         db.close_connection()
         log("Connection closed.")
 
+        # Perform the analysis
+        miner.analyze(date, card, seller, card_stats, sale_offer)
+
         log("- Job is done. Waiting 60 minutes.")
         tm.sleep(60 * 60)
 
