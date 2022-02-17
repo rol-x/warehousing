@@ -74,6 +74,8 @@ services:
     image: selenium/standalone-firefox
     ports:
       - "4444:4444"
+    logging:
+      driver: none
     restart: always
 
   mysql_database:
@@ -90,6 +92,8 @@ services:
       - shared_data:/var/lib/mysql-files
     ports:
       - "3307:3306"
+    logging:
+      driver: none
     restart: always
 
   st-agent:
@@ -112,6 +116,8 @@ services:
       - /sys:/host/sys:ro
       - /dev:/hostfs/dev:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    logging:
+      driver: none
     restart: always
 
 volumes:
