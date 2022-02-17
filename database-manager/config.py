@@ -1,6 +1,6 @@
 """Store and initialize global configuration of the program."""
 
-# Variables connected to this single run of the code
+# Variables connected to a single run of the code
 DB_CONN = None
 NEW_CHECKSUM = ''
 MAIN_LOGNAME = 'other_main.log'
@@ -17,15 +17,7 @@ DB_CONFIG = {
 CONTAINER_DELAY = 30
 NAME = 'database-manager'
 
-# SQL related data
-HEADERS = {"date": "id, day, month, year, weekday",
-           "card": "id, name, expansion, rarity",
-           "seller": "id, name, type, member_since, country, address",
-           "card_stats": "id, card_id, price_from, monthly_avg, "
-                         + "weekly_avg, daily_avg, available_items, date_id",
-           "sale_offer": "id, seller_id, price, card_id, card_condition, "
-                         + "card_language, is_foiled, amount, date_id"}
-
+# SQL static queries
 DROP = {"date": "DROP TABLE IF EXISTS date",
         "card": "DROP TABLE IF EXISTS card",
         "seller": "DROP TABLE IF EXISTS seller",

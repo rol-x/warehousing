@@ -16,23 +16,16 @@ def update_table(table_name):
     try:
         drop = config.DROP[table_name]
         create = config.CREATE[table_name]
-        headers = config.HEADERS[table_name]
         load = f'''LOAD DATA
                    INFILE '/var/lib/mysql-files/{table_name}.csv'
                    REPLACE
                    INTO TABLE {table_name}
                    FIELDS TERMINATED BY ';'
                    IGNORE 1 LINES'''
-        #    (''' + headers + ''')
 
         cursor.execute(drop)
         cursor.execute(create)
         cursor.execute(load)
-
-        # cols = headers.split(', ')
-        # for i in range(len(cols)):
-        #     cursor.execute(f'''ALTER TABLE {table_name}
-        #                        RENAME COLUMN `{i}` TO `{cols[i]}`''')
 
         config.DB_CONN.commit()
     except mysql.connector.Error as error:

@@ -2,7 +2,6 @@ import os
 import shutil
 import time as tm
 
-import config
 import pandas as pd
 
 from services.logs_service import log
