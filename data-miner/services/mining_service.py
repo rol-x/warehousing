@@ -2,37 +2,34 @@ import config
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pandas.io.sql as psql
 import seaborn as sns
-from sqlalchemy import create_engine
 
 from services.logs_service import log
 
-engine = create_engine('mysql://root:root@mysql_database/gathering')
+
+def load_table(table_name: str):
+    df = pd.DataFrame()
+    try:
+        cursor = config.DB_CONN.cursor()
+        if table_name == 'sale_offer':
+            raise Exception("Table over 10M rows needs different approach.")
+        select = f"SELECT * FROM {table_name}"
+        cursor.execute(select)
+        df = pd.DataFrame(cursor.fetchall(), columns=cursor.column_names)
+    except Exception as exception:
+        log(f"SQL query failed. {exception}")
+        log("Reading from local storage...")
+        df = pd.read_csv(f'./data/{table_name}.csv',
+                         compression='gzip', sep=';', encoding="utf-8")
+    finally:
+        log("Successfully read table " + table_name)
+        return df
 
 
-def load_instant():
-    with engine.connect() as conn, conn.begin():
-        sale_offer = pd.read_sql_table("sale_offer", conn)
-    return sale_offer
-
-
-def load_sale_offer():
-    chunk_size = 100000
-    offset = 0
-    dfs = []
-    conn = engine.connect()
-    while True:
-        sql = "SELECT * FROM sale_offer \
-            LIMIT %d OFFSET %d ORDER BY id" % (chunk_size, offset)
-        dfs.append(psql.read_sql_query(sql, conn))
-        offset += chunk_size
-        log("Chunk appended. Total rows: %s" % offset)
-        if len(dfs[-1]) < chunk_size:
-            break
-    full_df = pd.concat(dfs)
-    return full_df
-
-# for chunk in pd.read_sql_query
-#   'SELECT * FROM %s' % table_name, engine, chunksize=5):
-#    print(chunk)
+def load_all():
+    date = load_table("date")
+    card = load_table("card")
+    seller = load_table("seller")
+    card_stats = load_table("card_stats")
+    sale_offer = load_table("sale_offer")
+    return date, card, seller, card_stats, sale_offer

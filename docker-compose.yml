@@ -50,6 +50,7 @@ services:
     volumes:
       - ./logs:/logs
       - ./flags:/flags
+      - ./data:/data
     ports:
       - "3309:3306"
     environment:

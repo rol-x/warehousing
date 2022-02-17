@@ -36,13 +36,18 @@ def main():
         db.create_table_last_two_weeks()
         db.create_table_offers_today()
 
+        date, card, seller, card_stats, sale_offer = miner.load_all()
+        log("Sale offer yesterday for card 5: \n%s" %
+            sale_offer[(sale_offer.date_id == config.DATE_ID - 1) & (sale_offer.card_id == 5)])  # noqa
+        log("Card stats yesterday for card 5: \n%s" %
+            card_stats[(card_stats.date_id == config.DATE_ID - 1) & (card_stats.card_id == 5)])  # noqa
+        log("Last 3 sellers: \n%s" % seller.tail(3))
+        log("Last 3 dates: \n%s" % date.tail(3))
+        log("Card number 178: \n%s" % card[card.id == 178])
+
         # Close the connection to the database
         db.close_connection()
         log("Connection closed.")
-
-        sale_offer = miner.load_sale_offer()
-        log("Sale offer yesterday for card 5: \n%s" %
-            sale_offer[(sale_offer.date_id == config.DATE_ID - 1) & (sale_offer.card_id == 5)])  # noqa
 
         log("- Job is done. Waiting 60 minutes.")
         tm.sleep(60 * 60)
