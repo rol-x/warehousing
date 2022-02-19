@@ -51,6 +51,7 @@ services:
       - ./logs:/logs
       - ./flags:/flags
       - ./data:/data
+      - ./analysis:/analysis
     ports:
       - "3309:3306"
     environment:
