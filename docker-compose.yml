@@ -98,29 +98,6 @@ services:
       driver: none
     restart: always
 
-  st-agent:
-    container_name: sematext_agent
-    image: sematext/agent:latest
-    environment:
-      - INFRA_TOKEN=6291dc33-84e8-4557-9add-dfd972a367c8
-      - SERVER_BASE_URL=https://spm-receiver.sematext.com
-      - LOGS_RECEIVER_URL=https://logsene-receiver.sematext.com
-      - EVENT_RECEIVER_URL=https://event-receiver.sematext.com
-      - COMMAND_SERVER_URL=https://command.sematext.com
-    cap_add:
-      - SYS_ADMIN
-    volumes:
-      - /:/hostfs:ro
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
-      - /var/run/:/var/run
-      - /sys/kernel/debug:/sys/kernel/debug
-      - /sys:/host/sys:ro
-      - /dev:/hostfs/dev:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    logging:
-      driver: none
-    restart: always
 
 volumes:
   pickle_data: null
