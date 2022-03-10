@@ -1,6 +1,7 @@
 """Scrape the card market website to get all the neccessary data."""
 import os
 import time as tm
+import warnings
 
 import config
 from services import data_service as data
@@ -8,6 +9,8 @@ from services import flags_service as flags
 from services import logs_service as logs
 from services import web_service as web
 from services.logs_service import log, logr
+
+warnings.filterwarnings("ignore")
 
 # TODO: Change singular to plural in entities use, not in model
 # TODO: Cast id columns of card_stats to int.

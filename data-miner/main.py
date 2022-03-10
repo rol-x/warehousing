@@ -1,4 +1,5 @@
 import time as tm
+import warnings
 
 import config
 from services import database_service as db
@@ -6,6 +7,8 @@ from services import flags_service as flags
 from services import logs_service as logs
 from services import mining_service as miner
 from services.logs_service import log
+
+warnings.filterwarnings("ignore")
 
 
 # Main function
